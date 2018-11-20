@@ -168,8 +168,8 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 			}
 		} catch (IOException e) {
 			ErrorLogger.error(logger, e,
-					"Call method channel.basicAck(deliveryTag==[{}], multiple==[false]) throw IOException -> {}",
-					deliveryTag, e.getMessage());
+					"Call method channel.basicAck(deliveryTag==[{}], multiple==[{}]) throw IOException -> {}",
+					deliveryTag, isMultipleAck, e.getMessage());
 			return ack0(deliveryTag, ++retry);
 		}
 
