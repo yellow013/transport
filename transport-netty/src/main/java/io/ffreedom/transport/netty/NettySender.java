@@ -1,6 +1,6 @@
 package io.ffreedom.transport.netty;
 
-import static io.ffreedom.common.log.LogSequence.sysMicrosecond;
+import static io.ffreedom.common.log.SysSequence.microsecond;
 
 import org.slf4j.Logger;
 
@@ -49,14 +49,14 @@ public class NettySender implements Sender<byte[]> {
 
 	@Override
 	public void sent(byte[] msg) {
-		logger.debug(sysMicrosecond() + " call sender send -> data length : " + msg.length);
+		logger.debug(microsecond() + " call sender send -> data length : " + msg.length);
 		ByteBuf byteBuf = context.alloc().buffer(msg.length);
 		byteBuf.writeBytes(msg);
 		ChannelFuture writeAndFlush = context.writeAndFlush(byteBuf.retain());
 		writeAndFlush.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				logger.debug(sysMicrosecond() + " call sender send operation complete -> data length : "
+				logger.debug(microsecond() + " call sender send operation complete -> data length : "
 						+ byteBuf.writerIndex());
 				byteBuf.clear();
 				byteBuf.release();
