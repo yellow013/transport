@@ -1,6 +1,6 @@
 package io.ffreedom.transport.netty;
 
-import static io.ffreedom.common.log.LogSequence.sysMicrosecond;
+import static io.ffreedom.common.log.SysSequence.sysMicrosecond;
 
 import org.slf4j.Logger;
 
