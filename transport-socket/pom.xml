@@ -14,7 +14,10 @@
 	<name>transport-socket</name>
 
 	<dependencies>
-		
+		<dependency>
+			<groupId>io.ffreedom</groupId>
+			<artifactId>transport-core</artifactId>
+		</dependency>
 	</dependencies>
-	
+
 </project>

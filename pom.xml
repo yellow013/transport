@@ -24,6 +24,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<transport-core.version>1.0</transport-core.version>
 	</properties>
 
 	<build>
@@ -52,11 +53,16 @@
 			<artifactId>commons</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>io.ffreedom</groupId>
-			<artifactId>transport-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.ffreedom</groupId>
+				<artifactId>transport-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 </project>

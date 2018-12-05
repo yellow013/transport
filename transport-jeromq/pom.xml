@@ -15,6 +15,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>io.ffreedom</groupId>
+			<artifactId>transport-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.zeromq</groupId>
 			<artifactId>jeromq</artifactId>
 			<version>0.4.3</version>
