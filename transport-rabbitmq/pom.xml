@@ -14,13 +14,11 @@
 	<name>transport-rabbitmq</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>io.ffreedom</groupId>
-			<artifactId>transport-core</artifactId>
-		</dependency>
+		<!-- rabbitmq amqp-client -->
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
+			<version>5.5.1</version>
 		</dependency>
 	</dependencies>
 

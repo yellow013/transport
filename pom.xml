@@ -52,38 +52,11 @@
 			<artifactId>commons</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>io.ffreedom</groupId>
+			<artifactId>transport-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>io.ffreedom</groupId>
-				<artifactId>transport-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-all</artifactId>
-				<version>4.1.31.Final</version>
-			</dependency>
-			<dependency>
-				<groupId>org.zeromq</groupId>
-				<artifactId>jeromq</artifactId>
-				<version>0.4.3</version>
-			</dependency>
-			<!-- rabbitmq amqp-client -->
-			<dependency>
-				<groupId>com.rabbitmq</groupId>
-				<artifactId>amqp-client</artifactId>
-				<version>5.5.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>4.5.6</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 
 </project>
