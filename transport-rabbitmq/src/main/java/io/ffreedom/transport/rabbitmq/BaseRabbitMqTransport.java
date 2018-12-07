@@ -75,13 +75,12 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 				} else {
 					logger.info("{} -> is not normal shutdown.", tag);
 					// 如果回调函数不为null, 则执行此函数
-					if (shutdownEvent != null) {
+					if (shutdownEvent != null)
 						shutdownEvent.accept(shutdownSignalException);
-					}
 				}
 			});
 			channel = connection.createChannel();
-			channel.basicQos(3000);
+			channel.basicQos(500);
 			logger.info("Call method connection.createChannel() finished, tag -> {}, channel number -> {}", tag,
 					channel.getChannelNumber());
 			logger.info("All connection call method successful...");
