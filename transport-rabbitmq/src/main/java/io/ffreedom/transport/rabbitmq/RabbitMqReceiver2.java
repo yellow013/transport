@@ -88,7 +88,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport implements Receiver
 //			}, (consumerTag) -> {
 //			}, (consumerTag, shutdownException) -> {
 //			});
-
+			
 			// param1: queue
 			// param2: autoAck
 			// param3: consumeCallback

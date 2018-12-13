@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.zeromq.ZMQ;
 
+import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
@@ -58,8 +59,8 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 	}
 
 	public static void main(String[] args) {
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5555").setIoThreads(1)
-				.setTopic("cu").build();
+		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
+				.setTopic("").build();
 
 		JeroMqPublisher publisher = new JeroMqPublisher(configurator);
 
@@ -67,6 +68,7 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 
 		for (;;) {
 			publisher.publish(String.valueOf(random.nextInt()).getBytes());
+			ThreadUtil.sleep(1000);
 		}
 	}
 
