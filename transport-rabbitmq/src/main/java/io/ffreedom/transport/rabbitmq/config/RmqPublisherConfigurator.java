@@ -5,6 +5,7 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.MessageProperties;
 
 import io.ffreedom.common.functional.ShutdownEvent;
+import io.ffreedom.common.utils.StringUtil;
 
 public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublisherConfigurator> {
 
@@ -90,18 +91,39 @@ public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublishe
 		return builtinExchangeType;
 	}
 
-	public RmqPublisherConfigurator setMode(ExchangeType exchangeType) {
+	public RmqPublisherConfigurator setMode(ExchangeType exchangeType, String sendTarget) {
+		return setMode(exchangeType, sendTarget, null, null);
+	}
+
+	public RmqPublisherConfigurator setMode(ExchangeType exchangeType, String sendTarget, String[] bindQueues) {
+		return setMode(exchangeType, sendTarget, null, bindQueues);
+	}
+
+	public RmqPublisherConfigurator setMode(ExchangeType exchangeType, String sendTarget, String routingKey,
+			String[] bindQueues) {
 		if (exchangeType == null)
 			throw new IllegalArgumentException("Param exchangeType not allowed null");
 		switch (exchangeType) {
 		case DIRECT:
 			this.builtinExchangeType = BuiltinExchangeType.DIRECT;
+			if (!StringUtil.isNullOrEmpty(sendTarget))
+				this.directQueue = sendTarget;
 			return this;
 		case FANOUT:
 			this.builtinExchangeType = BuiltinExchangeType.FANOUT;
+			if (!StringUtil.isNullOrEmpty(sendTarget))
+				this.exchange = sendTarget;
+			if (bindQueues != null)
+				this.bindQueues = bindQueues;
 			return this;
 		case TOPIC:
 			this.builtinExchangeType = BuiltinExchangeType.TOPIC;
+			if (!StringUtil.isNullOrEmpty(sendTarget))
+				this.exchange = sendTarget;
+			if (!StringUtil.isNullOrEmpty(routingKey))
+				this.routingKey = routingKey;
+			if (bindQueues != null)
+				this.bindQueues = bindQueues;
 			return this;
 		default:
 			return this;
@@ -109,28 +131,19 @@ public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublishe
 	}
 
 	public RmqPublisherConfigurator setModeDirect(String directQueue) {
-		this.builtinExchangeType = BuiltinExchangeType.DIRECT;
-		this.directQueue = directQueue;
-		return this;
+		return setMode(ExchangeType.DIRECT, directQueue);
 	}
 
 	public RmqPublisherConfigurator setModeFanout(String exchange) {
-		return setModeFanoutAndBindQueues(exchange, null);
+		return setMode(ExchangeType.FANOUT, exchange);
 	}
 
 	public RmqPublisherConfigurator setModeFanoutAndBindQueues(String exchange, String[] bindQueues) {
-		this.builtinExchangeType = BuiltinExchangeType.FANOUT;
-		this.exchange = exchange;
-		this.bindQueues = bindQueues;
-		return this;
+		return setMode(ExchangeType.FANOUT, exchange, bindQueues);
 	}
 
 	public RmqPublisherConfigurator setModeTopic(String exchange, String routingKey, String[] bindQueues) {
-		this.builtinExchangeType = BuiltinExchangeType.TOPIC;
-		this.exchange = exchange;
-		this.routingKey = routingKey;
-		this.bindQueues = bindQueues;
-		return this;
+		return setMode(ExchangeType.FANOUT, exchange, routingKey, bindQueues);
 	}
 
 	/**
