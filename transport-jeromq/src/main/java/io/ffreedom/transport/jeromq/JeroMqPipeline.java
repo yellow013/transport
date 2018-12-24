@@ -4,7 +4,7 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
-import io.ffreedom.common.functional.MsgPipeline;
+import io.ffreedom.common.functional.Pipeline;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.Receiver;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
@@ -16,12 +16,12 @@ public class JeroMqPipeline implements Receiver {
 
 	private String receiverName;
 
-	private MsgPipeline<byte[], byte[]> pipeline;
+	private Pipeline<byte[], byte[]> pipeline;
 	private JeroMqConfigurator configurator;
 
 	private volatile boolean isRun = true;
 
-	public JeroMqPipeline(JeroMqConfigurator configurator, MsgPipeline<byte[], byte[]> pipeline) {
+	public JeroMqPipeline(JeroMqConfigurator configurator, Pipeline<byte[], byte[]> pipeline) {
 		if (configurator == null) {
 			throw new NullPointerException("configurator is null in JeroMQReceiver init mothed !");
 		}
