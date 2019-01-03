@@ -80,7 +80,6 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 				}
 			});
 			channel = connection.createChannel();
-			channel.basicQos(500);
 			logger.info("Call method connection.createChannel() finished, tag -> {}, channel number -> {}", tag,
 					channel.getChannelNumber());
 			logger.info("All connection call method successful...");

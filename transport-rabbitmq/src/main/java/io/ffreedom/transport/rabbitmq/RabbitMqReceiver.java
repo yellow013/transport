@@ -37,6 +37,8 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	private int maxAckReconnection;
 	private String receiverName;
 
+	private int qos;
+
 	/**
 	 * 
 	 * @param configurator
@@ -52,6 +54,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 		this.maxAckTotal = configurator.getMaxAckTotal();
 		this.maxAckReconnection = configurator.getMaxAckReconnection();
 		this.errorMsgToExchange = configurator.getErrorMsgToExchange();
+		this.qos = configurator.getQos();
 		createConnection();
 		init();
 	}
@@ -89,6 +92,8 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 //			}, (consumerTag, shutdownException) -> {
 //			});
 
+			if (!isAutoAck)
+				channel.basicQos(qos);
 			// param1: queue
 			// param2: autoAck
 			// param3: consumeCallback
