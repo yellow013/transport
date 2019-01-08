@@ -13,8 +13,6 @@ public final class RabbitMqOperatingTools {
 
 	public static class OperationalChannel extends BaseRabbitMqTransport {
 
-		private Channel channel;
-
 		private OperationalChannel(String tag, ConnectionConfigurator<?> configurator)
 				throws IOException, TimeoutException {
 			super(tag, configurator);
