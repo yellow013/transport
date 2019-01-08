@@ -3,6 +3,8 @@ package io.ffreedom.transport.rabbitmq.config;
 import io.ffreedom.common.functional.ShutdownEvent;
 import io.ffreedom.transport.core.config.TransportConfigurator;
 
+import javax.net.ssl.SSLContext;
+
 public abstract class ConnectionConfigurator<T extends ConnectionConfigurator<?>> implements TransportConfigurator {
 
 	/**
@@ -16,6 +18,7 @@ public abstract class ConnectionConfigurator<T extends ConnectionConfigurator<?>
 	// 连接超时时间
 	protected int connectionTimeout = 60 * 1000;
 
+	protected SSLContext sslContext;
 	/**
 	 * 队列定义参数
 	 */
@@ -43,6 +46,8 @@ public abstract class ConnectionConfigurator<T extends ConnectionConfigurator<?>
 	protected ConnectionConfigurator(String configuratorName) {
 		this.configuratorName = configuratorName;
 	}
+
+	abstract public T setSslContext(SSLContext sslContext);
 
 	abstract public T setConnectionParam(String host, int port);
 
@@ -134,4 +139,7 @@ public abstract class ConnectionConfigurator<T extends ConnectionConfigurator<?>
 		return configuratorName;
 	}
 
+	public SSLContext getSslContext() {
+		return sslContext;
+	}
 }

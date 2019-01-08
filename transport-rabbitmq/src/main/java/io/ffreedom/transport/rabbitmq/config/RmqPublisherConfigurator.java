@@ -7,6 +7,8 @@ import com.rabbitmq.client.MessageProperties;
 import io.ffreedom.common.functional.ShutdownEvent;
 import io.ffreedom.common.utils.StringUtil;
 
+import javax.net.ssl.SSLContext;
+
 public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublisherConfigurator> {
 
 	/**
@@ -144,6 +146,12 @@ public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublishe
 
 	public RmqPublisherConfigurator setModeTopic(String exchange, String routingKey, String[] bindQueues) {
 		return setMode(ExchangeType.FANOUT, exchange, routingKey, bindQueues);
+	}
+
+	@Override
+	public RmqPublisherConfigurator setSslContext(SSLContext sslContext) {
+		this.sslContext = sslContext;
+		return this;
 	}
 
 	/**

@@ -1,11 +1,7 @@
 package io.ffreedom.transport.rabbitmq;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
-
 import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.functional.Callback;
 import io.ffreedom.common.log.ErrorLogger;
@@ -14,6 +10,10 @@ import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.rabbitmq.RabbitMqOperatingTools.OperationalChannel;
 import io.ffreedom.transport.rabbitmq.config.RmqPublisherConfigurator;
+
+import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publisher<byte[]> {
 
@@ -47,15 +47,18 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	private Callback<Long> noAckCallback;
 
 	/**
-	 * 
 	 * @param configurator
 	 */
 	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator) {
-		this(tag, configurator, null, null);
+		this(tag, configurator, null, null, null);
+	}
+
+	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, SSLContext sslContext) {
+		this(tag, configurator, null, null, null);
 	}
 
 	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, Callback<Long> ackCallback,
-			Callback<Long> noAckCallback) {
+			Callback<Long> noAckCallback, SSLContext sslContext) {
 		super(tag, configurator);
 		this.exchange = configurator.getExchange();
 		this.routingKey = configurator.getRoutingKey();
@@ -77,10 +80,9 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 			switch (builtinExchangeType) {
 			case DIRECT:
 				this.routingKey = directQueue != null ? directQueue : "";
-				if (directQueue != null) {
+				if (directQueue != null)
 					operationalChannel.declareQueue(directQueue, configurator.isDurable(), configurator.isExclusive(),
 							configurator.isAutoDelete());
-				}
 				break;
 			case FANOUT:
 				operationalChannel.declareFanoutExchange(exchange);
@@ -112,8 +114,8 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 		} catch (IOException e) {
 			ErrorLogger.error(logger, e, "Call method init() throw IOException -> {}", e.getMessage());
 			destroy();
-		}finally {
-			
+		} finally {
+
 		}
 	}
 
@@ -210,7 +212,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	public class NoAckException extends Exception {
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -197190157920481972L;
 

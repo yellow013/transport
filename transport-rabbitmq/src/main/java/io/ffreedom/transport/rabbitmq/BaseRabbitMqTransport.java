@@ -1,17 +1,6 @@
 package io.ffreedom.transport.rabbitmq;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
-import org.slf4j.Logger;
-
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Method;
-import com.rabbitmq.client.ShutdownSignalException;
-
+import com.rabbitmq.client.*;
 import io.ffreedom.common.functional.ShutdownEvent;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.log.LoggerFactory;
@@ -19,6 +8,11 @@ import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.TransportModule;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
+import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 abstract class BaseRabbitMqTransport implements TransportModule {
 
@@ -36,6 +30,10 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected String tag;
+
+	protected BaseRabbitMqTransport() {
+		// Generally not used
+	}
 
 	/**
 	 * @param tag
@@ -62,6 +60,8 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 			connectionFactory.setConnectionTimeout(configurator.getConnectionTimeout());
 			connectionFactory.setShutdownTimeout(configurator.getShutdownTimeout());
 			connectionFactory.setRequestedHeartbeat(configurator.getRequestedHeartbeat());
+			if (Objects.nonNull(configurator.getSslContext()))
+				connectionFactory.useSslProtocol(configurator.getSslContext());
 		}
 		try {
 			connection = connectionFactory.newConnection();
@@ -70,9 +70,9 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 			connection.addShutdownListener(shutdownSignalException -> {
 				// 输出错误信息到控制台
 				logger.info("Call lambda shutdown listener message -> {}", shutdownSignalException.getMessage());
-				if (isNormalShutdown(shutdownSignalException)) {
+				if (isNormalShutdown(shutdownSignalException))
 					logger.info("{} -> normal shutdown.", tag);
-				} else {
+				else {
 					logger.info("{} -> is not normal shutdown.", tag);
 					// 如果回调函数不为null, 则执行此函数
 					if (shutdownEvent != null)
@@ -114,9 +114,8 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 			AMQP.Connection.Close connectionClose = (AMQP.Connection.Close) reason;
 			return connectionClose.getReplyCode() == AMQP.REPLY_SUCCESS
 					&& StringUtil.isEquals(connectionClose.getReplyText(), "OK");
-		} else {
+		} else
 			return false;
-		}
 	}
 
 	protected void closeConnection() {

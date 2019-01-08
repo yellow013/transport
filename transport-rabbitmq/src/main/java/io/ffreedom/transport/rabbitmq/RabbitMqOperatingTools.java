@@ -5,25 +5,20 @@ import java.util.concurrent.TimeoutException;
 
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+
+import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
+import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
 
 public final class RabbitMqOperatingTools {
 
-	public static class OperationalChannel {
-		private ConnectionFactory connectionFactory;
-		private Connection connection;
+	public static class OperationalChannel extends BaseRabbitMqTransport {
+
 		private Channel channel;
 
-		private OperationalChannel(String host, int port, String username, String password)
+		private OperationalChannel(String tag, ConnectionConfigurator<?> configurator)
 				throws IOException, TimeoutException {
-			this.connectionFactory = new ConnectionFactory();
-			connectionFactory.setHost(host);
-			connectionFactory.setPort(port);
-			connectionFactory.setUsername(username);
-			connectionFactory.setPassword(password);
-			this.connection = connectionFactory.newConnection();
-			this.channel = connection.createChannel();
+			super(tag, configurator);
+			createConnection();
 		}
 
 		private OperationalChannel(Channel channel) {
@@ -92,11 +87,27 @@ public final class RabbitMqOperatingTools {
 			connection.close();
 			return true;
 		}
+
+		@Override
+		public String getName() {
+			return tag;
+		}
+
+		@Override
+		public boolean destroy() {
+			return false;
+		}
 	}
 
 	public static OperationalChannel createChannel(String host, int port, String username, String password)
 			throws IOException, TimeoutException {
-		return new OperationalChannel(host, port, username, password);
+		return new OperationalChannel("OperationalChannel-Default", RmqReceiverConfigurator.configuration()
+				.setConnectionParam(host, port).setUserParam(username, password));
+	}
+
+	public static OperationalChannel createChannel(ConnectionConfigurator<?> configurator)
+			throws IOException, TimeoutException {
+		return new OperationalChannel("OperationalChannel-Default", configurator);
 	}
 
 	public static OperationalChannel ofChannel(Channel channel) {
