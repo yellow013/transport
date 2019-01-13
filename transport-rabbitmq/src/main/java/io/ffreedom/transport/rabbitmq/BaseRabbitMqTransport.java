@@ -92,7 +92,7 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 
 	@Override
 	public boolean isConnected() {
-		return (connection != null && connection.isOpen()) && (channel != null && channel.isOpen());
+		return connection != null && connection.isOpen() && channel != null && channel.isOpen();
 	}
 
 	protected boolean closeAndReconnection() {

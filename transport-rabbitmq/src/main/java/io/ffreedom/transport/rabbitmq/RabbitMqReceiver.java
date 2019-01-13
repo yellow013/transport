@@ -86,11 +86,11 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	@Override
 	public void receive() {
 		try {
-//			channel.basicConsume(receiveQueue, isAutoAck, tag, (consumerTag, msg) -> {
-//				Envelope envelope = msg.getEnvelope();
-//			}, (consumerTag) -> {
-//			}, (consumerTag, shutdownException) -> {
-//			});
+			// channel.basicConsume(receiveQueue, isAutoAck, tag, (consumerTag, msg) -> {
+			// Envelope envelope = msg.getEnvelope();
+			// }, (consumerTag) -> {
+			// }, (consumerTag, shutdownException) -> {
+			// });
 
 			if (!isAutoAck)
 				channel.basicQos(qos);
@@ -126,9 +126,9 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 						}
 					}
 					if (!isAutoAck) {
-						if (ack(envelope.getDeliveryTag())) {
+						if (ack(envelope.getDeliveryTag()))
 							logger.debug("Message handle end.");
-						} else {
+						else {
 							logger.info("Call method ack(envelope.getDeliveryTag()==[{}]) failure. Reject message.");
 							channel.basicReject(envelope.getDeliveryTag(), true);
 						}
@@ -201,11 +201,10 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	}
 
 	public static void main(String[] args) {
-		RabbitMqReceiver receiver = new RabbitMqReceiver("", RmqReceiverConfigurator.configuration()
-				.setConnectionParam("", 0).setUserParam("", "").setReceiveQueue("").setAutomaticRecovery(true),
-				(byte[] msg) -> {
-					System.out.println(new String(msg, Charsets.UTF8));
-				});
+		RabbitMqReceiver receiver = new RabbitMqReceiver("",
+				RmqReceiverConfigurator.configuration().setConnectionParam("", 0).setUserParam("", "")
+						.setReceiveQueue("").setAutomaticRecovery(true),
+				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}
 
