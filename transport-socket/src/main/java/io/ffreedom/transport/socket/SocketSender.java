@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 
 import io.ffreedom.common.log.LoggerFactory;
-import io.ffreedom.common.queue.ArrayBlockingMPSCQueue;
+import io.ffreedom.common.queue.impl.ArrayBlockingMPSCQueue;
 import io.ffreedom.transport.core.role.Sender;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
 
@@ -66,7 +66,7 @@ public class SocketSender implements Sender<byte[]> {
 
 	@Override
 	public void sent(byte[] msg) {
-		innerQueue.enQueue(msg);
+		innerQueue.enqueue(msg);
 	}
 
 	private DataOutputStream outputStream;

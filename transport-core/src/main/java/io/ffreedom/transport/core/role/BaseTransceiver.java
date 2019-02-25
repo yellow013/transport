@@ -1,6 +1,6 @@
 package io.ffreedom.transport.core.role;
 
-import io.ffreedom.common.queue.base.SCQueue;
+import io.ffreedom.common.queue.api.SCQueue;
 
 public abstract class BaseTransceiver<T> implements Transceiver<T> {
 
@@ -23,7 +23,7 @@ public abstract class BaseTransceiver<T> implements Transceiver<T> {
 
 		@Override
 		public void send(T msg) {
-			queue.enQueue(msg);
+			queue.enqueue(msg);
 		}
 
 	}

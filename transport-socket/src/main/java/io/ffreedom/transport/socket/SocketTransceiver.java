@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.IOUtils;
 
 import io.ffreedom.common.functional.Callback;
-import io.ffreedom.common.queue.base.SCQueue;
-import io.ffreedom.common.queue.disruptor.SPSCQueue;
+import io.ffreedom.common.queue.api.SCQueue;
+import io.ffreedom.common.queue.impl.disruptor.SPSCQueue;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.BaseTransceiver;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
