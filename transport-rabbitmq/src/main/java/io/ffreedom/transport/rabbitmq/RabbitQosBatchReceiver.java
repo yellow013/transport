@@ -81,4 +81,10 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
         closeConnection();
         return true;
     }
+
+	@Override
+	public void reconnect() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -1,6 +1,18 @@
 package io.ffreedom.transport.rabbitmq;
 
-import com.rabbitmq.client.*;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
+import org.slf4j.Logger;
+
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.Method;
+import com.rabbitmq.client.ShutdownSignalException;
+
 import io.ffreedom.common.functional.ShutdownEvent;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.log.LoggerFactory;
@@ -8,11 +20,6 @@ import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.TransportModule;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
-import org.slf4j.Logger;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 abstract class BaseRabbitMqTransport implements TransportModule {
 

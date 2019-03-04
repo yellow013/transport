@@ -206,4 +206,10 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 		receiver.receive();
 	}
 
+	@Override
+	public void reconnect() {
+		closeAndReconnection();
+		receive();
+	}
+
 }

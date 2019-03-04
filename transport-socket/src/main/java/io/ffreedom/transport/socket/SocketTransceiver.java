@@ -143,4 +143,10 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 		});
 	}
 
+	@Override
+	public void reconnect() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

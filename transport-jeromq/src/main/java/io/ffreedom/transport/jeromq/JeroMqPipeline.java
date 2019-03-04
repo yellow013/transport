@@ -85,4 +85,10 @@ public class JeroMqPipeline implements Receiver {
 		return !context.isClosed();
 	}
 
+	@Override
+	public void reconnect() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
