@@ -20,7 +20,7 @@ public class HttpGetRequester implements Requester<String> {
 
 	private final CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(connectionManager).build();
 
-	String url;
+	private String url;
 
 	public HttpGetRequester(String url) {
 		this.url = url;
@@ -32,10 +32,9 @@ public class HttpGetRequester implements Requester<String> {
 			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
 				int statusCode = response.getStatusLine().getStatusCode();
-				if (statusCode > 307) {
+				if (statusCode > 307)
 					throw new RuntimeException(
 							"Exception -> Request URI: [" + httpGet.getURI() + "] return status code " + statusCode);
-				}
 				return EntityUtils.toString(response.getEntity(), Charsets.UTF8);
 			} finally {
 				response.close();
