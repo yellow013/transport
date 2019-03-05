@@ -3,7 +3,7 @@ package io.ffreedom.transport.netty.handler;
 
 import org.slf4j.Logger;
 
-import io.ffreedom.common.log.LoggerFactory;
+import io.ffreedom.common.log.CommonLoggerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -12,7 +12,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public abstract class GeneralNettyHandler extends ChannelInboundHandlerAdapter {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	protected int byteBufSize;
 

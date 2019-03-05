@@ -9,12 +9,12 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
 import io.ffreedom.common.charset.Charsets;
-import io.ffreedom.common.log.LoggerFactory;
+import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.transport.core.role.Requester;
 
 public class HttpGetRequester implements Requester<String> {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	private final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
 

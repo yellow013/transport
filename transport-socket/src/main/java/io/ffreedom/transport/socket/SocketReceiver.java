@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import io.ffreedom.common.functional.Callback;
-import io.ffreedom.common.log.LoggerFactory;
+import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.Receiver;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
@@ -24,7 +24,7 @@ public class SocketReceiver implements Receiver {
 	private AtomicBoolean isReceiving = new AtomicBoolean(false);
 	private AtomicBoolean isRun = new AtomicBoolean(false);
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	/**
 	 * @param configurator

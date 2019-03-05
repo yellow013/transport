@@ -2,7 +2,7 @@ package io.ffreedom.transport.netty;
 
 import org.slf4j.Logger;
 
-import io.ffreedom.common.log.LoggerFactory;
+import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.transport.netty.config.NettyConfigurator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
@@ -15,7 +15,7 @@ public abstract class NettyTransport {
 
 	protected EventLoopGroup workerGroup;
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	protected ChannelHandler[] channelHandlers;
 
