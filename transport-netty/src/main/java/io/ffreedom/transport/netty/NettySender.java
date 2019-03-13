@@ -1,16 +1,16 @@
 package io.ffreedom.transport.netty;
 
 
+import static io.ffreedom.common.log.SysSequence.microsecond;
+
 import org.slf4j.Logger;
 
-import io.ffreedom.common.log.LoggerFactory;
+import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.transport.core.role.Sender;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-
-import static io.ffreedom.common.log.SysSequence.microsecond;
 
 public class NettySender implements Sender<byte[]> {
 
@@ -18,7 +18,7 @@ public class NettySender implements Sender<byte[]> {
 
 	// private ByteBuf byteBuf;
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	public NettySender(ChannelHandlerContext context) {
 		this.context = context;

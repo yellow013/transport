@@ -9,18 +9,18 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
 import io.ffreedom.common.charset.Charsets;
-import io.ffreedom.common.log.LoggerFactory;
+import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.transport.core.role.Requester;
 
 public class HttpGetRequester implements Requester<String> {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	private final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
 
 	private final CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(connectionManager).build();
 
-	String url;
+	private String url;
 
 	public HttpGetRequester(String url) {
 		this.url = url;
@@ -32,10 +32,9 @@ public class HttpGetRequester implements Requester<String> {
 			CloseableHttpResponse response = httpClient.execute(httpGet);
 			try {
 				int statusCode = response.getStatusLine().getStatusCode();
-				if (statusCode > 307) {
+				if (statusCode > 307)
 					throw new RuntimeException(
 							"Exception -> Request URI: [" + httpGet.getURI() + "] return status code " + statusCode);
-				}
 				return EntityUtils.toString(response.getEntity(), Charsets.UTF8);
 			} finally {
 				response.close();

@@ -14,8 +14,8 @@ import com.rabbitmq.client.Method;
 import com.rabbitmq.client.ShutdownSignalException;
 
 import io.ffreedom.common.functional.ShutdownEvent;
+import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.common.log.ErrorLogger;
-import io.ffreedom.common.log.LoggerFactory;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.TransportModule;
@@ -34,7 +34,7 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 	// 停机事件, 在监听到ShutdownSignalException时调用
 	protected ShutdownEvent<Exception> shutdownEvent;
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	protected String tag;
 
