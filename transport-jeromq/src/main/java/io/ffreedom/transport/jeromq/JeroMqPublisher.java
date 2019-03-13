@@ -74,8 +74,7 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 
 	@Override
 	public boolean isConnected() {
-
-		return false;
+		return !context.isClosed();
 	}
 
 }
