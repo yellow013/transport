@@ -35,6 +35,10 @@ public class JeroMqSubscriber implements Subscriber {
 		this.subscriber = context.socket(ZMQ.SUB);
 		this.subscriber.connect(configurator.getHost());
 		this.subscriber.subscribe(configurator.getTopic().getBytes());
+		this.subscriber.setTCPKeepAlive(1);
+		this.subscriber.setTCPKeepAliveCount(10);
+		this.subscriber.setTCPKeepAliveIdle(15);
+		this.subscriber.setTCPKeepAliveInterval(15);
 		this.subscriberName = "JeroMQ.SUB$" + configurator.getHost() + "::" + configurator.getTopic();
 	}
 
