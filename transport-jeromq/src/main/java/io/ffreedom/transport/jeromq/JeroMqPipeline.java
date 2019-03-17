@@ -22,9 +22,8 @@ public class JeroMqPipeline implements Receiver {
 	private volatile boolean isRun = true;
 
 	public JeroMqPipeline(JeroMqConfigurator configurator, Pipeline<byte[], byte[]> pipeline) {
-		if (configurator == null) {
-			throw new NullPointerException("configurator is null in JeroMQReceiver init mothed !");
-		}
+		if (configurator == null || pipeline == null)
+			throw new IllegalArgumentException("configurator is null in JeroMQReceiver init mothed !");
 		this.configurator = configurator;
 		this.pipeline = pipeline;
 		init();
@@ -42,9 +41,8 @@ public class JeroMqPipeline implements Receiver {
 		while (isRun) {
 			byte[] recvBytes = socket.recv();
 			byte[] bytes = pipeline.stream(recvBytes);
-			if (bytes == null) {
+			if (bytes == null)
 				bytes = new byte[0];
-			}
 			socket.send(bytes);
 		}
 		return;
@@ -88,7 +86,7 @@ public class JeroMqPipeline implements Receiver {
 	@Override
 	public void reconnect() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
