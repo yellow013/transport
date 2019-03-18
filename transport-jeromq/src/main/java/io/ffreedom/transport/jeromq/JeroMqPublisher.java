@@ -20,7 +20,7 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 	private JeroMqConfigurator configurator;
 
 	public JeroMqPublisher(JeroMqConfigurator configurator) {
-		if (configurator == null) 
+		if (configurator == null)
 			throw new IllegalArgumentException("configurator is null in JeroMQPublisher init method.");
 		this.configurator = configurator;
 		init();
@@ -49,7 +49,8 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 	public boolean destroy() {
 		publisher.close();
 		context.term();
-		return true;
+		context.close();
+		return context.isClosed();
 	}
 
 	@Override
