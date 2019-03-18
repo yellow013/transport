@@ -22,9 +22,8 @@ public class JeroMqSubscriber implements Subscriber {
 	private AtomicBoolean isRun = new AtomicBoolean(true);
 
 	public JeroMqSubscriber(JeroMqConfigurator configurator, Callback<byte[]> callback) {
-		if (configurator == null) {
-			throw new NullPointerException("configurator is null in JeroMQSubscriber init mothed !");
-		}
+		if (configurator == null || callback == null)
+			throw new IllegalArgumentException("configurator is null in JeroMQSubscriber init mothed !");
 		this.configurator = configurator;
 		this.callback = callback;
 		init();
@@ -65,11 +64,9 @@ public class JeroMqSubscriber implements Subscriber {
 	}
 
 	public static void main(String[] args) {
-
 		JeroMqSubscriber jeroMQSubscriber = new JeroMqSubscriber(
 				JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:5555").setIoThreads(2).setTopic("").build(),
 				(byte[] byteMsg) -> System.out.println(new String(byteMsg, Charsets.UTF8)));
-
 		jeroMQSubscriber.subscribe();
 	}
 

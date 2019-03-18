@@ -20,9 +20,8 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 	private JeroMqConfigurator configurator;
 
 	public JeroMqPublisher(JeroMqConfigurator configurator) {
-		if (configurator == null) {
-			throw new NullPointerException("configurator is null in JeroMQPublisher init method.");
-		}
+		if (configurator == null) 
+			throw new IllegalArgumentException("configurator is null in JeroMQPublisher init method.");
 		this.configurator = configurator;
 		init();
 	}

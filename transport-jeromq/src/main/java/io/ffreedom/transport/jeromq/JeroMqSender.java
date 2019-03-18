@@ -18,9 +18,8 @@ public class JeroMqSender implements Sender<byte[]> {
 	private JeroMqConfigurator configurator;
 
 	public JeroMqSender(JeroMqConfigurator configurator) {
-		if (configurator == null) {
-			throw new NullPointerException("configurator is null in JeroMQPublisher init mothed !");
-		}
+		if (configurator == null) 
+			throw new IllegalArgumentException("configurator is null in JeroMQPublisher init mothed !");
 		this.configurator = configurator;
 		init();
 	}
