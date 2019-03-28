@@ -2,6 +2,7 @@ package io.ffreedom.transport.jeromq;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import io.ffreedom.common.charset.Charsets;
@@ -31,7 +32,7 @@ public class JeroMqSubscriber implements Subscriber {
 
 	private void init() {
 		this.context = ZMQ.context(configurator.getIoThreads());
-		this.subscriber = context.socket(ZMQ.SUB);
+		this.subscriber = context.socket(SocketType.SUB);
 		this.subscriber.connect(configurator.getHost());
 		this.subscriber.subscribe(configurator.getTopic().getBytes());
 		this.subscriber.setTCPKeepAlive(1);

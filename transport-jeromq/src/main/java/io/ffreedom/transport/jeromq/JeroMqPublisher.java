@@ -2,6 +2,7 @@ package io.ffreedom.transport.jeromq;
 
 import java.util.Random;
 
+import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import io.ffreedom.common.utils.ThreadUtil;
@@ -28,7 +29,7 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 
 	private void init() {
 		this.context = ZMQ.context(configurator.getIoThreads());
-		this.publisher = context.socket(ZMQ.PUB);
+		this.publisher = context.socket(SocketType.PUB);
 		this.publisher.bind(configurator.getHost());
 		this.topic = configurator.getTopic();
 		this.publisherName = "JeroMQ.Pub$" + configurator.getHost();
