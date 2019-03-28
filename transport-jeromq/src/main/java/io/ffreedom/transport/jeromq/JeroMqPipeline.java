@@ -1,7 +1,7 @@
 package io.ffreedom.transport.jeromq;
 
+import org.zeromq.SocketType;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 import io.ffreedom.common.functional.Pipeline;
@@ -31,7 +31,7 @@ public class JeroMqPipeline implements Receiver {
 
 	private void init() {
 		this.context = new ZContext(configurator.getIoThreads());
-		this.socket = context.createSocket(ZMQ.REP);
+		this.socket = context.createSocket(SocketType.REP);
 		this.socket.bind(configurator.getHost());
 		this.receiverName = "JeroMQ.REP$" + configurator.getHost();
 	}

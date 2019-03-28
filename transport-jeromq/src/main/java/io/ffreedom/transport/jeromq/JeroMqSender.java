@@ -2,6 +2,7 @@ package io.ffreedom.transport.jeromq;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
+import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import io.ffreedom.transport.core.role.Sender;
@@ -26,7 +27,7 @@ public class JeroMqSender implements Sender<byte[]> {
 	
 	private void init(){
 		this.context = ZMQ.context(configurator.getIoThreads());
-		this.socket = context.socket(ZMQ.REQ);
+		this.socket = context.socket(SocketType.REQ);
 		this.socket.connect(configurator.getHost());
 		this.requesterName = "JeroMQ.REQ$" + configurator.getHost();
 	}
