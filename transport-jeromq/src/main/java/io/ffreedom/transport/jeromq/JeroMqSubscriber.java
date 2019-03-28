@@ -65,7 +65,7 @@ public class JeroMqSubscriber implements Subscriber {
 
 	public static void main(String[] args) {
 		JeroMqSubscriber jeroMQSubscriber = new JeroMqSubscriber(
-				JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:5555").setIoThreads(2).setTopic("").build(),
+				JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:10001").setIoThreads(2).setTopic("").build(),
 				(byte[] byteMsg) -> System.out.println(new String(byteMsg, Charsets.UTF8)));
 		jeroMQSubscriber.subscribe();
 	}
