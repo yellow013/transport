@@ -1,19 +1,21 @@
 package io.ffreedom.transport.rabbitmq;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
+
+import javax.net.ssl.SSLContext;
+
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
+
 import io.ffreedom.common.charset.Charsets;
-import io.ffreedom.common.functional.Callback;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.rabbitmq.RabbitMqOperatingTools.OperationalChannel;
 import io.ffreedom.transport.rabbitmq.config.RmqPublisherConfigurator;
-
-import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publisher<byte[]> {
 
@@ -41,10 +43,10 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	private int confirmRetry;
 
 	@SuppressWarnings("unused")
-	private Callback<Long> ackCallback;
+	private Consumer<Long> ackCallback;
 
 	@SuppressWarnings("unused")
-	private Callback<Long> noAckCallback;
+	private Consumer<Long> noAckCallback;
 
 	/**
 	 * @param configurator
@@ -57,8 +59,8 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 		this(tag, configurator, null, null, null);
 	}
 
-	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, Callback<Long> ackCallback,
-			Callback<Long> noAckCallback, SSLContext sslContext) {
+	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
+			Consumer<Long> noAckCallback, SSLContext sslContext) {
 		super(tag, configurator);
 		this.exchange = configurator.getExchange();
 		this.routingKey = configurator.getRoutingKey();

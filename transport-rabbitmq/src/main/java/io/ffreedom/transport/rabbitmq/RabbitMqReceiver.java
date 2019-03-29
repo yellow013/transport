@@ -7,7 +7,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import io.ffreedom.common.charset.Charsets;
-import io.ffreedom.common.functional.Callback;
+import io.ffreedom.common.functional.BinaryConsumer;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Receiver;
@@ -16,7 +16,7 @@ import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
 public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver {
 
 	// 接收消息时使用的回调函数
-	private volatile Callback<byte[]> callback;
+	private volatile BinaryConsumer callback;
 
 	// 绑定的Exchange
 	// 暂时没有使用
@@ -43,7 +43,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	 * @param configurator
 	 * @param callback
 	 */
-	public RabbitMqReceiver(String tag, RmqReceiverConfigurator configurator, Callback<byte[]> callback) {
+	public RabbitMqReceiver(String tag, RmqReceiverConfigurator configurator, BinaryConsumer callback) {
 		super(tag, configurator);
 		this.callback = callback;
 		this.exchange = configurator.getExchange();
@@ -68,7 +68,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	}
 
 	@Deprecated
-	public boolean initCallback(Callback<byte[]> callback) {
+	public boolean initCallback(BinaryConsumer callback) {
 		if (this.callback != null)
 			return false;
 		this.callback = callback;
