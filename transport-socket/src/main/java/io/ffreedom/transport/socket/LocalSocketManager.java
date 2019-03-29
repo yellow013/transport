@@ -3,7 +3,7 @@ package io.ffreedom.transport.socket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.ffreedom.common.functional.Callback;
+import io.ffreedom.common.functional.BinaryConsumer;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
 
 public class LocalSocketManager {
@@ -18,7 +18,7 @@ public class LocalSocketManager {
 	 * @return
 	 */
 	public static synchronized SocketTransceiver getSocketTransceiver(String name, int port,
-			Callback<byte[]> callback) {
+			BinaryConsumer callback) {
 		String socketName = getSocketName(name, port);
 		if (serverSocketMap.containsKey(socketName)) {
 			return serverSocketMap.get(socketName);

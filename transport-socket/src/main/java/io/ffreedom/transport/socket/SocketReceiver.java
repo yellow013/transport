@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
-import io.ffreedom.common.functional.Callback;
+import io.ffreedom.common.functional.BinaryConsumer;
 import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.Receiver;
@@ -17,7 +17,7 @@ import io.ffreedom.transport.socket.config.SocketConfigurator;
 public class SocketReceiver implements Receiver {
 
 	private SocketConfigurator configurator;
-	private Callback<byte[]> callback;
+	private BinaryConsumer callback;
 
 	private Socket socket;
 
@@ -31,7 +31,7 @@ public class SocketReceiver implements Receiver {
 	 * @param callback
 	 * @param serverSocket
 	 */
-	public SocketReceiver(SocketConfigurator configurator, Callback<byte[]> callback) {
+	public SocketReceiver(SocketConfigurator configurator, BinaryConsumer callback) {
 		super();
 		if (configurator == null || callback == null) {
 			throw new IllegalArgumentException("configurator or callback is null for init ");
