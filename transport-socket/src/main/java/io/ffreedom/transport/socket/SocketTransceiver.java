@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.IOUtils;
 
-import io.ffreedom.common.functional.Callback;
+import io.ffreedom.common.functional.BinaryConsumer;
 import io.ffreedom.common.queue.api.SCQueue;
 import io.ffreedom.common.queue.impl.disruptor.SPSCQueue;
 import io.ffreedom.common.utils.ThreadUtil;
@@ -19,7 +19,7 @@ import io.ffreedom.transport.socket.config.SocketConfigurator;
 public class SocketTransceiver extends BaseTransceiver<String> {
 
 	private SocketConfigurator configurator;
-	private Callback<byte[]> callback;
+	private BinaryConsumer callback;
 
 	private Socket socket;
 
@@ -33,7 +33,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 	 * @param callback
 	 * @param serverSocket
 	 */
-	public SocketTransceiver(SocketConfigurator configurator, Callback<byte[]> callback) {
+	public SocketTransceiver(SocketConfigurator configurator, BinaryConsumer callback) {
 		super();
 		if (configurator == null || callback == null) {
 			throw new IllegalArgumentException("configurator or callback is null for init ");
