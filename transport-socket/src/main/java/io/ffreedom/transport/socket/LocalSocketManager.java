@@ -2,8 +2,8 @@ package io.ffreedom.transport.socket;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
-import io.ffreedom.common.functional.BinaryConsumer;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
 
 public class LocalSocketManager {
@@ -18,7 +18,7 @@ public class LocalSocketManager {
 	 * @return
 	 */
 	public static synchronized SocketTransceiver getSocketTransceiver(String name, int port,
-			BinaryConsumer callback) {
+			Consumer<byte[]> callback) {
 		String socketName = getSocketName(name, port);
 		if (serverSocketMap.containsKey(socketName)) {
 			return serverSocketMap.get(socketName);

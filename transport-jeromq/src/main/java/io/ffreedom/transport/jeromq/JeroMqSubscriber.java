@@ -1,12 +1,12 @@
 package io.ffreedom.transport.jeromq;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import io.ffreedom.common.charset.Charsets;
-import io.ffreedom.common.functional.BinaryConsumer;
 import io.ffreedom.transport.core.role.Subscriber;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
@@ -17,12 +17,12 @@ public class JeroMqSubscriber implements Subscriber {
 
 	private String subscriberName;
 
-	private BinaryConsumer callback;
+	private Consumer<byte[]> callback;
 	private JeroMqConfigurator configurator;
 
 	private AtomicBoolean isRun = new AtomicBoolean(true);
 
-	public JeroMqSubscriber(JeroMqConfigurator configurator, BinaryConsumer callback) {
+	public JeroMqSubscriber(JeroMqConfigurator configurator, Consumer<byte[]> callback) {
 		if (configurator == null || callback == null)
 			throw new IllegalArgumentException("configurator is null in JeroMQSubscriber init mothed !");
 		this.configurator = configurator;
