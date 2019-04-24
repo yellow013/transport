@@ -1,71 +1,56 @@
 package io.ffreedom.transport.http;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.util.EntityUtils;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 
-import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.CommonLoggerFactory;
-import io.ffreedom.transport.core.role.Requester;
+import io.ffreedom.common.mark.MayThrowRuntimeException;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
-public class HttpGetRequester implements Requester<String> {
+public class HttpRequester {
 
 	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
-	private final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+	private OkHttpClient client = new OkHttpClient();
 
-	private final CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(connectionManager).build();
+	public final static HttpRequester Instance = new HttpRequester();
 
-	private String url;
-
-	public HttpGetRequester(String url) {
-		this.url = url;
+	public HttpRequester() {
 	}
 
-	public String sendGetRequest(HttpUri uri) {
-		try {
-			HttpGet httpGet = new HttpGet(url + uri);
-			CloseableHttpResponse response = httpClient.execute(httpGet);
-			try {
-				int statusCode = response.getStatusLine().getStatusCode();
-				if (statusCode > 307)
-					throw new RuntimeException(
-							"Exception -> Request URI: [" + httpGet.getURI() + "] return status code " + statusCode);
-				return EntityUtils.toString(response.getEntity(), Charsets.UTF8);
-			} finally {
-				response.close();
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Exception -> " + e.getMessage());
+	@MayThrowRuntimeException
+	public String httpGet(String url) {
+		Request request = new Request.Builder().url(url).build();
+		try (Response response = client.newCall(request).execute()) {
+			if (response.code() > 307)
+				throw new RuntimeException(
+						"RuntimeException -> Request Url: [" + url + "] return status code: " + response.code());
+			return response.body().string();
+		} catch (IOException e) {
+			logger.error("IOException -> {}", e.getMessage(), e);
+			throw new RuntimeException(e);
 		}
 	}
 
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private static final MediaType APP_JSON = MediaType.get("application/json; charset=utf-8");
 
-	@Override
-	public String request() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isConnected() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean destroy() {
-		// TODO Auto-generated method stub
-		return false;
+	public String httpJsonPost(String url, Object obj) throws IOException {
+		RequestBody body = RequestBody.create(APP_JSON, JsonSerializationUtil.objToJson(obj));
+		Request request = new Request.Builder().url(url).post(body).build();
+		try (Response response = client.newCall(request).execute()) {
+			if (response.code() > 307)
+				throw new RuntimeException(
+						"RuntimeException -> Request Url: [" + url + "] return status code: " + response.code());
+			return response.body().string();
+		} catch (IOException e) {
+			logger.error("IOException -> {}", e.getMessage(), e);
+			throw new RuntimeException(e);
+		}
 	}
 
 }
