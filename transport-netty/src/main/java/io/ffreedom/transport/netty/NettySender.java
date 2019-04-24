@@ -1,6 +1,5 @@
 package io.ffreedom.transport.netty;
 
-
 import static io.ffreedom.common.log.SysSequence.microsecond;
 
 import org.slf4j.Logger;
@@ -45,7 +44,7 @@ public class NettySender implements Sender<byte[]> {
 
 	@Override
 	public String getName() {
-		return "Sender->ContextHashCode:" + context.hashCode() + "&";// + byteBuf.capacity();
+		return "NettySender-ContextHashCode:" + context.hashCode() + "&";// + byteBuf.capacity();
 	}
 
 	@Override
