@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.apache.commons.io.IOUtils;
 
 import io.ffreedom.common.queue.api.SCQueue;
+import io.ffreedom.common.queue.impl.disruptor.BufferSize;
 import io.ffreedom.common.queue.impl.disruptor.SPSCQueue;
 import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.BaseTransceiver;
@@ -138,7 +139,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 
 	@Override
 	protected SCQueue<String> initSendQueue() {
-		return new SPSCQueue<>(1024, true, (msg) -> {
+		return new SPSCQueue<>(BufferSize.POW2_10, true, (msg) -> {
 			processSendQueue(msg);
 		});
 	}
@@ -146,7 +147,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 	@Override
 	public void reconnect() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
