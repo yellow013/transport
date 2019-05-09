@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 
+import io.ffreedom.common.annotations.lang.MayThrowRuntimeException;
 import io.ffreedom.common.log.CommonLoggerFactory;
-import io.ffreedom.common.mark.MayThrowRuntimeException;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
