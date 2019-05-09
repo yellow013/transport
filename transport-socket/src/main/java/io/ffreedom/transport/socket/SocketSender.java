@@ -24,9 +24,8 @@ public class SocketSender implements Sender<byte[]> {
 
 	public SocketSender(SocketConfigurator configurator) {
 		super();
-		if (configurator == null) {
+		if (configurator == null) 
 			throw new IllegalArgumentException("configurator or callback is null for init ");
-		}
 		this.configurator = configurator;
 		init();
 	}
@@ -50,9 +49,8 @@ public class SocketSender implements Sender<byte[]> {
 		this.isRun.set(false);
 		try {
 			outputStream.close();
-			if (socket != null) {
+			if (socket != null)
 				socket.close();
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -74,9 +72,8 @@ public class SocketSender implements Sender<byte[]> {
 	private void processSendQueue(byte[] msg) {
 		try {
 			if (isRun.get()) {
-				if (outputStream == null) {
+				if (outputStream == null)
 					outputStream = new DataOutputStream(socket.getOutputStream());
-				}
 				outputStream.write(msg);
 			}
 		} catch (IOException e) {
@@ -85,18 +82,13 @@ public class SocketSender implements Sender<byte[]> {
 		}
 	}
 
-	private ArrayBlockingMPSCQueue<byte[]> innerQueue = ArrayBlockingMPSCQueue.autoStartQueue(1024, bytes -> {
-		processSendQueue(bytes);
-	});
+	private ArrayBlockingMPSCQueue<byte[]> innerQueue = ArrayBlockingMPSCQueue.autoStartQueue(1024,
+			bytes -> processSendQueue(bytes));
 
 	public static void main(String[] args) {
-
 		SocketConfigurator configurator = SocketConfigurator.builder().setHost("192.168.1.138").setPort(7901).build();
-
 		SocketSender sender = new SocketSender(configurator);
-
 		sender.sent("hello".getBytes());
-
 	}
 
 }

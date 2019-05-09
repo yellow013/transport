@@ -20,12 +20,11 @@ public class LocalSocketManager {
 	public static synchronized SocketTransceiver getSocketTransceiver(String name, int port,
 			Consumer<byte[]> callback) {
 		String socketName = getSocketName(name, port);
-		if (serverSocketMap.containsKey(socketName)) {
+		if (serverSocketMap.containsKey(socketName))
 			return serverSocketMap.get(socketName);
-		} else {
-			if (port <= 7000 || port >= 8000) {
+		else {
+			if (port <= 7000 || port >= 8000)
 				throw new RuntimeException("port error.");
-			}
 			SocketTransceiver transceiver = new SocketTransceiver(SocketConfigurator.builder().setPort(port).build(),
 					callback);
 			serverSocketMap.put(socketName, transceiver);
@@ -41,11 +40,10 @@ public class LocalSocketManager {
 	 * @return
 	 */
 	public static SocketTransceiver getSocketTransceiver(String name, int port) {
-		if (serverSocketMap.containsKey(name)) {
+		if (serverSocketMap.containsKey(name))
 			return serverSocketMap.get(name);
-		} else {
+		else
 			return null;
-		}
 	}
 
 	private static String getSocketName(String name, int port) {

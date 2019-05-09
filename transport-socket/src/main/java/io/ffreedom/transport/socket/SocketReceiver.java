@@ -33,9 +33,8 @@ public class SocketReceiver implements Receiver {
 	 */
 	public SocketReceiver(SocketConfigurator configurator, Consumer<byte[]> callback) {
 		super();
-		if (configurator == null || callback == null) {
+		if (configurator == null || callback == null)
 			throw new IllegalArgumentException("configurator or callback is null for init ");
-		}
 		this.configurator = configurator;
 		this.callback = callback;
 		init();
@@ -59,9 +58,8 @@ public class SocketReceiver implements Receiver {
 	public boolean destroy() {
 		this.isRun.set(false);
 		try {
-			if (socket != null) {
+			if (socket != null)
 				socket.close();
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -75,18 +73,15 @@ public class SocketReceiver implements Receiver {
 
 	@Override
 	public void receive() {
-		if (!isRun.get()) {
+		if (!isRun.get())
 			isRun.set(true);
-		}
-		if (!isReceiving.get()) {
+		if (!isReceiving.get())
 			startReceiveThread();
-		}
 	}
 
 	private synchronized void startReceiveThread() {
-		if (isReceiving.get()) {
+		if (isReceiving.get())
 			return;
-		}
 		isReceiving.set(true);
 		ThreadUtil.startNewThread(() -> {
 			InputStream inputStream = null;
@@ -130,9 +125,7 @@ public class SocketReceiver implements Receiver {
 
 		SocketConfigurator configurator = SocketConfigurator.builder().setHost("192.168.1.138").setPort(7901).build();
 
-		SocketReceiver receiver = new SocketReceiver(configurator, bytes -> {
-			System.out.println(new String(bytes));
-		});
+		SocketReceiver receiver = new SocketReceiver(configurator, bytes -> System.out.println(new String(bytes)));
 
 		receiver.receive();
 
@@ -141,7 +134,7 @@ public class SocketReceiver implements Receiver {
 	@Override
 	public void reconnect() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
