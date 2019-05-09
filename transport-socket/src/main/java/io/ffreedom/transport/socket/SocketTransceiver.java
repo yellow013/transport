@@ -90,9 +90,8 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 	}
 
 	private synchronized void startReceiveThread() {
-		if (isReceiving.get()) {
+		if (isReceiving.get())
 			return;
-		}
 		ThreadUtil.startNewThread(() -> {
 			InputStream inputStream = null;
 			while (isRun.get()) {
@@ -125,9 +124,8 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 	private void processSendQueue(String msg) {
 		try {
 			if (isRun.get()) {
-				if (writer == null) {
+				if (writer == null)
 					this.writer = new OutputStreamWriter(socket.getOutputStream());
-				}
 				writer.write(msg);
 				writer.flush();
 			}
@@ -139,7 +137,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 
 	@Override
 	protected SCQueue<String> initSendQueue() {
-		return new SPSCQueue<>(BufferSize.POW2_10, true, (msg) -> {
+		return new SPSCQueue<>("", BufferSize.POW2_10, true, (msg) -> {
 			processSendQueue(msg);
 		});
 	}
