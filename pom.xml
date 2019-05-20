@@ -24,7 +24,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<transport-core.version>1.0</transport-core.version>
+		<transport-core.version>1.0-SNAPSHOT</transport-core.version>
 	</properties>
 
 	<build>
