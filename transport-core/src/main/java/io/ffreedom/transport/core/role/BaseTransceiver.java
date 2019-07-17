@@ -4,20 +4,20 @@ import io.ffreedom.common.queue.api.SCQueue;
 
 public abstract class BaseTransceiver<T> implements Transceiver<T> {
 
-	private InnerSender<T> innerSender;
+	private Sender<T> innerSender;
 
 	private SCQueue<T> queue;
 
 	protected BaseTransceiver() {
 		this.queue = initSendQueue();
-		this.innerSender = new InnerSenderDevice(queue);
+		this.innerSender = new InnerSender(queue);
 	}
 
-	private class InnerSenderDevice implements InnerSender<T> {
+	private class InnerSender implements Sender<T> {
 
 		private SCQueue<T> queue;
 
-		private InnerSenderDevice(SCQueue<T> queue) {
+		private InnerSender(SCQueue<T> queue) {
 			this.queue = queue;
 		}
 
@@ -26,10 +26,28 @@ public abstract class BaseTransceiver<T> implements Transceiver<T> {
 			queue.enqueue(msg);
 		}
 
+		@Override
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public boolean isConnected() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean destroy() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
 	}
 
 	@Override
-	public InnerSender<T> getInnerSender() {
+	public Sender<T> getInnerSender() {
 		return innerSender;
 	}
 
