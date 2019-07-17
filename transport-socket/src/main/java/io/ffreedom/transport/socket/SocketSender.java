@@ -24,7 +24,7 @@ public class SocketSender implements Sender<byte[]> {
 
 	public SocketSender(SocketConfigurator configurator) {
 		super();
-		if (configurator == null) 
+		if (configurator == null)
 			throw new IllegalArgumentException("configurator or callback is null for init ");
 		this.configurator = configurator;
 		init();
@@ -63,7 +63,7 @@ public class SocketSender implements Sender<byte[]> {
 	}
 
 	@Override
-	public void sent(byte[] msg) {
+	public void send(byte[] msg) {
 		innerQueue.enqueue(msg);
 	}
 
@@ -88,7 +88,7 @@ public class SocketSender implements Sender<byte[]> {
 	public static void main(String[] args) {
 		SocketConfigurator configurator = SocketConfigurator.builder().setHost("192.168.1.138").setPort(7901).build();
 		SocketSender sender = new SocketSender(configurator);
-		sender.sent("hello".getBytes());
+		sender.send("hello".getBytes());
 	}
 
 }

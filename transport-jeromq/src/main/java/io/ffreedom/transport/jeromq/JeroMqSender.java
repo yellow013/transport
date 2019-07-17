@@ -33,7 +33,7 @@ public class JeroMqSender implements Sender<byte[]> {
 	}
 
 	@Override
-	public void sent(byte[] msg) {
+	public void send(byte[] msg) {
 		socket.send(msg);
 		socket.recv();
 	}
@@ -56,7 +56,7 @@ public class JeroMqSender implements Sender<byte[]> {
 
 		JeroMqSender requester = new JeroMqSender(configurator);
 
-		requester.sent("TEST MSG".getBytes());
+		requester.send("TEST MSG".getBytes());
 
 		requester.destroy();
 	}

@@ -48,7 +48,7 @@ public class NettySender implements Sender<byte[]> {
 	}
 
 	@Override
-	public void sent(byte[] msg) {
+	public void send(byte[] msg) {
 		logger.debug(microsecond() + " call sender send -> data length : " + msg.length);
 		ByteBuf byteBuf = context.alloc().buffer(msg.length);
 		byteBuf.writeBytes(msg);
