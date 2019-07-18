@@ -16,9 +16,9 @@ public class HttpRequester {
 
 	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
-	private OkHttpClient client = new OkHttpClient();
+	private final OkHttpClient client = new OkHttpClient();
 
-	public final static HttpRequester Instance = new HttpRequester();
+	public static final HttpRequester INSTANCE = new HttpRequester();
 
 	public HttpRequester() {
 	}
@@ -37,10 +37,11 @@ public class HttpRequester {
 		}
 	}
 
-	private static final MediaType APP_JSON = MediaType.get("application/json; charset=utf-8");
+	private static final MediaType APPLICATION_JSON = MediaType.get("application/json; charset=utf-8");
 
+	@MayThrowRuntimeException
 	public String httpJsonPost(String url, Object obj) throws IOException {
-		RequestBody body = RequestBody.create(APP_JSON, JsonSerializationUtil.objToJson(obj));
+		RequestBody body = RequestBody.create(JsonSerializationUtil.objToJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
 		try (Response response = client.newCall(request).execute()) {
 			if (response.code() > 307)
