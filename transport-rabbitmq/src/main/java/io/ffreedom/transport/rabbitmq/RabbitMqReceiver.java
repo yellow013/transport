@@ -13,7 +13,7 @@ import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Receiver;
 import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
 
-public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver {
+public class RabbitMqReceiver extends BaseRabbitMqTransport<RmqReceiverConfigurator> implements Receiver {
 
 	// 接收消息时使用的回调函数
 	private volatile Consumer<byte[]> callback;

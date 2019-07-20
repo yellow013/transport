@@ -21,7 +21,7 @@ import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.TransportModule;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 
-abstract class BaseRabbitMqTransport implements TransportModule {
+public abstract class BaseRabbitMqTransport<CT extends ConnectionConfigurator> implements TransportModule {
 
 	// 连接RabbitMQ Server使用的组件
 	protected ConnectionFactory connectionFactory;
@@ -29,7 +29,7 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 	protected volatile Channel channel;
 
 	// 存储配置信息对象
-	protected ConnectionConfigurator<?> configurator;
+	protected CT configurator;
 
 	// 停机事件, 在监听到ShutdownSignalException时调用
 	protected ShutdownEvent<Exception> shutdownEvent;
@@ -46,7 +46,7 @@ abstract class BaseRabbitMqTransport implements TransportModule {
 	 * @param tag
 	 * @param configurator
 	 */
-	protected BaseRabbitMqTransport(String tag, ConnectionConfigurator<?> configurator) {
+	protected BaseRabbitMqTransport(String tag, CT configurator) {
 		if (configurator == null)
 			throw new NullPointerException(tag + ": configurator is null.");
 		this.tag = (tag == null) ? "start_time_" + System.currentTimeMillis() : tag;

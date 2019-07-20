@@ -7,13 +7,36 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
-import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
 
 public final class RabbitMqOperatingTools {
 
-	public static class OperationalChannel extends BaseRabbitMqTransport {
+	public static class OperationalConnectionConfigurator extends ConnectionConfigurator {
 
-		private OperationalChannel(String tag, ConnectionConfigurator<?> configurator)
+		protected OperationalConnectionConfigurator(String configuratorName) {
+			super(configuratorName);
+		}
+
+		public static OperationalConnectionConfigurator configuration() {
+			return new OperationalConnectionConfigurator("RmqOperationalConnectionConfigurator");
+		}
+
+		public OperationalConnectionConfigurator setConnectionParam(String host, int port) {
+			this.host = host;
+			this.port = port;
+			return this;
+		}
+
+		public OperationalConnectionConfigurator setUserParam(String username, String password) {
+			this.username = username;
+			this.password = password;
+			return this;
+		}
+
+	}
+
+	public static class OperationalChannel extends BaseRabbitMqTransport<OperationalConnectionConfigurator> {
+
+		private OperationalChannel(String tag, OperationalConnectionConfigurator configurator)
 				throws IOException, TimeoutException {
 			super(tag, configurator);
 			createConnection();
@@ -99,11 +122,11 @@ public final class RabbitMqOperatingTools {
 
 	public static OperationalChannel createChannel(String host, int port, String username, String password)
 			throws IOException, TimeoutException {
-		return new OperationalChannel("OperationalChannel-Default", RmqReceiverConfigurator.configuration()
+		return new OperationalChannel("OperationalChannel-Default", OperationalConnectionConfigurator.configuration()
 				.setConnectionParam(host, port).setUserParam(username, password));
 	}
 
-	public static OperationalChannel createChannel(ConnectionConfigurator<?> configurator)
+	public static OperationalChannel createChannel(OperationalConnectionConfigurator configurator)
 			throws IOException, TimeoutException {
 		return new OperationalChannel("OperationalChannel-Default", configurator);
 	}

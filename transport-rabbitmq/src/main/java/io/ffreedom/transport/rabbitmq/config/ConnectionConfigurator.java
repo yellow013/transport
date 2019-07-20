@@ -5,7 +5,7 @@ import io.ffreedom.transport.core.config.TransportConfigurator;
 
 import javax.net.ssl.SSLContext;
 
-public abstract class ConnectionConfigurator<T extends ConnectionConfigurator<?>> implements TransportConfigurator {
+public abstract class ConnectionConfigurator implements TransportConfigurator {
 
 	/**
 	 * 连接参数
@@ -46,34 +46,6 @@ public abstract class ConnectionConfigurator<T extends ConnectionConfigurator<?>
 	protected ConnectionConfigurator(String configuratorName) {
 		this.configuratorName = configuratorName;
 	}
-
-	abstract public T setSslContext(SSLContext sslContext);
-
-	abstract public T setConnectionParam(String host, int port);
-
-	abstract public T setUserParam(String username, String password);
-
-	abstract public T setVirtualHost(String virtualHost);
-
-	abstract public T setConnectionTimeout(int connectionTimeout);
-
-	abstract public T setDurable(boolean durable);
-
-	abstract public T setExclusive(boolean exclusive);
-
-	abstract public T setAutoDelete(boolean autoDelete);
-
-	abstract public T setAutomaticRecovery(boolean automaticRecovery);
-
-	abstract public T setRecoveryInterval(long recoveryInterval);
-
-	abstract public T setHandshakeTimeout(int handshakeTimeout);
-
-	abstract public T setShutdownTimeout(int shutdownTimeout);
-
-	abstract public T setRequestedHeartbeat(int requestedHeartbeat);
-
-	abstract public T setShutdownEvent(ShutdownEvent<Exception> shutdownEvent);
 
 	public String getHost() {
 		return host;

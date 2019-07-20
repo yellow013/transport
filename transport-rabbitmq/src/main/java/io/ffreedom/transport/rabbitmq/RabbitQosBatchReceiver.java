@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  * @author xuejian.sun
  * @date 2019/1/14 19:16
  */
-public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements Receiver {
+public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport<RmqReceiverConfigurator> implements Receiver {
 
     private String receiverName;
 

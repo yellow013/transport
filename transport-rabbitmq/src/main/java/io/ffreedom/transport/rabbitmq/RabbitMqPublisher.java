@@ -17,7 +17,7 @@ import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.rabbitmq.RabbitMqOperatingTools.OperationalChannel;
 import io.ffreedom.transport.rabbitmq.config.RmqPublisherConfigurator;
 
-public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publisher<byte[]> {
+public class RabbitMqPublisher extends BaseRabbitMqTransport<RmqPublisherConfigurator> implements Publisher<byte[]> {
 
 	// 发布消息使用的routingKey
 	private String routingKey;

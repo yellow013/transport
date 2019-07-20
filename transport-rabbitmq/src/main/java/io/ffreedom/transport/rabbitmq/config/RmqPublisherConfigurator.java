@@ -9,7 +9,7 @@ import io.ffreedom.common.utils.StringUtil;
 
 import javax.net.ssl.SSLContext;
 
-public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublisherConfigurator> {
+public class RmqPublisherConfigurator extends ConnectionConfigurator {
 
 	/**
 	 * 发布者参数
@@ -148,7 +148,6 @@ public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublishe
 		return setMode(ExchangeType.FANOUT, exchange, routingKey, bindQueues);
 	}
 
-	@Override
 	public RmqPublisherConfigurator setSslContext(SSLContext sslContext) {
 		this.sslContext = sslContext;
 		return this;
@@ -158,82 +157,68 @@ public class RmqPublisherConfigurator extends ConnectionConfigurator<RmqPublishe
 	 * 配置连接信息 START
 	 */
 
-	@Override
 	public RmqPublisherConfigurator setConnectionParam(String host, int port) {
 		this.host = host;
 		this.port = port;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setUserParam(String username, String password) {
 		this.username = username;
 		this.password = password;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setVirtualHost(String virtualHost) {
 		this.virtualHost = virtualHost;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setConnectionTimeout(int connectionTimeout) {
 		this.connectionTimeout = connectionTimeout;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setDurable(boolean durable) {
 		this.durable = durable;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setExclusive(boolean exclusive) {
 		this.exclusive = exclusive;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setAutoDelete(boolean autoDelete) {
 		this.autoDelete = autoDelete;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setAutomaticRecovery(boolean automaticRecovery) {
 		this.automaticRecovery = automaticRecovery;
 		return this;
 	}
-
-	@Override
 
 	public RmqPublisherConfigurator setRecoveryInterval(long recoveryInterval) {
 		this.recoveryInterval = recoveryInterval;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setHandshakeTimeout(int handshakeTimeout) {
 		this.handshakeTimeout = handshakeTimeout;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setShutdownTimeout(int shutdownTimeout) {
 		this.shutdownTimeout = shutdownTimeout;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setRequestedHeartbeat(int requestedHeartbeat) {
 		this.requestedHeartbeat = requestedHeartbeat;
 		return this;
 	}
 
-	@Override
 	public RmqPublisherConfigurator setShutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
 		this.shutdownEvent = shutdownEvent;
 		return this;
