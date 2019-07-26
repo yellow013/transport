@@ -56,7 +56,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<RmqPublisherConfigu
 	}
 
 	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, SSLContext sslContext) {
-		this(tag, configurator, null, null, null);
+		this(tag, configurator, null, null, sslContext);
 	}
 
 	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
@@ -162,21 +162,24 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<RmqPublisherConfigu
 			basicPublish(target, msg);
 			if (channel.waitForConfirms(confirmTimeout))
 				return;
-			ErrorLogger.error(logger, "Call method channel.waitForConfirms(confirmTimeout==[{}]) retry==[{}]",
-					confirmTimeout, retry);
+			logger.error("Call method channel.waitForConfirms(confirmTimeout==[{}]) retry==[{}]", confirmTimeout,
+					retry);
 			if (++retry == confirmRetry)
 				throw new NoAckException(target, retry);
 			confirmPublish0(target, msg, retry);
 		} catch (IOException e) {
-			ErrorLogger.error(logger, e, "Call method channel.confirmSelect() throw IOException -> {}", exchange,
-					target, msgProperties, e.getMessage());
+			ErrorLogger.error(logger, e,
+					"Call method channel.confirmSelect() throw IOException from publisherName -> {}, target -> {}",
+					publisherName, target);
 			throw new IOException(e.getMessage());
 		} catch (InterruptedException e) {
-			ErrorLogger.error(logger, e, "Call method channel.waitForConfirms() throw InterruptedException -> {}",
-					e.getMessage());
+			ErrorLogger.error(logger, e,
+					"Call method channel.waitForConfirms() throw InterruptedException from publisherName -> {}, target -> {}",
+					publisherName, target);
 		} catch (TimeoutException e) {
-			ErrorLogger.error(logger, e, "Call method channel.waitForConfirms() throw TimeoutException -> {}",
-					e.getMessage());
+			ErrorLogger.error(logger, e,
+					"Call method channel.waitForConfirms() throw TimeoutException from publisherName -> {}, target -> {}",
+					publisherName, target);
 		}
 	}
 

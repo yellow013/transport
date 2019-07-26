@@ -142,7 +142,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<RmqReceiverConfigur
 
 	private boolean ack0(long deliveryTag, int retry) {
 		if (retry == maxAckTotal) {
-			ErrorLogger.error(logger, "Has been retry ack {}, Quit ack.", maxAckTotal);
+			logger.error("Has been retry ack {}, Quit ack.", maxAckTotal);
 			return false;
 		}
 		logger.debug("Has been retry ack {}, Do next ack.", retry);
@@ -205,8 +205,8 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<RmqReceiverConfigur
 
 	@Override
 	public void reconnect() {
-		// TODO Auto-generated method stub
-
+		closeAndReconnection();
+		receive();
 	}
 
 }
