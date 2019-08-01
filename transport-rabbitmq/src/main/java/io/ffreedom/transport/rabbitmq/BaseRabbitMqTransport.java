@@ -1,6 +1,7 @@
 package io.ffreedom.transport.rabbitmq;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -21,7 +22,7 @@ import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.TransportModule;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 
-public abstract class BaseRabbitMqTransport<CT extends ConnectionConfigurator> implements TransportModule {
+public abstract class BaseRabbitMqTransport<CCT extends ConnectionConfigurator> implements TransportModule {
 
 	// 连接RabbitMQ Server使用的组件
 	protected ConnectionFactory connectionFactory;
@@ -29,7 +30,7 @@ public abstract class BaseRabbitMqTransport<CT extends ConnectionConfigurator> i
 	protected volatile Channel channel;
 
 	// 存储配置信息对象
-	protected CT configurator;
+	protected CCT configurator;
 
 	// 停机事件, 在监听到ShutdownSignalException时调用
 	protected ShutdownEvent<Exception> shutdownEvent;
@@ -46,10 +47,10 @@ public abstract class BaseRabbitMqTransport<CT extends ConnectionConfigurator> i
 	 * @param tag
 	 * @param configurator
 	 */
-	protected BaseRabbitMqTransport(String tag, CT configurator) {
+	protected BaseRabbitMqTransport(String tag, CCT configurator) {
+		this.tag = tag == null ? "START_TIME_" + LocalDateTime.now() : tag;
 		if (configurator == null)
-			throw new NullPointerException(tag + ": configurator is null.");
-		this.tag = (tag == null) ? "start_time_" + System.currentTimeMillis() : tag;
+			throw new NullPointerException(this.tag + " : configurator is null.");
 		this.configurator = configurator;
 		this.shutdownEvent = configurator.getShutdownEvent();
 	}
@@ -72,7 +73,7 @@ public abstract class BaseRabbitMqTransport<CT extends ConnectionConfigurator> i
 		}
 		try {
 			connection = connectionFactory.newConnection();
-			logger.info("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}.", tag,
+			logger.debug("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}.", tag,
 					connection.getId());
 			connection.addShutdownListener(shutdownSignalException -> {
 				// 输出错误信息到控制台
@@ -87,9 +88,9 @@ public abstract class BaseRabbitMqTransport<CT extends ConnectionConfigurator> i
 				}
 			});
 			channel = connection.createChannel();
-			logger.info("Call method connection.createChannel() finished, tag -> {}, channel number -> {}", tag,
+			logger.debug("Call method connection.createChannel() finished, tag -> {}, channel number -> {}", tag,
 					channel.getChannelNumber());
-			logger.info("All connection call method successful...");
+			logger.debug("All connection call method successful...");
 		} catch (IOException e) {
 			ErrorLogger.error(logger, e, "Call method createConnection() throw IOException -> {}", e.getMessage());
 		} catch (TimeoutException e) {
