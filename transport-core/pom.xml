@@ -17,7 +17,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.ffreedom</groupId>
-			<artifactId>commons-queue</artifactId>
+			<artifactId>commons-concurrent</artifactId>
 		</dependency>
 	</dependencies>
 
