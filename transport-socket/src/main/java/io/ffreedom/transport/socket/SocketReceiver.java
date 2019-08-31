@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import io.ffreedom.common.log.CommonLoggerFactory;
-import io.ffreedom.common.utils.ThreadUtil;
+import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.transport.core.role.Receiver;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
 
