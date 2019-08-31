@@ -11,8 +11,8 @@ import com.rabbitmq.client.BuiltinExchangeType;
 
 import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
+import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.common.utils.StringUtil;
-import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.rabbitmq.RabbitMqOperatingTools.OperationalChannel;
 import io.ffreedom.transport.rabbitmq.config.RmqPublisherConfigurator;
