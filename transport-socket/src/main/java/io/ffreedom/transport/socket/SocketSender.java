@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
+import io.ffreedom.common.concurrent.queue.impl.ArrayBlockingMPSCQueue;
 import io.ffreedom.common.log.CommonLoggerFactory;
-import io.ffreedom.common.queue.impl.ArrayBlockingMPSCQueue;
 import io.ffreedom.transport.core.role.Sender;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
 

@@ -17,8 +17,8 @@ import com.rabbitmq.client.ShutdownSignalException;
 import io.ffreedom.common.functional.ShutdownEvent;
 import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.common.log.ErrorLogger;
+import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.common.utils.StringUtil;
-import io.ffreedom.common.utils.ThreadUtil;
 import io.ffreedom.transport.core.TransportModule;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 

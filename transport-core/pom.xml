@@ -14,4 +14,11 @@
 	<artifactId>transport-core</artifactId>
 	<name>transport-core</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>io.ffreedom</groupId>
+			<artifactId>commons-concurrent</artifactId>
+		</dependency>
+	</dependencies>
+
 </project>

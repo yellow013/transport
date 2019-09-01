@@ -5,7 +5,7 @@ import java.util.Random;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
-import io.ffreedom.common.utils.ThreadUtil;
+import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 

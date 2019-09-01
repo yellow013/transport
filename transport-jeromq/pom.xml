@@ -18,6 +18,7 @@
 			<groupId>io.ffreedom</groupId>
 			<artifactId>transport-core</artifactId>
 		</dependency>
+		<!-- JeroMq API -->
 		<dependency>
 			<groupId>org.zeromq</groupId>
 			<artifactId>jeromq</artifactId>
