@@ -15,9 +15,9 @@ import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.rabbitmq.RabbitMqOperatingTools.OperationalChannel;
-import io.ffreedom.transport.rabbitmq.config.RmqPublisherConfigurator;
+import io.ffreedom.transport.rabbitmq.config.PublisherConfigurator;
 
-public class RabbitMqPublisher extends BaseRabbitMqTransport<RmqPublisherConfigurator> implements Publisher<byte[]> {
+public class RabbitMqPublisher extends BaseRabbitMqTransport<PublisherConfigurator> implements Publisher<byte[]> {
 
 	// 发布消息使用的routingKey
 	private String routingKey;
@@ -31,8 +31,6 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<RmqPublisherConfigu
 	private String publisherName;
 
 	private String[] bindQueues;
-
-	private String directQueue;
 
 	private BuiltinExchangeType builtinExchangeType;
 
@@ -51,16 +49,16 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<RmqPublisherConfigu
 	/**
 	 * @param configurator
 	 */
-	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator) {
+	public RabbitMqPublisher(String tag, PublisherConfigurator configurator) {
 		this(tag, configurator, null, null, null);
 	}
 
-	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, SSLContext sslContext) {
-		this(tag, configurator, null, null, sslContext);
+	public RabbitMqPublisher(String tag, PublisherConfigurator configurator, SSLContext sslContext) {
+		this(tag, configurator, sslContext, null, null);
 	}
 
-	public RabbitMqPublisher(String tag, RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
-			Consumer<Long> noAckCallback, SSLContext sslContext) {
+	public RabbitMqPublisher(String tag, PublisherConfigurator configurator, SSLContext sslContext,
+			Consumer<Long> ackCallback, Consumer<Long> noAckCallback) {
 		super(tag, configurator);
 		this.exchange = configurator.getExchange();
 		this.routingKey = configurator.getRoutingKey();
@@ -233,8 +231,8 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<RmqPublisherConfigu
 
 	public static void main(String[] args) {
 
-		RabbitMqPublisher publisher = new RabbitMqPublisher("", RmqPublisherConfigurator.configuration()
-				.setConnectionParam("", 5672).setUserParam("", "").setModeDirect("").setAutomaticRecovery(true));
+		RabbitMqPublisher publisher = new RabbitMqPublisher("",
+				PublisherConfigurator.configuration("", 5672, "", "").setModeDirect("").setAutomaticRecovery(true));
 
 		ThreadUtil.startNewThread(() -> {
 			int count = 0;

@@ -11,9 +11,9 @@ import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Receiver;
-import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
+import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
 
-public class RabbitMqReceiver extends BaseRabbitMqTransport<RmqReceiverConfigurator> implements Receiver {
+public class RabbitMqReceiver extends BaseRabbitMqTransport<ReceiverConfigurator> implements Receiver {
 
 	// 接收消息时使用的回调函数
 	private volatile Consumer<byte[]> callback;
@@ -21,6 +21,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport<RmqReceiverConfigura
 	// 绑定的Exchange
 	// 暂时没有使用
 	@SuppressWarnings("unused")
+	//TODO
 	private String exchange;
 	// 连接的Queue
 	private String receiveQueue;
@@ -43,7 +44,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport<RmqReceiverConfigura
 	 * @param configurator
 	 * @param callback
 	 */
-	public RabbitMqReceiver(String tag, RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
+	public RabbitMqReceiver(String tag, ReceiverConfigurator configurator, Consumer<byte[]> callback) {
 		super(tag, configurator);
 		this.callback = callback;
 		this.exchange = configurator.getExchange();
@@ -63,7 +64,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport<RmqReceiverConfigura
 	 * @param callback
 	 */
 	@Deprecated
-	public RabbitMqReceiver(String tag, RmqReceiverConfigurator configurator) {
+	public RabbitMqReceiver(String tag, ReceiverConfigurator configurator) {
 		this(tag, configurator, null);
 	}
 
@@ -200,8 +201,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport<RmqReceiverConfigura
 
 	public static void main(String[] args) {
 		RabbitMqReceiver receiver = new RabbitMqReceiver("",
-				RmqReceiverConfigurator.configuration().setConnectionParam("", 0).setUserParam("", "")
-						.setReceiveQueue("").setAutomaticRecovery(true),
+				ReceiverConfigurator.configuration("", 0, "", "").setReceiveQueue("").setAutomaticRecovery(true),
 				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}

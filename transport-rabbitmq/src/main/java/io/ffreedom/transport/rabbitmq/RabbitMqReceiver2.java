@@ -11,9 +11,9 @@ import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Receiver;
-import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
+import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
 
-public class RabbitMqReceiver2 extends BaseRabbitMqTransport<RmqReceiverConfigurator> implements Receiver {
+public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurator> implements Receiver {
 
 	// 接收消息时使用的回调函数
 	private volatile Consumer<byte[]> callback;
@@ -42,7 +42,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<RmqReceiverConfigur
 	 * @param configurator
 	 * @param callback
 	 */
-	public RabbitMqReceiver2(String tag, RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
+	public RabbitMqReceiver2(String tag, ReceiverConfigurator configurator, Consumer<byte[]> callback) {
 		super(tag, configurator);
 		this.callback = callback;
 		this.exchange = configurator.getExchange();
@@ -62,7 +62,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<RmqReceiverConfigur
 	 * @param callback
 	 */
 	@Deprecated
-	public RabbitMqReceiver2(String tag, RmqReceiverConfigurator configurator) {
+	public RabbitMqReceiver2(String tag, ReceiverConfigurator configurator) {
 		this(tag, configurator, null);
 	}
 
@@ -197,8 +197,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<RmqReceiverConfigur
 
 	public static void main(String[] args) {
 		RabbitMqReceiver2 receiver = new RabbitMqReceiver2("",
-				RmqReceiverConfigurator.configuration().setConnectionParam("", 0).setUserParam("", "")
-						.setReceiveQueue("").setAutomaticRecovery(true),
+				ReceiverConfigurator.configuration("", 0, "", "").setReceiveQueue("").setAutomaticRecovery(true),
 				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}

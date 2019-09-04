@@ -12,24 +12,15 @@ public final class RabbitMqOperatingTools {
 
 	public static class OperationalConnectionConfigurator extends ConnectionConfigurator {
 
-		protected OperationalConnectionConfigurator(String configuratorName) {
-			super(configuratorName);
+		protected OperationalConnectionConfigurator(String configuratorName, String host, int port, String username,
+				String password) {
+			super(configuratorName, host, port, username, password);
 		}
 
-		public static OperationalConnectionConfigurator configuration() {
-			return new OperationalConnectionConfigurator("RmqOperationalConnectionConfigurator");
-		}
-
-		public OperationalConnectionConfigurator setConnectionParam(String host, int port) {
-			this.host = host;
-			this.port = port;
-			return this;
-		}
-
-		public OperationalConnectionConfigurator setUserParam(String username, String password) {
-			this.username = username;
-			this.password = password;
-			return this;
+		public static OperationalConnectionConfigurator configuration(String host, int port, String username,
+				String password) {
+			return new OperationalConnectionConfigurator("RmqOperationalConnectionConfigurator", host, port, username,
+					password);
 		}
 
 	}
@@ -122,8 +113,8 @@ public final class RabbitMqOperatingTools {
 
 	public static OperationalChannel createChannel(String host, int port, String username, String password)
 			throws IOException, TimeoutException {
-		return new OperationalChannel("OperationalChannel-Default", OperationalConnectionConfigurator.configuration()
-				.setConnectionParam(host, port).setUserParam(username, password));
+		return new OperationalChannel("OperationalChannel-Default",
+				OperationalConnectionConfigurator.configuration(host, port, username, password));
 	}
 
 	public static OperationalChannel createChannel(OperationalConnectionConfigurator configurator)

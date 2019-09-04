@@ -2,7 +2,7 @@ package io.ffreedom.transport.rabbitmq;
 
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.transport.core.role.Receiver;
-import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
+import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
 import io.ffreedom.transport.rabbitmq.consumer.QosBatchCallBack;
 import io.ffreedom.transport.rabbitmq.consumer.QosBatchProcessConsumer;
 import io.ffreedom.transport.rabbitmq.consumer.QueueMessageSerializable;
@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  * @author xuejian.sun
  * @date 2019/1/14 19:16
  */
-public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport<RmqReceiverConfigurator> implements Receiver {
+public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport<ReceiverConfigurator> implements Receiver {
 
     private String receiverName;
 
@@ -24,7 +24,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport<RmqReceiver
 
     private QosBatchProcessConsumer<T> consumer;
 
-    public RabbitQosBatchReceiver(String tag, RmqReceiverConfigurator configurator, long autoFlushInterval
+    public RabbitQosBatchReceiver(String tag, ReceiverConfigurator configurator, long autoFlushInterval
             , QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack
             , RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
         super(tag, configurator);
@@ -35,7 +35,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport<RmqReceiver
                 , autoFlushInterval, callBack, serializable,refreshNowEvent,filter);
     }
 
-    public RabbitQosBatchReceiver(String tag, RmqReceiverConfigurator configurator, long autoFlushInterval
+    public RabbitQosBatchReceiver(String tag, ReceiverConfigurator configurator, long autoFlushInterval
             , QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack
             , RefreshNowEvent<T> refreshNowEvent) {
         super(tag, configurator);

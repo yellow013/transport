@@ -14,11 +14,12 @@ public abstract class ConnectionConfigurator implements TransportConfigurator {
 	protected int port;
 	protected String username;
 	protected String password;
-	protected String virtualHost = "/";
+	// SSL
+	protected SSLContext sslContext;
 	// 连接超时时间
 	protected int connectionTimeout = 60 * 1000;
 
-	protected SSLContext sslContext;
+	protected String virtualHost = "/";
 	/**
 	 * 队列定义参数
 	 */
@@ -43,8 +44,18 @@ public abstract class ConnectionConfigurator implements TransportConfigurator {
 
 	protected String configuratorName;
 
-	protected ConnectionConfigurator(String configuratorName) {
+	protected ConnectionConfigurator(String configuratorName, String host, int port) {
 		this.configuratorName = configuratorName;
+		this.host = host;
+		this.port = port;
+	}
+
+	protected ConnectionConfigurator(String configuratorName, String host, int port, String username, String password) {
+		this.configuratorName = configuratorName;
+		this.host = host;
+		this.port = port;
+		this.username = username;
+		this.password = password;
 	}
 
 	public String getHost() {

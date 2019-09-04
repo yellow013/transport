@@ -2,7 +2,6 @@ package io.ffreedom.transport.rabbitmq;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public abstract class BaseRabbitMqTransport<CCT extends ConnectionConfigurator> 
 			connectionFactory.setConnectionTimeout(configurator.getConnectionTimeout());
 			connectionFactory.setShutdownTimeout(configurator.getShutdownTimeout());
 			connectionFactory.setRequestedHeartbeat(configurator.getRequestedHeartbeat());
-			if (Objects.nonNull(configurator.getSslContext()))
+			if (configurator.getSslContext() != null)
 				connectionFactory.useSslProtocol(configurator.getSslContext());
 		}
 		try {
