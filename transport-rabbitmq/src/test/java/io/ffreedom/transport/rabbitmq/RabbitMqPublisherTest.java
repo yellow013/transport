@@ -12,7 +12,10 @@ public class RabbitMqPublisherTest {
 				"global", "global2018", "report");
 
 		RabbitMqPublisher publisher = new RabbitMqPublisher("test-publisher",
-				PublisherConfigurator.configuration(connectionConfigurator));
+				PublisherConfigurator.configuration(connectionConfigurator)
+				
+				
+				);
 
 		new RabbitMqReceiver("test-receiver",
 				ReceiverConfigurator.configuration(connectionConfigurator).setReceiveQueue(""),

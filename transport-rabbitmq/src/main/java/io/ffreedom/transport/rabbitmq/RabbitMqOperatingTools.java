@@ -41,18 +41,39 @@ public final class RabbitMqOperatingTools {
 		/**
 		 * 
 		 * @param String           -> queue name
-		 * @param DefaultParameter -> isDurable == true, isExclusive == false,
-		 *                         isAutoDelete == false
+		 * @param DefaultParameter -> durable == true, exclusive == false, autoDelete ==
+		 *                         false<br>
 		 * @throws IOException
 		 */
 		public boolean declareQueueDefault(String queue) throws IOException {
 			return declareQueue(queue, true, false, false);
 		}
 
-		public boolean declareQueue(String queue, boolean isDurable, boolean isExclusive, boolean isAutoDelete)
+		public boolean declareQueue(String queue, boolean durable, boolean exclusive, boolean autoDelete)
 				throws IOException {
-			channel.queueDeclare(queue, isDurable, isExclusive, isAutoDelete, null);
+			channel.queueDeclare(queue, durable, exclusive, autoDelete, null);
 			return true;
+		}
+
+		/**
+		 * 
+		 * @param exchange
+		 * @param DefaultParameter -> durable == true, autoDelete == false, internal ==
+		 *                         false
+		 * @return
+		 * @throws IOException
+		 */
+		public boolean declareDirectExchangeDefault(String exchange) throws IOException {
+			return declareDirectExchange(exchange, true, false, false);
+		}
+
+		public boolean declareDirectExchange(String exchange, boolean durable, boolean autoDelete, boolean internal)
+				throws IOException {
+			return declareExchange(exchange, BuiltinExchangeType.DIRECT, durable, autoDelete, internal);
+		}
+
+		public boolean declareFanoutExchangeDefault(String exchange) throws IOException {
+			return declareFanoutExchange(exchange, true, false, false);
 		}
 
 		public boolean declareFanoutExchange(String exchange, boolean durable, boolean autoDelete, boolean internal)
@@ -60,14 +81,13 @@ public final class RabbitMqOperatingTools {
 			return declareExchange(exchange, BuiltinExchangeType.FANOUT, durable, autoDelete, internal);
 		}
 
+		public boolean declareTopicExchangeDefault(String exchange) throws IOException {
+			return declareTopicExchange(exchange, true, false, false);
+		}
+
 		public boolean declareTopicExchange(String exchange, boolean durable, boolean autoDelete, boolean internal)
 				throws IOException {
 			return declareExchange(exchange, BuiltinExchangeType.TOPIC, durable, autoDelete, internal);
-		}
-
-		public boolean declareDirectExchange(String exchange, boolean durable, boolean autoDelete, boolean internal)
-				throws IOException {
-			return declareExchange(exchange, BuiltinExchangeType.DIRECT, durable, autoDelete, internal);
 		}
 
 		private boolean declareExchange(String exchange, BuiltinExchangeType type, boolean durable, boolean autoDelete,
