@@ -3,6 +3,8 @@ package io.ffreedom.transport.rabbitmq;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
+
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
@@ -13,7 +15,7 @@ import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Receiver;
 import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
 
-public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurator> implements Receiver {
+public class RabbitMqReceiver2 extends BaseRabbitMqTransport implements Receiver {
 
 	// 接收消息时使用的回调函数
 	private volatile Consumer<byte[]> callback;
@@ -21,37 +23,53 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurato
 	// 绑定的Exchange
 	// 暂时没有使用
 	@SuppressWarnings("unused")
-	private String exchange;
+	private String exchange[];
+	@SuppressWarnings("unused")
+	private String[] routingKey;
 	// 连接的Queue
 	private String receiveQueue;
 
 	// 消息无法处理时发送到的错误队列
 	private String errorMsgToExchange;
 
+	// 队列持久化
+	private boolean durable;
+	// 连接独占此队列
+	private boolean exclusive;
+	// channel关闭后自动删除队列
+	private boolean autoDelete;
 	// 自动ACK
-	private boolean isAutoAck;
+	private boolean autoAck;
 	// 一次ACK多条
-	private boolean isMultipleAck;
+	private boolean multipleAck;
 	// 最大自动重试次数
 	private int maxAckTotal;
 	private int maxAckReconnection;
 	private String receiverName;
+
+	@SuppressWarnings("unused")
+	private int qos;
 
 	/**
 	 * 
 	 * @param configurator
 	 * @param callback
 	 */
-	public RabbitMqReceiver2(String tag, ReceiverConfigurator configurator, Consumer<byte[]> callback) {
-		super(tag, configurator);
+	public RabbitMqReceiver2(String tag, @Nonnull ReceiverConfigurator configurator, Consumer<byte[]> callback) {
+		super(tag, configurator.getConnectionConfigurator());
 		this.callback = callback;
 		this.exchange = configurator.getExchange();
+		this.routingKey = configurator.getRoutingKey();
 		this.receiveQueue = configurator.getReceiveQueue();
-		this.isAutoAck = configurator.isAutoAck();
-		this.isMultipleAck = configurator.isMultipleAck();
+		this.durable = configurator.isDurable();
+		this.exclusive = configurator.isExclusive();
+		this.autoDelete = configurator.isAutoDelete();
+		this.autoAck = configurator.isAutoAck();
+		this.multipleAck = configurator.isMultipleAck();
 		this.maxAckTotal = configurator.getMaxAckTotal();
 		this.maxAckReconnection = configurator.getMaxAckReconnection();
 		this.errorMsgToExchange = configurator.getErrorMsgToExchange();
+		this.qos = configurator.getQos();
 		createConnection();
 		init();
 	}
@@ -67,15 +85,13 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurato
 	}
 
 	private void init() {
-		this.receiverName = "Receiver->" + configurator.getHost() + ":" + configurator.getPort() + "$" + receiveQueue;
+		this.receiverName = "Receiver->" + connectionConfigurator.getConfiguratorName() + "$" + receiveQueue;
 		try {
-			channel.queueDeclare(receiveQueue, configurator.isDurable(), configurator.isExclusive(),
-					configurator.isAutoDelete(), null);
+			channel.queueDeclare(receiveQueue, durable, exclusive, autoDelete, null);
 		} catch (IOException e) {
 			ErrorLogger.error(logger, e,
 					"Method channel.queueDeclare(queue==[{}], durable==[{]}, exclusive==[{}], autoDelete==[{}], arguments==null) IOException message -> {}",
-					receiveQueue, configurator.isDurable(), configurator.isExclusive(), configurator.isAutoDelete(),
-					e.getMessage());
+					receiveQueue, durable, exclusive, autoDelete, e.getMessage());
 			destroy();
 		}
 	}
@@ -92,7 +108,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurato
 			// param1: queue
 			// param2: autoAck
 			// param3: consumeCallback
-			channel.basicConsume(receiveQueue, isAutoAck, tag, new DefaultConsumer(channel) {
+			channel.basicConsume(receiveQueue, autoAck, tag, new DefaultConsumer(channel) {
 				@Override
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 						byte[] body) throws IOException {
@@ -120,7 +136,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurato
 							destroy();
 						}
 					}
-					if (!isAutoAck) {
+					if (!autoAck) {
 						if (ack(envelope.getDeliveryTag()))
 							logger.debug("Message handle end.");
 						else {
@@ -158,7 +174,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurato
 			}
 			if (isConnected()) {
 				logger.debug("Last detect connection isConnected() == true, Reconnection count {}", reconnectionCount);
-				channel.basicAck(deliveryTag, isMultipleAck);
+				channel.basicAck(deliveryTag, multipleAck);
 				logger.debug("Method channel.basicAck() finished.");
 				return true;
 			} else {
@@ -169,7 +185,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurato
 		} catch (IOException e) {
 			ErrorLogger.error(logger, e,
 					"Call method channel.basicAck(deliveryTag==[{}], multiple==[{}]) throw IOException -> {}",
-					deliveryTag, isMultipleAck, e.getMessage());
+					deliveryTag, multipleAck, e.getMessage());
 			return ack0(deliveryTag, ++retry);
 		}
 
@@ -197,7 +213,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport<ReceiverConfigurato
 
 	public static void main(String[] args) {
 		RabbitMqReceiver2 receiver = new RabbitMqReceiver2("",
-				ReceiverConfigurator.configuration("", 0, "", "").setReceiveQueue("").setAutomaticRecovery(true),
+				ReceiverConfigurator.configuration("", 0, "", "").setReceiveQueue(""),
 				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}

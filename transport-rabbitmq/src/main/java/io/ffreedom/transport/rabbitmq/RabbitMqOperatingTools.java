@@ -3,6 +3,7 @@ package io.ffreedom.transport.rabbitmq;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import com.rabbitmq.client.AMQP.Queue.DeleteOk;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
@@ -10,24 +11,24 @@ import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 
 public final class RabbitMqOperatingTools {
 
-	public static class OperationalConnectionConfigurator extends ConnectionConfigurator {
-
-		protected OperationalConnectionConfigurator(String configuratorName, String host, int port, String username,
-				String password) {
-			super(configuratorName, host, port, username, password);
-		}
-
-		public static OperationalConnectionConfigurator configuration(String host, int port, String username,
-				String password) {
-			return new OperationalConnectionConfigurator("RmqOperationalConnectionConfigurator", host, port, username,
-					password);
-		}
-
+	public static OperationalChannel createChannel(String host, int port, String username, String password)
+			throws IOException, TimeoutException {
+		return new OperationalChannel("OperationalChannel",
+				ConnectionConfigurator.configuration(host, port, username, password));
 	}
 
-	public static class OperationalChannel extends BaseRabbitMqTransport<OperationalConnectionConfigurator> {
+	public static OperationalChannel createChannel(ConnectionConfigurator configurator)
+			throws IOException, TimeoutException {
+		return new OperationalChannel("OperationalChannel", configurator);
+	}
 
-		private OperationalChannel(String tag, OperationalConnectionConfigurator configurator)
+	public static OperationalChannel ofChannel(Channel channel) {
+		return new OperationalChannel(channel);
+	}
+
+	public static class OperationalChannel extends BaseRabbitMqTransport {
+
+		private OperationalChannel(String tag, ConnectionConfigurator configurator)
 				throws IOException, TimeoutException {
 			super(tag, configurator);
 			createConnection();
@@ -44,7 +45,7 @@ public final class RabbitMqOperatingTools {
 		 *                         isAutoDelete == false
 		 * @throws IOException
 		 */
-		public boolean declareQueueUseDefaultParameter(String queue) throws IOException {
+		public boolean declareQueueDefault(String queue) throws IOException {
 			return declareQueue(queue, true, false, false);
 		}
 
@@ -54,20 +55,24 @@ public final class RabbitMqOperatingTools {
 			return true;
 		}
 
-		public boolean declareFanoutExchange(String exchange) throws IOException {
-			return declareExchange(exchange, BuiltinExchangeType.FANOUT);
+		public boolean declareFanoutExchange(String exchange, boolean durable, boolean autoDelete, boolean internal)
+				throws IOException {
+			return declareExchange(exchange, BuiltinExchangeType.FANOUT, durable, autoDelete, internal);
 		}
 
-		public boolean declareTopicExchange(String exchange) throws IOException {
-			return declareExchange(exchange, BuiltinExchangeType.TOPIC);
+		public boolean declareTopicExchange(String exchange, boolean durable, boolean autoDelete, boolean internal)
+				throws IOException {
+			return declareExchange(exchange, BuiltinExchangeType.TOPIC, durable, autoDelete, internal);
 		}
 
-		public boolean declareDirectExchange(String exchange) throws IOException {
-			return declareExchange(exchange, BuiltinExchangeType.DIRECT);
+		public boolean declareDirectExchange(String exchange, boolean durable, boolean autoDelete, boolean internal)
+				throws IOException {
+			return declareExchange(exchange, BuiltinExchangeType.DIRECT, durable, autoDelete, internal);
 		}
 
-		private boolean declareExchange(String exchange, BuiltinExchangeType type) throws IOException {
-			channel.exchangeDeclare(exchange, type, true, false, false, null);
+		private boolean declareExchange(String exchange, BuiltinExchangeType type, boolean durable, boolean autoDelete,
+				boolean internal) throws IOException {
+			channel.exchangeDeclare(exchange, type, durable, autoDelete, internal, null);
 			return true;
 		}
 
@@ -80,13 +85,14 @@ public final class RabbitMqOperatingTools {
 			return true;
 		}
 
-		public boolean deleteQueue(String queue, boolean isForce) throws IOException {
-			channel.queueDelete(queue, !isForce, !isForce);
+		public boolean deleteQueue(String queue, boolean force) throws IOException {
+			DeleteOk queueDelete = channel.queueDelete(queue, !force, !force);
+			queueDelete.getMessageCount();
 			return true;
 		}
 
-		public boolean deleteExchange(String exchange, boolean isForce) throws IOException {
-			channel.exchangeDelete(exchange, !isForce);
+		public boolean deleteExchange(String exchange, boolean force) throws IOException {
+			channel.exchangeDelete(exchange, !force);
 			return true;
 		}
 
@@ -109,21 +115,6 @@ public final class RabbitMqOperatingTools {
 		public boolean destroy() {
 			return false;
 		}
-	}
-
-	public static OperationalChannel createChannel(String host, int port, String username, String password)
-			throws IOException, TimeoutException {
-		return new OperationalChannel("OperationalChannel-Default",
-				OperationalConnectionConfigurator.configuration(host, port, username, password));
-	}
-
-	public static OperationalChannel createChannel(OperationalConnectionConfigurator configurator)
-			throws IOException, TimeoutException {
-		return new OperationalChannel("OperationalChannel-Default", configurator);
-	}
-
-	public static OperationalChannel ofChannel(Channel channel) {
-		return new OperationalChannel(channel);
 	}
 
 //	static class TestBean {
@@ -195,7 +186,7 @@ public final class RabbitMqOperatingTools {
 		try {
 			manualCloseChannel = createChannel("127.0.0.1", 5672, "guest", "guest");
 			System.out.println(manualCloseChannel.isOpen());
-			manualCloseChannel.declareFanoutExchange("MarketData");
+			manualCloseChannel.declareFanoutExchange("MarketData", true, false, false);
 			manualCloseChannel.close();
 			System.out.println(manualCloseChannel.isOpen());
 		} catch (IOException | TimeoutException e) {

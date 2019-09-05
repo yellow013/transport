@@ -1,66 +1,118 @@
 package io.ffreedom.transport.rabbitmq.config;
 
-import io.ffreedom.common.functional.ShutdownEvent;
+import javax.annotation.Nonnull;
 
-import javax.net.ssl.SSLContext;
-
-public final class ReceiverConfigurator extends ConnectionConfigurator {
+public final class ReceiverConfigurator {
 
 	/**
 	 * 接收者参数
 	 */
-	private String exchange;
+	// 接受者队列
 	private String receiveQueue;
+	// 需要绑定的Exchange
+	private String exchange[];
+	// 需要绑定的routingKey
+	private String routingKey[];
+
+	// 错误消息Ecchange
 	private String errorMsgToExchange;
+	// 是否持久化
+	private boolean durable = true;
+	// 连接独占此队列
+	private boolean exclusive = false;
+	// channel关闭后自动删除队列
+	private boolean autoDelete = false;
 	// 自动ACK
 	private boolean isAutoAck = true;
 	// 一次ACK多条
 	private boolean isMultipleAck = false;
-
 	// 最大重新ACK次数
 	private int maxAckTotal = 16;
 	// 最大ACK重连次数
 	private int maxAckReconnection = 8;
+	// QOS预取
+	private int qos = 256;
 
-	private int qos = 1024;
+	// 连接配置
+	private ConnectionConfigurator connectionConfigurator;
 
-//	private ReceiverConfigurator(String host, int port) {
-//		super("RabbitMqReceiverConfigurator", host, port);
-//	}
-	
-	private ReceiverConfigurator(String host, int port, String username, String password) {
-		super("RabbitMqReceiverConfigurator", host, port);
-		authenticates(username, password);
+	private ReceiverConfigurator(@Nonnull ConnectionConfigurator connectionConfigurator) {
+		this.connectionConfigurator = connectionConfigurator;
 	}
 
-//	public static ReceiverConfigurator configuration(String host, int port) {
-//		return new ReceiverConfigurator(host, port);
-//	}
-	
 	public static ReceiverConfigurator configuration(String host, int port, String username, String password) {
-		return new ReceiverConfigurator(host, port, username, password);
+		return new ReceiverConfigurator(ConnectionConfigurator.configuration(host, port, username, password));
 	}
 
-	public String getExchange() {
+	public static ReceiverConfigurator configuration(String host, int port, String username, String password,
+			String virtualHost) {
+		return new ReceiverConfigurator(
+				ConnectionConfigurator.configuration(host, port, username, password, virtualHost));
+	}
+
+	public static ReceiverConfigurator configuration(ConnectionConfigurator connectionConfigurator) {
+		return new ReceiverConfigurator(connectionConfigurator);
+	}
+
+	public ConnectionConfigurator getConnectionConfigurator() {
+		return connectionConfigurator;
+	}
+
+	public String[] getExchange() {
 		return exchange;
 	}
 
-	public ReceiverConfigurator setExchange(String exchange) {
-		this.exchange = exchange;
-		return this;
+	public String[] getRoutingKey() {
+		return routingKey;
+	}
+
+	public String getReceiveQueue() {
+		return receiveQueue;
 	}
 
 	public String getErrorMsgToExchange() {
 		return errorMsgToExchange;
 	}
 
-	public ReceiverConfigurator setErrorMsgToExchange(String errorMsgToExchange) {
-		this.errorMsgToExchange = errorMsgToExchange;
+	public boolean isDurable() {
+		return durable;
+	}
+
+	public boolean isExclusive() {
+		return exclusive;
+	}
+
+	public boolean isAutoDelete() {
+		return autoDelete;
+	}
+
+	public boolean isAutoAck() {
+		return isAutoAck;
+	}
+
+	public boolean isMultipleAck() {
+		return isMultipleAck;
+	}
+
+	public int getMaxAckTotal() {
+		return maxAckTotal;
+	}
+
+	public int getMaxAckReconnection() {
+		return maxAckReconnection;
+	}
+
+	public int getQos() {
+		return qos;
+	}
+
+	public ReceiverConfigurator setExchange(String... exchange) {
+		this.exchange = exchange;
 		return this;
 	}
 
-	public String getReceiveQueue() {
-		return receiveQueue;
+	public void setRoutingKey(String... routingKey) {
+		this.routingKey = routingKey;
 	}
 
 	public ReceiverConfigurator setReceiveQueue(String receiveQueue) {
@@ -68,72 +120,8 @@ public final class ReceiverConfigurator extends ConnectionConfigurator {
 		return this;
 	}
 
-	public boolean isAutoAck() {
-		return isAutoAck;
-	}
-
-	public ReceiverConfigurator setAutoAck(boolean isAutoAck) {
-		this.isAutoAck = isAutoAck;
-		return this;
-	}
-
-	public boolean isMultipleAck() {
-		return isMultipleAck;
-	}
-
-	public ReceiverConfigurator setMultipleAck(boolean isMultipleAck) {
-		this.isMultipleAck = isMultipleAck;
-		return this;
-	}
-
-	public int getMaxAckTotal() {
-		return maxAckTotal;
-	}
-
-	public ReceiverConfigurator setMaxAckTotal(int maxAckTotal) {
-		this.maxAckTotal = maxAckTotal;
-		return this;
-	}
-
-	public int getMaxAckReconnection() {
-		return maxAckReconnection;
-	}
-
-	public ReceiverConfigurator setMaxAckReconnection(int maxAckReconnection) {
-		this.maxAckReconnection = maxAckReconnection;
-		return this;
-	}
-
-	public int getQos() {
-		return qos;
-	}
-
-	public ReceiverConfigurator setQos(int qos) {
-		this.qos = qos;
-		return this;
-	}
-
-	/**
-	 * 配置连接信息 START
-	 */
-	private ReceiverConfigurator authenticates(String username, String password) {
-		this.username = username;
-		this.password = password;
-		return this;
-	}
-
-	public ReceiverConfigurator setSslContext(SSLContext sslContext) {
-		this.sslContext = sslContext;
-		return this;
-	}
-
-	public ReceiverConfigurator setConnectionTimeout(int connectionTimeout) {
-		this.connectionTimeout = connectionTimeout;
-		return this;
-	}
-
-	public ReceiverConfigurator setVirtualHost(String virtualHost) {
-		this.virtualHost = virtualHost;
+	public ReceiverConfigurator setErrorMsgToExchange(String errorMsgToExchange) {
+		this.errorMsgToExchange = errorMsgToExchange;
 		return this;
 	}
 
@@ -152,37 +140,29 @@ public final class ReceiverConfigurator extends ConnectionConfigurator {
 		return this;
 	}
 
-	public ReceiverConfigurator setAutomaticRecovery(boolean automaticRecovery) {
-		this.automaticRecovery = automaticRecovery;
+	public ReceiverConfigurator setAutoAck(boolean isAutoAck) {
+		this.isAutoAck = isAutoAck;
 		return this;
 	}
 
-	public ReceiverConfigurator setRecoveryInterval(long recoveryInterval) {
-		this.recoveryInterval = recoveryInterval;
+	public ReceiverConfigurator setMultipleAck(boolean isMultipleAck) {
+		this.isMultipleAck = isMultipleAck;
 		return this;
 	}
 
-	public ReceiverConfigurator setHandshakeTimeout(int handshakeTimeout) {
-		this.handshakeTimeout = handshakeTimeout;
+	public ReceiverConfigurator setMaxAckTotal(int maxAckTotal) {
+		this.maxAckTotal = maxAckTotal;
 		return this;
 	}
 
-	public ReceiverConfigurator setShutdownTimeout(int shutdownTimeout) {
-		this.shutdownTimeout = shutdownTimeout;
+	public ReceiverConfigurator setMaxAckReconnection(int maxAckReconnection) {
+		this.maxAckReconnection = maxAckReconnection;
 		return this;
 	}
 
-	public ReceiverConfigurator setRequestedHeartbeat(int requestedHeartbeat) {
-		this.requestedHeartbeat = requestedHeartbeat;
+	public ReceiverConfigurator setQos(int qos) {
+		this.qos = qos;
 		return this;
 	}
 
-	public ReceiverConfigurator setShutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
-		this.shutdownEvent = shutdownEvent;
-		return this;
-	}
-
-	/**
-	 * 配置连接信息 END
-	 */
 }

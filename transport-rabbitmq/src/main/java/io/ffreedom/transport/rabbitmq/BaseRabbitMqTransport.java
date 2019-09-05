@@ -21,7 +21,7 @@ import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.TransportModule;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 
-public abstract class BaseRabbitMqTransport<CCT extends ConnectionConfigurator> implements TransportModule {
+public abstract class BaseRabbitMqTransport  implements TransportModule {
 
 	// 连接RabbitMQ Server使用的组件
 	protected ConnectionFactory connectionFactory;
@@ -29,7 +29,7 @@ public abstract class BaseRabbitMqTransport<CCT extends ConnectionConfigurator> 
 	protected volatile Channel channel;
 
 	// 存储配置信息对象
-	protected CCT configurator;
+	protected ConnectionConfigurator connectionConfigurator;
 
 	// 停机事件, 在监听到ShutdownSignalException时调用
 	protected ShutdownEvent<Exception> shutdownEvent;
@@ -46,29 +46,30 @@ public abstract class BaseRabbitMqTransport<CCT extends ConnectionConfigurator> 
 	 * @param tag
 	 * @param configurator
 	 */
-	protected BaseRabbitMqTransport(String tag, CCT configurator) {
+	protected BaseRabbitMqTransport(String tag, ConnectionConfigurator connectionConfigurator) {
 		this.tag = tag == null ? "START_TIME_" + LocalDateTime.now() : tag;
-		if (configurator == null)
+		if (connectionConfigurator == null)
 			throw new NullPointerException(this.tag + " : configurator is null.");
-		this.configurator = configurator;
-		this.shutdownEvent = configurator.getShutdownEvent();
+		this.connectionConfigurator = connectionConfigurator;
+		this.shutdownEvent = connectionConfigurator.getShutdownEvent();
 	}
 
 	protected void createConnection() {
 		if (connectionFactory == null) {
 			connectionFactory = new ConnectionFactory();
-			connectionFactory.setHost(configurator.getHost());
-			connectionFactory.setPort(configurator.getPort());
-			connectionFactory.setUsername(configurator.getUsername());
-			connectionFactory.setPassword(configurator.getPassword());
-			connectionFactory.setAutomaticRecoveryEnabled(configurator.isAutomaticRecovery());
-			connectionFactory.setNetworkRecoveryInterval(configurator.getRecoveryInterval());
-			connectionFactory.setHandshakeTimeout(configurator.getHandshakeTimeout());
-			connectionFactory.setConnectionTimeout(configurator.getConnectionTimeout());
-			connectionFactory.setShutdownTimeout(configurator.getShutdownTimeout());
-			connectionFactory.setRequestedHeartbeat(configurator.getRequestedHeartbeat());
-			if (configurator.getSslContext() != null)
-				connectionFactory.useSslProtocol(configurator.getSslContext());
+			connectionFactory.setHost(connectionConfigurator.getHost());
+			connectionFactory.setPort(connectionConfigurator.getPort());
+			connectionFactory.setUsername(connectionConfigurator.getUsername());
+			connectionFactory.setPassword(connectionConfigurator.getPassword());
+			connectionFactory.setVirtualHost(connectionConfigurator.getVirtualHost());
+			connectionFactory.setAutomaticRecoveryEnabled(connectionConfigurator.isAutomaticRecovery());
+			connectionFactory.setNetworkRecoveryInterval(connectionConfigurator.getRecoveryInterval());
+			connectionFactory.setHandshakeTimeout(connectionConfigurator.getHandshakeTimeout());
+			connectionFactory.setConnectionTimeout(connectionConfigurator.getConnectionTimeout());
+			connectionFactory.setShutdownTimeout(connectionConfigurator.getShutdownTimeout());
+			connectionFactory.setRequestedHeartbeat(connectionConfigurator.getRequestedHeartbeat());
+			if (connectionConfigurator.getSslContext() != null)
+				connectionFactory.useSslProtocol(connectionConfigurator.getSslContext());
 		}
 		try {
 			connection = connectionFactory.newConnection();
@@ -105,9 +106,9 @@ public abstract class BaseRabbitMqTransport<CCT extends ConnectionConfigurator> 
 	protected boolean closeAndReconnection() {
 		logger.info("Call method closeAndReconnection().");
 		closeConnection();
-		ThreadUtil.sleep(configurator.getRecoveryInterval() / 2);
+		ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval() / 2);
 		createConnection();
-		ThreadUtil.sleep(configurator.getRecoveryInterval() / 2);
+		ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval() / 2);
 		return isConnected();
 	}
 

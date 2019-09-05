@@ -4,12 +4,15 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.MessageProperties;
 
-import io.ffreedom.common.functional.ShutdownEvent;
 import io.ffreedom.common.utils.StringUtil;
 
-import javax.net.ssl.SSLContext;
-
-public class PublisherConfigurator extends ConnectionConfigurator {
+/**
+ * 
+ * @author yellow013
+ * 
+ *         TODO 扩展针对多个routingKey的绑定关系
+ */
+public final class PublisherConfigurator {
 
 	/**
 	 * 发布者参数
@@ -18,26 +21,43 @@ public class PublisherConfigurator extends ConnectionConfigurator {
 	private String routingKey = "";
 	private String[] bindQueues = null;
 	private BasicProperties msgProperties = MessageProperties.PERSISTENT_BASIC;
-	private BuiltinExchangeType builtinExchangeType = BuiltinExchangeType.DIRECT;
+	private BuiltinExchangeType builtinExchangeType = BuiltinExchangeType.FANOUT;
+	// 是否持久化
+	private boolean durable = true;
+	// 没有使用时自动删除
+	private boolean autoDelete = false;
+	// 是否为内部Exchange
+	private boolean internal = false;
+	// 连接独占此队列(针对绑定的队列)
+	private boolean exclusive = false;
+
 	private boolean isConfirm = false;
 	private long confirmTimeout = 5000;
 	private int confirmRetry = 3;
 
-	private PublisherConfigurator(String host, int port) {
-		super("RabbitMqPublisherConfigurator", host, port);
-	}
+	//连接配置
+	private ConnectionConfigurator connectionConfigurator;
 
-	private PublisherConfigurator(String host, int port, String username, String password) {
-		super("RabbitMqPublisherConfigurator", host, port);
-		authenticates(username, password);
-	}
-
-	public static PublisherConfigurator configuration(String host, int port) {
-		return new PublisherConfigurator(host, port);
+	private PublisherConfigurator(ConnectionConfigurator connectionConfigurator) {
+		this.connectionConfigurator = connectionConfigurator;
 	}
 
 	public static PublisherConfigurator configuration(String host, int port, String username, String password) {
-		return new PublisherConfigurator(host, port, username, password);
+		return new PublisherConfigurator(ConnectionConfigurator.configuration(host, port, username, password));
+	}
+
+	public static PublisherConfigurator configuration(String host, int port, String username, String password,
+			String virtualHost) {
+		return new PublisherConfigurator(
+				ConnectionConfigurator.configuration(host, port, username, password, virtualHost));
+	}
+
+	public static PublisherConfigurator configuration(ConnectionConfigurator connectionConfigurator) {
+		return new PublisherConfigurator(connectionConfigurator);
+	}
+
+	public ConnectionConfigurator getConnectionConfigurator() {
+		return connectionConfigurator;
 	}
 
 	public String getExchange() {
@@ -56,27 +76,56 @@ public class PublisherConfigurator extends ConnectionConfigurator {
 		return msgProperties;
 	}
 
-	public PublisherConfigurator setMsgProperties(BasicProperties msgProperties) {
-		this.msgProperties = msgProperties;
-		return this;
+	public BuiltinExchangeType getBuiltinExchangeType() {
+		return builtinExchangeType;
+	}
+
+	public boolean isDurable() {
+		return durable;
+	}
+
+	public boolean isAutoDelete() {
+		return autoDelete;
+	}
+
+	public boolean isInternal() {
+		return internal;
+	}
+
+	public boolean isExclusive() {
+		return exclusive;
 	}
 
 	public boolean isConfirm() {
 		return isConfirm;
 	}
 
-	public PublisherConfigurator openConfirm() {
-		this.isConfirm = true;
-		return this;
-	}
-
-	public PublisherConfigurator closeConfirm() {
-		this.isConfirm = false;
-		return this;
-	}
-
 	public long getConfirmTimeout() {
 		return confirmTimeout;
+	}
+
+	public int getConfirmRetry() {
+		return confirmRetry;
+	}
+
+	public void setDurable(boolean durable) {
+		this.durable = durable;
+	}
+
+	public void setAutoDelete(boolean autoDelete) {
+		this.autoDelete = autoDelete;
+	}
+
+	public void setInternal(boolean internal) {
+		this.internal = internal;
+	}
+
+	public void setExclusive(boolean exclusive) {
+		this.exclusive = exclusive;
+	}
+
+	public void setConfirm(boolean isConfirm) {
+		this.isConfirm = isConfirm;
 	}
 
 	public PublisherConfigurator setConfirmTimeout(long confirmTimeout) {
@@ -84,34 +133,52 @@ public class PublisherConfigurator extends ConnectionConfigurator {
 		return this;
 	}
 
-	public int getConfirmRetry() {
-		return confirmRetry;
-	}
-
 	public PublisherConfigurator setConfirmRetry(int confirmRetry) {
 		this.confirmRetry = confirmRetry;
 		return this;
 	}
 
-	public BuiltinExchangeType getBuiltinExchangeType() {
-		return builtinExchangeType;
+	public PublisherConfigurator setMsgProperties(BasicProperties msgProperties) {
+		this.msgProperties = msgProperties;
+		return this;
 	}
 
-	public PublisherConfigurator setFanoutExchange(String exchange, String[] bindQueues) {
-		return setMode(ExchangeType.FANOUT, exchange, null, bindQueues);
+	public PublisherConfigurator setFanoutExchange(String exchange) {
+		return setFanoutExchangeAndBindQueues(exchange, null);
 	}
 
-	public PublisherConfigurator setDirectExchange(String exchange, String routingKey, String[] bindQueues) {
-		return setMode(ExchangeType.DIRECT, exchange, routingKey, bindQueues);
+	public PublisherConfigurator setFanoutExchangeAndBindQueues(String exchange, String[] bindQueues) {
+		return setExchange(ExchangeType.FANOUT, exchange, null, bindQueues);
 	}
 
-	private PublisherConfigurator setMode(ExchangeType exchangeType, String exchange, String routingKey,
+	public PublisherConfigurator setDirectExchange(String exchange) {
+		return setDirectExchange(exchange, null);
+	}
+
+	public PublisherConfigurator setDirectExchange(String exchange, String routingKey) {
+		return setDirectExchangeAndBindQueues(exchange, routingKey, null);
+	}
+
+	public PublisherConfigurator setDirectExchangeAndBindQueues(String exchange, String[] bindQueues) {
+		return setDirectExchangeAndBindQueues(exchange, bindQueues);
+	}
+
+	public PublisherConfigurator setDirectExchangeAndBindQueues(String exchange, String routingKey,
+			String[] bindQueues) {
+		return setExchange(ExchangeType.DIRECT, exchange, routingKey, bindQueues);
+	}
+
+	public PublisherConfigurator setModeTopic(String exchange, String routingKey, String[] bindQueues) {
+		return setExchange(ExchangeType.FANOUT, exchange, routingKey, bindQueues);
+	}
+
+	private PublisherConfigurator setExchange(ExchangeType exchangeType, String exchange, String routingKey,
 			String[] bindQueues) {
 		if (StringUtil.isNullOrEmpty(exchange))
 			throw new IllegalArgumentException("Param exchange not allowed null");
 		// 设置exchange
 		this.exchange = exchange;
-		//设置routingKey
+		// 设置routingKey
 		if (!StringUtil.isNullOrEmpty(routingKey))
 			this.routingKey = routingKey;
 		// 设置需要绑定的Queue
@@ -128,101 +195,11 @@ public class PublisherConfigurator extends ConnectionConfigurator {
 			this.builtinExchangeType = BuiltinExchangeType.TOPIC;
 			return this;
 		default:
-			return this;
+			throw new IllegalArgumentException("exchangeType is error : " + exchangeType);
 		}
 	}
 
-	public PublisherConfigurator setModeDirect(String directQueue) {
-		return setMode(ExchangeType.DIRECT, directQueue);
-	}
-
-	public PublisherConfigurator setModeFanout(String exchange) {
-		return setMode(ExchangeType.FANOUT, exchange);
-	}
-
-	public PublisherConfigurator setModeFanoutAndBindQueues(String exchange, String[] bindQueues) {
-		return setMode(ExchangeType.FANOUT, exchange, bindQueues);
-	}
-
-	public PublisherConfigurator setModeTopic(String exchange, String routingKey, String[] bindQueues) {
-		return setMode(ExchangeType.FANOUT, exchange, routingKey, bindQueues);
-	}
-
-	/**
-	 * 配置连接信息 START
-	 */
-
-	private PublisherConfigurator authenticates(String username, String password) {
-		this.username = username;
-		this.password = password;
-		return this;
-	}
-
-	public PublisherConfigurator setSslContext(SSLContext sslContext) {
-		this.sslContext = sslContext;
-		return this;
-	}
-
-	public PublisherConfigurator setConnectionTimeout(int connectionTimeout) {
-		this.connectionTimeout = connectionTimeout;
-		return this;
-	}
-
-	public PublisherConfigurator setVirtualHost(String virtualHost) {
-		this.virtualHost = virtualHost;
-		return this;
-	}
-
-	public PublisherConfigurator setDurable(boolean durable) {
-		this.durable = durable;
-		return this;
-	}
-
-	public PublisherConfigurator setExclusive(boolean exclusive) {
-		this.exclusive = exclusive;
-		return this;
-	}
-
-	public PublisherConfigurator setAutoDelete(boolean autoDelete) {
-		this.autoDelete = autoDelete;
-		return this;
-	}
-
-	public PublisherConfigurator setAutomaticRecovery(boolean automaticRecovery) {
-		this.automaticRecovery = automaticRecovery;
-		return this;
-	}
-
-	public PublisherConfigurator setRecoveryInterval(long recoveryInterval) {
-		this.recoveryInterval = recoveryInterval;
-		return this;
-	}
-
-	public PublisherConfigurator setHandshakeTimeout(int handshakeTimeout) {
-		this.handshakeTimeout = handshakeTimeout;
-		return this;
-	}
-
-	public PublisherConfigurator setShutdownTimeout(int shutdownTimeout) {
-		this.shutdownTimeout = shutdownTimeout;
-		return this;
-	}
-
-	public PublisherConfigurator setRequestedHeartbeat(int requestedHeartbeat) {
-		this.requestedHeartbeat = requestedHeartbeat;
-		return this;
-	}
-
-	public PublisherConfigurator setShutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
-		this.shutdownEvent = shutdownEvent;
-		return this;
-	}
-
-	/**
-	 * 配置连接信息 END
-	 */
-
-	public static enum ExchangeType {
+	private enum ExchangeType {
 		DIRECT, FANOUT, TOPIC
 	}
 

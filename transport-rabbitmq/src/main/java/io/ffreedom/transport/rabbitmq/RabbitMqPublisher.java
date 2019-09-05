@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
 
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -17,27 +18,20 @@ import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.rabbitmq.RabbitMqOperatingTools.OperationalChannel;
 import io.ffreedom.transport.rabbitmq.config.PublisherConfigurator;
 
-public class RabbitMqPublisher extends BaseRabbitMqTransport<PublisherConfigurator> implements Publisher<byte[]> {
+public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publisher<byte[]> {
 
 	// 发布消息使用的routingKey
 	private String routingKey;
-
 	// 发布消息使用的exchange
 	private String exchange;
-
 	// 发布消息使用的参数
 	private BasicProperties msgProperties;
-
 	private String publisherName;
-
 	private String[] bindQueues;
-
 	private BuiltinExchangeType builtinExchangeType;
 
 	private boolean isConfirm;
-
 	private long confirmTimeout;
-
 	private int confirmRetry;
 
 	@SuppressWarnings("unused")
@@ -45,6 +39,8 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<PublisherConfigurat
 
 	@SuppressWarnings("unused")
 	private Consumer<Long> noAckCallback;
+
+	private PublisherConfigurator configurator;
 
 	/**
 	 * @param configurator
@@ -57,15 +53,15 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<PublisherConfigurat
 		this(tag, configurator, sslContext, null, null);
 	}
 
-	public RabbitMqPublisher(String tag, PublisherConfigurator configurator, SSLContext sslContext,
+	public RabbitMqPublisher(String tag, @Nonnull PublisherConfigurator configurator, SSLContext sslContext,
 			Consumer<Long> ackCallback, Consumer<Long> noAckCallback) {
-		super(tag, configurator);
+		super(tag, configurator.getConnectionConfigurator());
+		this.configurator = configurator;
 		this.exchange = configurator.getExchange();
 		this.routingKey = configurator.getRoutingKey();
 		this.msgProperties = configurator.getMsgProperties();
 		this.bindQueues = configurator.getBindQueues();
 		this.builtinExchangeType = configurator.getBuiltinExchangeType();
-		this.directQueue = configurator.getDirectQueue();
 		this.isConfirm = configurator.isConfirm();
 		this.confirmTimeout = configurator.getConfirmTimeout();
 		this.confirmRetry = configurator.getConfirmRetry();
@@ -74,42 +70,34 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<PublisherConfigurat
 	}
 
 	private void init() {
-		this.publisherName = "Publisher->" + configurator.getHost() + ":" + configurator.getPort() + "$" + routingKey;
+		this.publisherName = "Publisher->" + connectionConfigurator.getConfiguratorName() + "$" + routingKey;
 		try {
 			OperationalChannel operationalChannel = RabbitMqOperatingTools.ofChannel(channel);
+			// 根据不同的Exchange类型, 创建Exchange
 			switch (builtinExchangeType) {
 			case DIRECT:
-				this.routingKey = directQueue != null ? directQueue : "";
-				if (directQueue != null)
-					operationalChannel.declareQueue(directQueue, configurator.isDurable(), configurator.isExclusive(),
-							configurator.isAutoDelete());
+				operationalChannel.declareDirectExchange(exchange, configurator.isDurable(),
+						configurator.isAutoDelete(), configurator.isInternal());
 				break;
 			case FANOUT:
-				operationalChannel.declareFanoutExchange(exchange);
-				if (bindQueues != null) {
-					for (String queue : bindQueues) {
-						if (!StringUtil.isNullOrEmpty(queue)) {
-							operationalChannel.declareQueue(queue, configurator.isDurable(), configurator.isExclusive(),
-									configurator.isAutoDelete());
-							operationalChannel.bindQueue(queue, exchange);
-						}
-					}
-				}
+				operationalChannel.declareFanoutExchange(exchange, configurator.isDurable(),
+						configurator.isAutoDelete(), configurator.isInternal());
 				break;
 			case TOPIC:
-				operationalChannel.declareTopicExchange(exchange);
-				if (bindQueues != null) {
-					for (String queue : bindQueues) {
-						if (!StringUtil.isNullOrEmpty(queue)) {
-							operationalChannel.declareQueue(queue, configurator.isDurable(), configurator.isExclusive(),
-									configurator.isAutoDelete());
-							operationalChannel.bindQueue(queue, exchange, routingKey);
-						}
-					}
-				}
+				operationalChannel.declareTopicExchange(exchange, configurator.isDurable(), configurator.isAutoDelete(),
+						configurator.isInternal());
 				break;
 			default:
 				break;
+			}
+			if (bindQueues != null) {
+				for (String queue : bindQueues) {
+					if (!StringUtil.isNullOrEmpty(queue)) {
+						operationalChannel.declareQueue(queue, configurator.isDurable(), configurator.isExclusive(),
+								configurator.isAutoDelete());
+						operationalChannel.bindQueue(queue, exchange, routingKey);
+					}
+				}
 			}
 		} catch (IOException e) {
 			ErrorLogger.error(logger, e, "Call method init() throw IOException -> {}", e.getMessage());
@@ -133,7 +121,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<PublisherConfigurat
 			while (!isConnected()) {
 				logger.error("Detect connection isConnected() == false, retry {}", (++retry));
 				destroy();
-				ThreadUtil.sleep(configurator.getRecoveryInterval());
+				ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval());
 				createConnection();
 			}
 			if (isConfirm)
@@ -232,7 +220,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport<PublisherConfigurat
 	public static void main(String[] args) {
 
 		RabbitMqPublisher publisher = new RabbitMqPublisher("",
-				PublisherConfigurator.configuration("", 5672, "", "").setModeDirect("").setAutomaticRecovery(true));
+				PublisherConfigurator.configuration("", 5672, "", "").setFanoutExchange(""));
 
 		ThreadUtil.startNewThread(() -> {
 			int count = 0;

@@ -5,63 +5,74 @@ import io.ffreedom.transport.core.config.TransportConfigurator;
 
 import javax.net.ssl.SSLContext;
 
-public abstract class ConnectionConfigurator implements TransportConfigurator {
+public final class ConnectionConfigurator implements TransportConfigurator {
 
 	/**
 	 * 连接参数
 	 */
-	protected String host;
-	protected int port;
-	protected String username;
-	protected String password;
+	private String host;
+	private int port;
+	private String username;
+	private String password;
+	private String virtualHost = "/";
+
+	// 配置器全名
+	private String configuratorName;
+
 	// SSL
-	protected SSLContext sslContext;
+	private SSLContext sslContext;
 	// 连接超时时间
-	protected int connectionTimeout = 60 * 1000;
-
-	protected String virtualHost = "/";
-	/**
-	 * 队列定义参数
-	 */
-	// 是否持久化
-	protected boolean durable = true;
-	// 连接独占此队列
-	protected boolean exclusive = false;
-	// channel关闭后自动删除队列
-	protected boolean autoDelete = false;
+	private int connectionTimeout = 60 * 1000;
 	// 自动恢复连接
-	protected boolean automaticRecovery = true;
+	private boolean automaticRecovery = true;
 	// 重试连接间隔
-	protected long recoveryInterval = 10 * 1000;
+	private long recoveryInterval = 10 * 1000;
 	// 握手通信超时时间
-	protected int handshakeTimeout = 10 * 1000;
+	private int handshakeTimeout = 10 * 1000;
 	// 关闭超时时间
-	protected int shutdownTimeout = 10 * 1000;
+	private int shutdownTimeout = 10 * 1000;
 	// 请求心跳超时时间
-	protected int requestedHeartbeat = 20;
+	private int requestedHeartbeat = 20;
 	// 停机处理回调函数
-	protected ShutdownEvent<Exception> shutdownEvent;
+	private ShutdownEvent<Exception> shutdownEvent;
 
-	protected String configuratorName;
-
-	protected ConnectionConfigurator(String configuratorName, String host, int port) {
-		this.configuratorName = configuratorName;
-		this.host = host;
-		this.port = port;
+	protected ConnectionConfigurator(String host, int port, String username, String password) {
+		this(host, port, username, password, "/");
 	}
 
-	protected ConnectionConfigurator(String configuratorName, String host, int port, String username, String password) {
-		this.configuratorName = configuratorName;
+	protected ConnectionConfigurator(String host, int port, String username, String password, String virtualHost) {
 		this.host = host;
 		this.port = port;
 		this.username = username;
 		this.password = password;
+		this.virtualHost = virtualHost;
+		this.configuratorName = username + "@" + host + ":" + port
+				+ (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
 	}
 
+	public static ConnectionConfigurator configuration(String host, int port, String username, String password) {
+		return new ConnectionConfigurator(host, port, username, password);
+	}
+
+	public static ConnectionConfigurator configuration(String host, int port, String username, String password,
+			String virtualHost) {
+		return new ConnectionConfigurator(host, port, username, password, virtualHost);
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public String getConfiguratorName() {
+		return configuratorName;
+	}
+
+	@Override
 	public String getHost() {
 		return host;
 	}
 
+	@Override
 	public int getPort() {
 		return port;
 	}
@@ -80,18 +91,6 @@ public abstract class ConnectionConfigurator implements TransportConfigurator {
 
 	public int getConnectionTimeout() {
 		return connectionTimeout;
-	}
-
-	public boolean isDurable() {
-		return durable;
-	}
-
-	public boolean isExclusive() {
-		return exclusive;
-	}
-
-	public boolean isAutoDelete() {
-		return autoDelete;
 	}
 
 	public boolean isAutomaticRecovery() {
@@ -118,11 +117,60 @@ public abstract class ConnectionConfigurator implements TransportConfigurator {
 		return shutdownEvent;
 	}
 
-	public String getConfiguratorName() {
-		return configuratorName;
-	}
-
 	public SSLContext getSslContext() {
 		return sslContext;
 	}
+
+	public ConnectionConfigurator setConfiguratorName(String configuratorName) {
+		this.configuratorName = configuratorName;
+		return this;
+	}
+
+	public ConnectionConfigurator setSslContext(SSLContext sslContext) {
+		this.sslContext = sslContext;
+		return this;
+	}
+
+	public ConnectionConfigurator setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+		return this;
+	}
+
+	public ConnectionConfigurator setAutomaticRecovery(boolean automaticRecovery) {
+		this.automaticRecovery = automaticRecovery;
+		return this;
+	}
+
+	public ConnectionConfigurator setRecoveryInterval(long recoveryInterval) {
+		this.recoveryInterval = recoveryInterval;
+		return this;
+	}
+
+	public ConnectionConfigurator setHandshakeTimeout(int handshakeTimeout) {
+		this.handshakeTimeout = handshakeTimeout;
+		return this;
+	}
+
+	public ConnectionConfigurator setShutdownTimeout(int shutdownTimeout) {
+		this.shutdownTimeout = shutdownTimeout;
+		return this;
+	}
+
+	public ConnectionConfigurator setRequestedHeartbeat(int requestedHeartbeat) {
+		this.requestedHeartbeat = requestedHeartbeat;
+		return this;
+	}
+
+	public ConnectionConfigurator setShutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
+		this.shutdownEvent = shutdownEvent;
+		return this;
+	}
+
+	public static void main(String[] args) {
+
+		ConnectionConfigurator configuration = configuration("localhost", 5672, "admin", "admin", "report");
+		System.out.println(configuration.getConfiguratorName());
+
+	}
+
 }
