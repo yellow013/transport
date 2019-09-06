@@ -1,10 +1,13 @@
 package io.ffreedom.transport.rabbitmq.config;
 
+import javax.annotation.Nonnull;
+
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.MessageProperties;
 
 import io.ffreedom.common.utils.StringUtil;
+import io.ffreedom.transport.rabbitmq.declare.BaseEntity.ExchangeType;
 
 /**
  * 
@@ -35,24 +38,14 @@ public final class PublisherConfigurator {
 	private long confirmTimeout = 5000;
 	private int confirmRetry = 3;
 
-	//连接配置
+	// 连接配置
 	private ConnectionConfigurator connectionConfigurator;
 
 	private PublisherConfigurator(ConnectionConfigurator connectionConfigurator) {
 		this.connectionConfigurator = connectionConfigurator;
 	}
 
-	public static PublisherConfigurator configuration(String host, int port, String username, String password) {
-		return new PublisherConfigurator(ConnectionConfigurator.configuration(host, port, username, password));
-	}
-
-	public static PublisherConfigurator configuration(String host, int port, String username, String password,
-			String virtualHost) {
-		return new PublisherConfigurator(
-				ConnectionConfigurator.configuration(host, port, username, password, virtualHost));
-	}
-
-	public static PublisherConfigurator configuration(ConnectionConfigurator connectionConfigurator) {
+	public static PublisherConfigurator configuration(@Nonnull ConnectionConfigurator connectionConfigurator) {
 		return new PublisherConfigurator(connectionConfigurator);
 	}
 
@@ -144,32 +137,35 @@ public final class PublisherConfigurator {
 	}
 
 	public PublisherConfigurator setFanoutExchange(String exchange) {
-		return setFanoutExchangeAndBindQueues(exchange, null);
+		return setFanoutExchange(exchange, null);
 	}
 
-	public PublisherConfigurator setFanoutExchangeAndBindQueues(String exchange, String[] bindQueues) {
-		return setExchange(ExchangeType.FANOUT, exchange, null, bindQueues);
+	public PublisherConfigurator setFanoutExchange(String exchange, String[] bindQueues) {
+		return setExchange(ExchangeType.Fanout, exchange, "", bindQueues);
 	}
 
 	public PublisherConfigurator setDirectExchange(String exchange) {
-		return setDirectExchange(exchange, null);
+		return setDirectExchange(exchange, "");
 	}
 
 	public PublisherConfigurator setDirectExchange(String exchange, String routingKey) {
-		return setDirectExchangeAndBindQueues(exchange, routingKey, null);
+		return setDirectExchange(exchange, routingKey, null);
 	}
 
-	public PublisherConfigurator setDirectExchangeAndBindQueues(String exchange, String[] bindQueues) {
-		return setDirectExchangeAndBindQueues(exchange, bindQueues);
+	public PublisherConfigurator setDirectExchange(String exchange, String[] bindQueues) {
+		return setDirectExchange(exchange, "", bindQueues);
 	}
 
-	public PublisherConfigurator setDirectExchangeAndBindQueues(String exchange, String routingKey,
-			String[] bindQueues) {
-		return setExchange(ExchangeType.DIRECT, exchange, routingKey, bindQueues);
+	public PublisherConfigurator setDirectExchange(String exchange, String routingKey, String[] bindQueues) {
+		return setExchange(ExchangeType.Direct, exchange, routingKey, bindQueues);
 	}
 
-	public PublisherConfigurator setModeTopic(String exchange, String routingKey, String[] bindQueues) {
-		return setExchange(ExchangeType.FANOUT, exchange, routingKey, bindQueues);
+	public PublisherConfigurator setTopicExchange(String exchange) {
+		return setTopicExchange(exchange, "", null);
+	}
+
+	public PublisherConfigurator setTopicExchange(String exchange, String routingKey, String[] bindQueues) {
+		return setExchange(ExchangeType.Topic, exchange, routingKey, bindQueues);
 	}
 
 	private PublisherConfigurator setExchange(ExchangeType exchangeType, String exchange, String routingKey,
@@ -185,22 +181,18 @@ public final class PublisherConfigurator {
 		if (bindQueues != null)
 			this.bindQueues = bindQueues;
 		switch (exchangeType) {
-		case DIRECT:
+		case Direct:
 			this.builtinExchangeType = BuiltinExchangeType.DIRECT;
 			return this;
-		case FANOUT:
+		case Fanout:
 			this.builtinExchangeType = BuiltinExchangeType.FANOUT;
 			return this;
-		case TOPIC:
+		case Topic:
 			this.builtinExchangeType = BuiltinExchangeType.TOPIC;
 			return this;
 		default:
 			throw new IllegalArgumentException("exchangeType is error : " + exchangeType);
 		}
-	}
-
-	private enum ExchangeType {
-		DIRECT, FANOUT, TOPIC
 	}
 
 }

@@ -36,21 +36,11 @@ public final class ReceiverConfigurator {
 	// 连接配置
 	private ConnectionConfigurator connectionConfigurator;
 
-	private ReceiverConfigurator(@Nonnull ConnectionConfigurator connectionConfigurator) {
+	private ReceiverConfigurator(ConnectionConfigurator connectionConfigurator) {
 		this.connectionConfigurator = connectionConfigurator;
 	}
 
-	public static ReceiverConfigurator configuration(String host, int port, String username, String password) {
-		return new ReceiverConfigurator(ConnectionConfigurator.configuration(host, port, username, password));
-	}
-
-	public static ReceiverConfigurator configuration(String host, int port, String username, String password,
-			String virtualHost) {
-		return new ReceiverConfigurator(
-				ConnectionConfigurator.configuration(host, port, username, password, virtualHost));
-	}
-
-	public static ReceiverConfigurator configuration(ConnectionConfigurator connectionConfigurator) {
+	public static ReceiverConfigurator configuration(@Nonnull ConnectionConfigurator connectionConfigurator) {
 		return new ReceiverConfigurator(connectionConfigurator);
 	}
 
