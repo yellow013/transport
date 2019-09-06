@@ -14,7 +14,7 @@ public final class RabbitMqOperatingTools {
 	public static OperationalChannel createChannel(String host, int port, String username, String password)
 			throws IOException, TimeoutException {
 		return new OperationalChannel("OperationalChannel",
-				ConnectionConfigurator.configuration(host, port, username, password));
+				ConnectionConfigurator.configuration(host, port, username, password).build());
 	}
 
 	public static OperationalChannel createChannel(ConnectionConfigurator configurator)

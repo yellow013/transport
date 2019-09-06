@@ -16,6 +16,7 @@ import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Publisher;
 import io.ffreedom.transport.rabbitmq.RabbitMqOperatingTools.OperationalChannel;
+import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 import io.ffreedom.transport.rabbitmq.config.PublisherConfigurator;
 
 public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publisher<byte[]> {
@@ -219,8 +220,8 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 
 	public static void main(String[] args) {
 
-		RabbitMqPublisher publisher = new RabbitMqPublisher("",
-				PublisherConfigurator.configuration("", 5672, "", "").setFanoutExchange(""));
+		RabbitMqPublisher publisher = new RabbitMqPublisher("", PublisherConfigurator
+				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build()).setFanoutExchange(""));
 
 		ThreadUtil.startNewThread(() -> {
 			int count = 0;

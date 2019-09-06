@@ -13,6 +13,7 @@ import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Receiver;
+import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
 
 public class RabbitMqReceiver2 extends BaseRabbitMqTransport implements Receiver {
@@ -213,7 +214,7 @@ public class RabbitMqReceiver2 extends BaseRabbitMqTransport implements Receiver
 
 	public static void main(String[] args) {
 		RabbitMqReceiver2 receiver = new RabbitMqReceiver2("",
-				ReceiverConfigurator.configuration("", 0, "", "").setReceiveQueue(""),
+				ReceiverConfigurator.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build()).setReceiveQueue(""),
 				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}
