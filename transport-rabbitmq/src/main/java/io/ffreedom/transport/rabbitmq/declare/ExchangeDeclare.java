@@ -1,10 +1,10 @@
 package io.ffreedom.transport.rabbitmq.declare;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
-import org.eclipse.collections.api.list.MutableList;
-
-import io.ffreedom.common.collections.MutableLists;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Binding;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Exchange;
@@ -13,9 +13,6 @@ import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
 public class ExchangeDeclare extends BaseDeclare {
 
 	private Exchange exchange;
-
-	private MutableList<Exchange> bindingExchanges = MutableLists.newFastList();
-	private MutableList<Queue> bindingQueues = MutableLists.newFastList();
 
 	public static ExchangeDeclare declareFanoutExchange(@Nonnull String exchangeName) {
 		return new ExchangeDeclare(Exchange.declareFanout(exchangeName));
@@ -53,43 +50,35 @@ public class ExchangeDeclare extends BaseDeclare {
 		return this;
 	}
 
-	public ExchangeDeclare bindingExchange(Exchange... exchanges) {
+	public ExchangeDeclare declareBindingExchange(Exchange... exchanges) {
+		return declareBindingExchange(exchanges != null ? Arrays.asList(exchanges) : null, null);
+	}
+
+	public ExchangeDeclare declareBindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
-			for (Exchange exchange : exchanges)
-				bindingExchanges.add(exchange);
+			exchanges.forEach(exchange -> {
+				if (routingKeys != null)
+					routingKeys.forEach(routingKey -> bindings.add(new Binding(this.exchange, exchange, routingKey)));
+				else
+					bindings.add(new Binding(this.exchange, exchange));
+			});
 		}
 		return this;
 	}
 
-	public ExchangeDeclare bindingQueue(Queue... queues) {
+	public ExchangeDeclare declareBindingQueue(Queue... queues) {
+		return declareBindingQueue(queues != null ? Arrays.asList(queues) : null, null);
+	}
+
+	public ExchangeDeclare declareBindingQueue(List<Queue> queues, List<String> routingKeys) {
 		if (queues != null) {
-			for (Queue queue : queues)
-				bindingQueues.add(queue);
+			queues.forEach(queue -> {
+				if (routingKeys != null)
+					routingKeys.forEach(routingKey -> bindings.add(new Binding(this.exchange, queue, routingKey)));
+				else
+					bindings.add(new Binding(this.exchange, queue));
+			});
 		}
-		return this;
-	}
-
-	public ExchangeDeclare declareBinding() {
-		return declareBinding("");
-	}
-
-	public ExchangeDeclare declareBinding(String... routingKeys) {
-		bindingQueues.forEach(destination -> {
-			if (routingKeys != null) {
-				for (String routingKey : routingKeys)
-					bindings.add(new Binding(exchange, destination, routingKey));
-			} else
-				bindings.add(new Binding(exchange, destination));
-		});
-		bindingQueues.clear();
-		bindingExchanges.forEach(destination -> {
-			if (routingKeys != null) {
-				for (String routingKey : routingKeys)
-					bindings.add(new Binding(exchange, destination, routingKey));
-			} else
-				bindings.add(new Binding(exchange, destination));
-		});
-		bindingExchanges.clear();
 		return this;
 	}
 

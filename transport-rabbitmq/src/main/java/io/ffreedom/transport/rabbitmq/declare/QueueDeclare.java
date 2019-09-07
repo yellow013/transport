@@ -1,24 +1,24 @@
 package io.ffreedom.transport.rabbitmq.declare;
 
-import org.eclipse.collections.api.list.MutableList;
+import java.util.Arrays;
+import java.util.List;
 
-import io.ffreedom.common.collections.MutableLists;
+import javax.annotation.Nonnull;
+
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Binding;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Exchange;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
 
-public class ReceiverDeclare extends BaseDeclare {
+public class QueueDeclare extends BaseDeclare {
 
 	private Queue queue;
-	private ExchangeDeclare errorMsgExchange;
-	private MutableList<Exchange> bindingExchanges = MutableLists.newFastList();
 
-	public static ReceiverDeclare declareQueue(String queueName) {
-		return new ReceiverDeclare(Queue.declare(queueName));
+	public static QueueDeclare declare(String queueName) {
+		return new QueueDeclare(Queue.declare(queueName));
 	}
 
-	private ReceiverDeclare(Queue queue) {
+	private QueueDeclare(Queue queue) {
 		this.queue = queue;
 	}
 
@@ -27,52 +27,39 @@ public class ReceiverDeclare extends BaseDeclare {
 
 	}
 
-	public ReceiverDeclare setDurable(boolean durable) {
+	public QueueDeclare setDurable(boolean durable) {
 		queue.setDurable(durable);
 		return this;
 	}
 
-	public ReceiverDeclare setAutoDelete(boolean autoDelete) {
+	public QueueDeclare setAutoDelete(boolean autoDelete) {
 		queue.setAutoDelete(autoDelete);
 		return this;
 	}
 
-	public ReceiverDeclare setExclusive(boolean exclusive) {
+	public QueueDeclare setExclusive(boolean exclusive) {
 		queue.setExclusive(exclusive);
 		return this;
 	}
 
-	public ExchangeDeclare getErrorMsgExchange() {
-		return errorMsgExchange;
+	public QueueDeclare declareBinding(Exchange... exchanges) {
+		return declareBinding(exchanges != null ? Arrays.asList(exchanges) : null, null);
 	}
 
-	public ReceiverDeclare setErrorMsgExchange(ExchangeDeclare errorMsgExchange) {
-		this.errorMsgExchange = errorMsgExchange;
-		return this;
-	}
-
-	public ReceiverDeclare bindingExchange(Exchange... exchanges) {
+	public QueueDeclare declareBinding(@Nonnull List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
-			for (Exchange exchange : exchanges)
-				bindingExchanges.add(exchange);
+			exchanges.forEach(exchange -> {
+				if (routingKeys != null)
+					routingKeys.forEach(routingKey -> bindings.add(new Binding(exchange, this.queue, routingKey)));
+				else
+					bindings.add(new Binding(exchange, this.queue));
+			});
 		}
 		return this;
 	}
 
-	public ReceiverDeclare declareBinding() {
-		return declareBinding("");
-	}
+	public static void main(String[] args) {
 
-	public ReceiverDeclare declareBinding(String... routingKeys) {
-		bindingExchanges.forEach(source -> {
-			if (routingKeys != null) {
-				for (String routingKey : routingKeys)
-					bindings.add(new Binding(source, queue, routingKey));
-			} else
-				bindings.add(new Binding(source, queue));
-		});
-		bindingExchanges.clear();
-		return this;
 	}
 
 }

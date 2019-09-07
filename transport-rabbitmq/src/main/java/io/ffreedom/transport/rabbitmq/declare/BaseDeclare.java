@@ -12,5 +12,4 @@ public abstract class BaseDeclare {
 
 	public abstract void declare(ConnectionConfigurator configurator);
 
-	
 }
