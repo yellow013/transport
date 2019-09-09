@@ -5,16 +5,17 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
+import io.ffreedom.transport.rabbitmq.OperationalChannel;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Binding;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Exchange;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.ffreedom.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 public class QueueDeclare extends BaseDeclare {
 
 	private Queue queue;
 
-	public static QueueDeclare declare(String queueName) {
+	public static QueueDeclare queue(String queueName) {
 		return new QueueDeclare(Queue.declare(queueName));
 	}
 
@@ -23,8 +24,20 @@ public class QueueDeclare extends BaseDeclare {
 	}
 
 	@Override
-	public void declare(ConnectionConfigurator configurator) {
+	protected void declare0(OperationalChannel channel) {
+		try {
+			channel.declareQueue(queue);
+		} catch (RabbitMqDeclareException e) {
+			logger.error("Declare Queue failure -> {}", queue);
+			throw new RuntimeException(e);
+		}
+	}
 
+	/**
+	 * @return the queue
+	 */
+	public Queue getQueue() {
+		return queue;
 	}
 
 	public QueueDeclare setDurable(boolean durable) {

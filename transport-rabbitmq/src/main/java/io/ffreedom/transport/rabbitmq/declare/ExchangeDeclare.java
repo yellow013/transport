@@ -5,24 +5,25 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
+import io.ffreedom.transport.rabbitmq.OperationalChannel;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Binding;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Exchange;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.ffreedom.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 public class ExchangeDeclare extends BaseDeclare {
 
 	private Exchange exchange;
 
-	public static ExchangeDeclare declareFanoutExchange(@Nonnull String exchangeName) {
+	public static ExchangeDeclare fanoutExchange(@Nonnull String exchangeName) {
 		return new ExchangeDeclare(Exchange.declareFanout(exchangeName));
 	}
 
-	public static ExchangeDeclare declareDirectExchange(@Nonnull String exchangeName) {
+	public static ExchangeDeclare directExchange(@Nonnull String exchangeName) {
 		return new ExchangeDeclare(Exchange.declareDirect(exchangeName));
 	}
 
-	public static ExchangeDeclare declareTopicExchange(@Nonnull String exchangeName) {
+	public static ExchangeDeclare topicExchange(@Nonnull String exchangeName) {
 		return new ExchangeDeclare(Exchange.declareTopic(exchangeName));
 	}
 
@@ -31,8 +32,20 @@ public class ExchangeDeclare extends BaseDeclare {
 	}
 
 	@Override
-	public void declare(ConnectionConfigurator configurator) {
-		// TODO Auto-generated method stub
+	protected void declare0(OperationalChannel channel) {
+		try {
+			channel.declareExchange(exchange);
+		} catch (RabbitMqDeclareException e) {
+			logger.error("Declare Exchange failure -> {}", exchange);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * @return the exchange
+	 */
+	public Exchange getExchange() {
+		return exchange;
 	}
 
 	public ExchangeDeclare setDurable(boolean durable) {
@@ -84,7 +97,7 @@ public class ExchangeDeclare extends BaseDeclare {
 
 	public static void main(String[] args) {
 
-		ExchangeDeclare.declareDirectExchange("TEST_DIRECT").setAutoDelete(true).setInternal(true);
+		ExchangeDeclare.directExchange("TEST_DIRECT").setAutoDelete(true).setInternal(true);
 
 	}
 

@@ -1,5 +1,7 @@
 package io.ffreedom.transport.rabbitmq.declare;
 
+import static java.lang.String.valueOf;
+
 public class BaseEntity {
 
 	public static class Exchange {
@@ -92,6 +94,20 @@ public class BaseEntity {
 			return this;
 		}
 
+		private final static String ToStringTemplate = "Exchange([name=$name],[type=$type],[durable=$durable],[autoDelete=$autoDelete],[internal=$internal])";
+
+		@Override
+		public String toString() {
+			return ToStringTemplate.replace("$name", name).replace("$type", valueOf(type))
+					.replace("$durable", valueOf(durable)).replace("$autoDelete", valueOf(autoDelete))
+					.replace("$internal", valueOf(internal));
+		}
+
+		public boolean idempotent(Exchange another) {
+			return name.equals(another.name) && type == another.type && durable == another.durable
+					&& autoDelete == another.autoDelete && internal == another.internal;
+		}
+
 	}
 
 	public static class Queue {
@@ -165,42 +181,50 @@ public class BaseEntity {
 			return this;
 		}
 
+		private final static String ToStringTemplate = "Queue([name=$name],[durable=$durable],[exclusive=$exclusive],[autoDelete=$autoDelete])";
+
+		@Override
+		public String toString() {
+			return ToStringTemplate.replace("$name", name).replace("$durable", valueOf(durable))
+					.replace("$exclusive", valueOf(exclusive)).replace("$autoDelete", valueOf(autoDelete));
+		}
+
 	}
 
 	public static class Binding {
 
 		private Exchange source;
-		private Exchange destinationExchange;
-		private Queue destinationQueue;
+		private Exchange destExchange;
+		private Queue destQueue;
 		private String routingKey = "";
 		private DestinationType destinationType;
 
-		public Binding(Exchange source, Exchange destinationExchange) {
+		public Binding(Exchange source, Exchange destExchange) {
 			super();
 			this.source = source;
-			this.destinationExchange = destinationExchange;
+			this.destExchange = destExchange;
 			this.destinationType = DestinationType.Exchange;
 		}
 
-		public Binding(Exchange source, Queue destinationQueue) {
+		public Binding(Exchange source, Queue destQueue) {
 			super();
 			this.source = source;
-			this.destinationQueue = destinationQueue;
+			this.destQueue = destQueue;
 			this.destinationType = DestinationType.Queue;
 		}
 
-		public Binding(Exchange source, Exchange destinationExchange, String routingKey) {
+		public Binding(Exchange source, Exchange destExchange, String routingKey) {
 			super();
 			this.source = source;
-			this.destinationExchange = destinationExchange;
+			this.destExchange = destExchange;
 			this.routingKey = routingKey;
 			this.destinationType = DestinationType.Exchange;
 		}
 
-		public Binding(Exchange source, Queue destinationQueue, String routingKey) {
+		public Binding(Exchange source, Queue destQueue, String routingKey) {
 			super();
 			this.source = source;
-			this.destinationQueue = destinationQueue;
+			this.destQueue = destQueue;
 			this.routingKey = routingKey;
 			this.destinationType = DestinationType.Queue;
 		}
@@ -220,17 +244,17 @@ public class BaseEntity {
 		}
 
 		/**
-		 * @return the destinationExchange
+		 * @return the destExchange
 		 */
-		public Exchange getDestinationExchange() {
-			return destinationExchange;
+		public Exchange getDestExchange() {
+			return destExchange;
 		}
 
 		/**
-		 * @return the destinationQueue
+		 * @return the destQueue
 		 */
-		public Queue getDestinationQueue() {
-			return destinationQueue;
+		public Queue getDestQueue() {
+			return destQueue;
 		}
 
 		/**
@@ -247,6 +271,20 @@ public class BaseEntity {
 
 	public static enum DestinationType {
 		Exchange, Queue
+	}
+
+	public static void main(String[] args) {
+
+		Exchange exchange0 = Exchange.declareDirect("ABC");
+		Exchange exchange1 = Exchange.declareDirect("ABC");
+		System.out.println(exchange0);
+		System.out.println(exchange1);
+		System.out.println(exchange0 == exchange1);
+		System.out.println(exchange0.idempotent(exchange1));
+
+		System.out.println(Exchange.declareDirect("ABC"));
+		System.out.println(Queue.declare("ABC"));
+
 	}
 
 }
