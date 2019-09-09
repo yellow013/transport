@@ -25,11 +25,11 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 	private String receiveQueue;
 
 	// 队列持久化
-	private boolean durable;
+	private boolean durable = true;
 	// 连接独占此队列
-	private boolean exclusive;
+	private boolean exclusive = false;
 	// channel关闭后自动删除队列
-	private boolean autoDelete;
+	private boolean autoDelete = false;
 
 	private QosBatchProcessConsumer<T> consumer;
 
@@ -37,10 +37,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
 		super(tag, configurator.getConnectionConfigurator());
-		this.receiveQueue = configurator.getReceiveQueue();
-		this.durable = configurator.isDurable();
-		this.exclusive = configurator.isExclusive();
-		this.autoDelete = configurator.isAutoDelete();
+		this.receiveQueue = configurator.getQueueDeclare().getQueue().getName();
 		createConnection();
 		queueDeclare();
 		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.getQos(), autoFlushInterval, callBack,
@@ -51,7 +48,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent) {
 		super(tag, configurator.getConnectionConfigurator());
-		this.receiveQueue = configurator.getReceiveQueue();
+		this.receiveQueue = configurator.getQueueDeclare().getQueue().getName();
 		createConnection();
 		queueDeclare();
 		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.getQos(), autoFlushInterval, callBack,

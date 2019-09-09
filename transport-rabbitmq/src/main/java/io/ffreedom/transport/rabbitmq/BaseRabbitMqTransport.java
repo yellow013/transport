@@ -21,7 +21,7 @@ import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.TransportModule;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 
-public abstract class BaseRabbitMqTransport  implements TransportModule {
+public abstract class BaseRabbitMqTransport implements TransportModule {
 
 	// 连接RabbitMQ Server使用的组件
 	protected ConnectionFactory connectionFactory;

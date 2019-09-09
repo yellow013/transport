@@ -5,16 +5,17 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
-import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
-import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.role.Receiver;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
+import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
+import io.ffreedom.transport.rabbitmq.declare.QueueDeclare;
 
 /**
  * 
@@ -28,34 +29,27 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	// 接收消息时使用的回调函数
 	private volatile Consumer<byte[]> callback;
 
-	// 连接的Queue
-	private String receiveQueue;
-	// 需要绑定的Exchange
-	@SuppressWarnings("unused")
-	private String[] exchange;
-	// 需要绑定的RoutingKey
-	@SuppressWarnings("unused")
-	private String[] routingKey;
-
-	// 消息无法处理时发送到的错误Exchange
-	private String errorMsgToExchange;
-
-	// 队列持久化
-	private boolean durable;
-	// 连接独占此队列
-	private boolean exclusive;
-	// channel关闭后自动删除队列
-	private boolean autoDelete;
+	// 接受者QueueDeclare
+	private QueueDeclare queueDeclare;
+	// 接受者Queue
+	private String queueName;
+	// 消息无法处理时发送到的错误消息ExchangeDeclare
+	private ExchangeDeclare errorMsgExchange;
+	// 消息无法处理时发送到的错误消息Exchange
+	private String errorMsgExchangeName;
+	// 是否有错误消息Exchange
+	private boolean hasErrorMsgExchange;
 	// 自动ACK
 	private boolean autoAck;
 	// 一次ACK多条
 	private boolean multipleAck;
-	// 最大自动重试次数
+	// Ack最大自动重试次数
 	private int maxAckTotal;
+	// Ack最大自动重连次数
 	private int maxAckReconnection;
-	private String receiverName;
-
 	private int qos;
+
+	private String receiverName;
 
 	/**
 	 * @param configurator
@@ -64,17 +58,12 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	public RabbitMqReceiver(String tag, @Nonnull ReceiverConfigurator configurator, Consumer<byte[]> callback) {
 		super(tag, configurator.getConnectionConfigurator());
 		this.callback = callback;
-		this.exchange = configurator.getExchange();
-		this.routingKey = configurator.getRoutingKey();
-		this.receiveQueue = configurator.getReceiveQueue();
-		this.durable = configurator.isDurable();
-		this.exclusive = configurator.isExclusive();
-		this.autoDelete = configurator.isAutoDelete();
+		this.queueDeclare = configurator.getQueueDeclare();
+		this.errorMsgExchange = configurator.getErrorMsgExchange();
 		this.autoAck = configurator.isAutoAck();
 		this.multipleAck = configurator.isMultipleAck();
 		this.maxAckTotal = configurator.getMaxAckTotal();
 		this.maxAckReconnection = configurator.getMaxAckReconnection();
-		this.errorMsgToExchange = configurator.getErrorMsgToExchange();
 		this.qos = configurator.getQos();
 		createConnection();
 		init();
@@ -98,15 +87,25 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	}
 
 	private void init() {
-		this.receiverName = "Receiver->" + connectionConfigurator.getConfiguratorName() + "$" + receiveQueue;
 		try {
-			channel.queueDeclare(receiveQueue, durable, exclusive, autoDelete, null);
-		} catch (IOException e) {
+			OperationalChannel operationalChannel = OperationalChannel.ofChannel(channel);
+			this.queueDeclare.declare(operationalChannel);
+			this.queueName = queueDeclare.getQueue().getName();
+			if (errorMsgExchange != null) {
+				this.errorMsgExchange.declare(operationalChannel);
+				this.errorMsgExchangeName = errorMsgExchange.getExchange().getName();
+				this.hasErrorMsgExchange = true;
+			}
+		} catch (Exception e) {
+			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			ErrorLogger.error(logger, e,
-					"Method channel.queueDeclare(queue==[{}], durable==[{]}, exclusive==[{}], autoDelete==[{}], arguments==null) IOException message -> {}",
-					receiveQueue, durable, exclusive, autoDelete, e.getMessage());
+					"Call method declare() throw exception -> connection configurator info : {},"
+							+ System.lineSeparator() + "error message : {}",
+					connectionConfigurator.getConfiguratorName(), e.getMessage());
 			destroy();
+			throw new RuntimeException(e);
 		}
+		this.receiverName = "Receiver->" + connectionConfigurator.getConfiguratorName() + "$" + queueName;
 	}
 
 	@Override
@@ -121,7 +120,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 				channel.basicQos(qos);
 			channel.basicConsume(
 					// param1: queue
-					receiveQueue,
+					queueName,
 					// param2: autoAck
 					autoAck,
 					// param3: consumerTag
@@ -129,8 +128,8 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 					// param4: consumeCallback
 					new DefaultConsumer(channel) {
 						@Override
-						public void handleDelivery(String consumerTag, Envelope envelope,
-								AMQP.BasicProperties properties, byte[] body) throws IOException {
+						public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties,
+								byte[] body) throws IOException {
 							try {
 								logger.debug("Message handle start.");
 								logger.debug(
@@ -141,11 +140,11 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 							} catch (Exception e) {
 								ErrorLogger.error(logger, e, "Call method callback.accept(body) throw Exception -> {}",
 										e.getMessage());
-								if (StringUtil.notNullAndEmpty(errorMsgToExchange)) {
+								if (hasErrorMsgExchange) {
 									// Sent message to error dump queue.
 									logger.info("Exception handling -> Msg [{}] sent to ErrorMsgExchange.",
 											new String(body, Charsets.UTF8));
-									channel.basicPublish(errorMsgToExchange, "", null, body);
+									channel.basicPublish(errorMsgExchangeName, "", null, body);
 									logger.info("Exception handling -> Sent to ErrorMsgExchange finished.");
 								} else {
 									// Reject message and close connection.
@@ -225,9 +224,9 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	}
 
 	public static void main(String[] args) {
-		RabbitMqReceiver receiver = new RabbitMqReceiver("",
-				ReceiverConfigurator.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build()).setReceiveQueue(""),
-				msg -> System.out.println(new String(msg, Charsets.UTF8)));
+		RabbitMqReceiver receiver = new RabbitMqReceiver("", ReceiverConfigurator
+				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build(), QueueDeclare.queue(""))
+				.build(), msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}
 
