@@ -35,6 +35,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 
 	// 配置器全名
 	private String configuratorName;
+	private String connectionName;
 
 	private ConnectionConfigurator(Builder builder) {
 		this.host = builder.host;
@@ -50,11 +51,16 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		this.shutdownTimeout = builder.shutdownTimeout;
 		this.requestedHeartbeat = builder.requestedHeartbeat;
 		this.shutdownEvent = builder.shutdownEvent;
+		this.connectionName = newConnectionName();
 		this.configuratorName = newConfiguratorName();
 	}
 
+	private String newConnectionName() {
+		return host + ":" + port + (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
+	}
+
 	private String newConfiguratorName() {
-		return username + "@" + host + ":" + port + (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
+		return username + "@" + connectionName;
 	}
 
 	public static Builder configuration(String host, int port, String username, String password) {
@@ -83,52 +89,91 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		return port;
 	}
 
+	/**
+	 * @return the username
+	 */
 	public String getUsername() {
 		return username;
 	}
 
+	/**
+	 * @return the password
+	 */
 	public String getPassword() {
 		return password;
 	}
 
+	/**
+	 * @return the virtualHost
+	 */
 	public String getVirtualHost() {
 		return virtualHost;
 	}
 
-	public int getConnectionTimeout() {
-		return connectionTimeout;
-	}
-
-	public boolean isAutomaticRecovery() {
-		return automaticRecovery;
-	}
-
-	public long getRecoveryInterval() {
-		return recoveryInterval;
-	}
-
-	public int getHandshakeTimeout() {
-		return handshakeTimeout;
-	}
-
-	public int getShutdownTimeout() {
-		return shutdownTimeout;
-	}
-
-	public int getRequestedHeartbeat() {
-		return requestedHeartbeat;
-	}
-
-	public ShutdownEvent<Exception> getShutdownEvent() {
-		return shutdownEvent;
-	}
-
+	/**
+	 * @return the sslContext
+	 */
 	public SSLContext getSslContext() {
 		return sslContext;
 	}
 
-	public static class Builder {
+	/**
+	 * @return the connectionTimeout
+	 */
+	public int getConnectionTimeout() {
+		return connectionTimeout;
+	}
 
+	/**
+	 * @return the automaticRecovery
+	 */
+	public boolean isAutomaticRecovery() {
+		return automaticRecovery;
+	}
+
+	/**
+	 * @return the recoveryInterval
+	 */
+	public long getRecoveryInterval() {
+		return recoveryInterval;
+	}
+
+	/**
+	 * @return the handshakeTimeout
+	 */
+	public int getHandshakeTimeout() {
+		return handshakeTimeout;
+	}
+
+	/**
+	 * @return the shutdownTimeout
+	 */
+	public int getShutdownTimeout() {
+		return shutdownTimeout;
+	}
+
+	/**
+	 * @return the requestedHeartbeat
+	 */
+	public int getRequestedHeartbeat() {
+		return requestedHeartbeat;
+	}
+
+	/**
+	 * @return the shutdownEvent
+	 */
+	public ShutdownEvent<Exception> getShutdownEvent() {
+		return shutdownEvent;
+	}
+
+	/**
+	 * @return the connectionName
+	 */
+	public String getConnectionName() {
+		return connectionName;
+	}
+
+	public static class Builder {
 		/**
 		 * 连接参数
 		 */
@@ -246,6 +291,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 	public static void main(String[] args) {
 
 		ConnectionConfigurator configuration = configuration("localhost", 5672, "admin", "admin", "report").build();
+		System.out.println(configuration.getConnectionName());
 		System.out.println(configuration.getConfiguratorName());
 
 	}

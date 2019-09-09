@@ -2,157 +2,166 @@ package io.ffreedom.transport.rabbitmq.config;
 
 import javax.annotation.Nonnull;
 
-public final class ReceiverConfigurator {
+import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
+import io.ffreedom.transport.rabbitmq.declare.QueueDeclare;
+
+public final class ReceiverConfigurator extends BaseRabbitMqConfigurator {
+
+	// 接受者QueueDeclare
+	private QueueDeclare queueDeclare;
+	// 错误消息ExchangeDeclare
+	private ExchangeDeclare errorMsgExchange;
+	// 自动ACK
+	private boolean isAutoAck;
+	// 一次ACK多条
+	private boolean isMultipleAck;
+	// 最大重新ACK次数
+	private int maxAckTotal;
+	// 最大ACK重连次数
+	private int maxAckReconnection;
+	// QOS预取
+	private int qos;
+
+	private ReceiverConfigurator(Builder builder) {
+		super(builder.connectionConfigurator);
+		this.queueDeclare = builder.queueDeclare;
+		this.errorMsgExchange = builder.errorMsgExchange;
+		this.isAutoAck = builder.isAutoAck;
+		this.isMultipleAck = builder.isMultipleAck;
+		this.maxAckTotal = builder.maxAckTotal;
+		this.maxAckReconnection = builder.maxAckReconnection;
+		this.qos = builder.qos;
+	}
+
+	public static Builder configuration(@Nonnull ConnectionConfigurator connectionConfigurator,
+			@Nonnull QueueDeclare queueDeclare) {
+		return new Builder(connectionConfigurator, queueDeclare);
+	}
 
 	/**
-	 * 接收者参数
+	 * @return the queueDeclare
 	 */
-	// 接受者队列
-	private String receiveQueue;
-	// 需要绑定的Exchange
-	private String exchange[];
-	// 需要绑定的routingKey
-	private String routingKey[];
-
-	// 错误消息Ecchange
-	private String errorMsgToExchange;
-	// 是否持久化
-	private boolean durable = true;
-	// 连接独占此队列
-	private boolean exclusive = false;
-	// channel关闭后自动删除队列
-	private boolean autoDelete = false;
-	// 自动ACK
-	private boolean isAutoAck = true;
-	// 一次ACK多条
-	private boolean isMultipleAck = false;
-	// 最大重新ACK次数
-	private int maxAckTotal = 16;
-	// 最大ACK重连次数
-	private int maxAckReconnection = 8;
-	// QOS预取
-	private int qos = 256;
-
-	// 连接配置
-	private ConnectionConfigurator connectionConfigurator;
-
-	private ReceiverConfigurator(ConnectionConfigurator connectionConfigurator) {
-		this.connectionConfigurator = connectionConfigurator;
+	public QueueDeclare getQueueDeclare() {
+		return queueDeclare;
 	}
 
-	public static ReceiverConfigurator configuration(@Nonnull ConnectionConfigurator connectionConfigurator) {
-		return new ReceiverConfigurator(connectionConfigurator);
+	/**
+	 * @return the errorMsgExchange
+	 */
+	public ExchangeDeclare getErrorMsgExchange() {
+		return errorMsgExchange;
 	}
 
-	public ConnectionConfigurator getConnectionConfigurator() {
-		return connectionConfigurator;
-	}
-
-	public String[] getExchange() {
-		return exchange;
-	}
-
-	public String[] getRoutingKey() {
-		return routingKey;
-	}
-
-	public String getReceiveQueue() {
-		return receiveQueue;
-	}
-
-	public String getErrorMsgToExchange() {
-		return errorMsgToExchange;
-	}
-
-	public boolean isDurable() {
-		return durable;
-	}
-
-	public boolean isExclusive() {
-		return exclusive;
-	}
-
-	public boolean isAutoDelete() {
-		return autoDelete;
-	}
-
+	/**
+	 * @return the isAutoAck
+	 */
 	public boolean isAutoAck() {
 		return isAutoAck;
 	}
 
+	/**
+	 * @return the isMultipleAck
+	 */
 	public boolean isMultipleAck() {
 		return isMultipleAck;
 	}
 
+	/**
+	 * @return the maxAckTotal
+	 */
 	public int getMaxAckTotal() {
 		return maxAckTotal;
 	}
 
+	/**
+	 * @return the maxAckReconnection
+	 */
 	public int getMaxAckReconnection() {
 		return maxAckReconnection;
 	}
 
+	/**
+	 * @return the qos
+	 */
 	public int getQos() {
 		return qos;
 	}
 
-	public ReceiverConfigurator setExchange(String... exchange) {
-		this.exchange = exchange;
-		return this;
-	}
+	public static class Builder {
+		// 连接配置
+		private ConnectionConfigurator connectionConfigurator;
+		// 接受者QueueDeclare
+		private QueueDeclare queueDeclare;
+		// 错误消息ExchangeDeclare
+		private ExchangeDeclare errorMsgExchange;
+		// 自动ACK
+		private boolean isAutoAck = true;
+		// 一次ACK多条
+		private boolean isMultipleAck = false;
+		// 最大重新ACK次数
+		private int maxAckTotal = 16;
+		// 最大ACK重连次数
+		private int maxAckReconnection = 8;
+		// QOS预取
+		private int qos = 256;
 
-	public void setRoutingKey(String... routingKey) {
-		this.routingKey = routingKey;
-	}
+		public Builder(ConnectionConfigurator connectionConfigurator, QueueDeclare queueDeclare) {
+			this.connectionConfigurator = connectionConfigurator;
+			this.queueDeclare = queueDeclare;
+		}
 
-	public ReceiverConfigurator setReceiveQueue(String receiveQueue) {
-		this.receiveQueue = receiveQueue;
-		return this;
-	}
+		public ReceiverConfigurator build() {
+			return new ReceiverConfigurator(this);
+		}
 
-	public ReceiverConfigurator setErrorMsgToExchange(String errorMsgToExchange) {
-		this.errorMsgToExchange = errorMsgToExchange;
-		return this;
-	}
+		/**
+		 * @param errorMsgExchange the errorMsgExchange to set
+		 */
+		public Builder setErrorMsgExchange(ExchangeDeclare errorMsgExchange) {
+			this.errorMsgExchange = errorMsgExchange;
+			return this;
+		}
 
-	public ReceiverConfigurator setDurable(boolean durable) {
-		this.durable = durable;
-		return this;
-	}
+		/**
+		 * @param isAutoAck the isAutoAck to set
+		 */
+		public Builder setAutoAck(boolean isAutoAck) {
+			this.isAutoAck = isAutoAck;
+			return this;
+		}
 
-	public ReceiverConfigurator setExclusive(boolean exclusive) {
-		this.exclusive = exclusive;
-		return this;
-	}
+		/**
+		 * @param isMultipleAck the isMultipleAck to set
+		 */
+		public Builder setMultipleAck(boolean isMultipleAck) {
+			this.isMultipleAck = isMultipleAck;
+			return this;
+		}
 
-	public ReceiverConfigurator setAutoDelete(boolean autoDelete) {
-		this.autoDelete = autoDelete;
-		return this;
-	}
+		/**
+		 * @param maxAckTotal the maxAckTotal to set
+		 */
+		public Builder setMaxAckTotal(int maxAckTotal) {
+			this.maxAckTotal = maxAckTotal;
+			return this;
+		}
 
-	public ReceiverConfigurator setAutoAck(boolean isAutoAck) {
-		this.isAutoAck = isAutoAck;
-		return this;
-	}
+		/**
+		 * @param maxAckReconnection the maxAckReconnection to set
+		 */
+		public Builder setMaxAckReconnection(int maxAckReconnection) {
+			this.maxAckReconnection = maxAckReconnection;
+			return this;
+		}
 
-	public ReceiverConfigurator setMultipleAck(boolean isMultipleAck) {
-		this.isMultipleAck = isMultipleAck;
-		return this;
-	}
+		/**
+		 * @param qos the qos to set
+		 */
+		public Builder setQos(int qos) {
+			this.qos = qos;
+			return this;
+		}
 
-	public ReceiverConfigurator setMaxAckTotal(int maxAckTotal) {
-		this.maxAckTotal = maxAckTotal;
-		return this;
-	}
-
-	public ReceiverConfigurator setMaxAckReconnection(int maxAckReconnection) {
-		this.maxAckReconnection = maxAckReconnection;
-		return this;
-	}
-
-	public ReceiverConfigurator setQos(int qos) {
-		this.qos = qos;
-		return this;
 	}
 
 }

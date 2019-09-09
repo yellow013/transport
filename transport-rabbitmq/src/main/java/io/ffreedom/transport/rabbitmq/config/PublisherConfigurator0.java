@@ -15,7 +15,7 @@ import io.ffreedom.transport.rabbitmq.declare.BaseEntity.ExchangeType;
  * 
  *         TODO 扩展针对多个routingKey的绑定关系
  */
-public final class PublisherConfigurator {
+public final class PublisherConfigurator0 {
 
 	/**
 	 * 发布者参数
@@ -41,12 +41,12 @@ public final class PublisherConfigurator {
 	// 连接配置
 	private ConnectionConfigurator connectionConfigurator;
 
-	private PublisherConfigurator(ConnectionConfigurator connectionConfigurator) {
+	private PublisherConfigurator0(ConnectionConfigurator connectionConfigurator) {
 		this.connectionConfigurator = connectionConfigurator;
 	}
 
-	public static PublisherConfigurator configuration(@Nonnull ConnectionConfigurator connectionConfigurator) {
-		return new PublisherConfigurator(connectionConfigurator);
+	public static PublisherConfigurator0 configuration(@Nonnull ConnectionConfigurator connectionConfigurator) {
+		return new PublisherConfigurator0(connectionConfigurator);
 	}
 
 	public ConnectionConfigurator getConnectionConfigurator() {
@@ -121,54 +121,54 @@ public final class PublisherConfigurator {
 		this.isConfirm = isConfirm;
 	}
 
-	public PublisherConfigurator setConfirmTimeout(long confirmTimeout) {
+	public PublisherConfigurator0 setConfirmTimeout(long confirmTimeout) {
 		this.confirmTimeout = confirmTimeout;
 		return this;
 	}
 
-	public PublisherConfigurator setConfirmRetry(int confirmRetry) {
+	public PublisherConfigurator0 setConfirmRetry(int confirmRetry) {
 		this.confirmRetry = confirmRetry;
 		return this;
 	}
 
-	public PublisherConfigurator setMsgProperties(BasicProperties msgProperties) {
+	public PublisherConfigurator0 setMsgProperties(BasicProperties msgProperties) {
 		this.msgProperties = msgProperties;
 		return this;
 	}
 
-	public PublisherConfigurator setFanoutExchange(String exchange) {
+	public PublisherConfigurator0 setFanoutExchange(String exchange) {
 		return setFanoutExchange(exchange, null);
 	}
 
-	public PublisherConfigurator setFanoutExchange(String exchange, String[] bindQueues) {
+	public PublisherConfigurator0 setFanoutExchange(String exchange, String[] bindQueues) {
 		return setExchange(ExchangeType.Fanout, exchange, "", bindQueues);
 	}
 
-	public PublisherConfigurator setDirectExchange(String exchange) {
+	public PublisherConfigurator0 setDirectExchange(String exchange) {
 		return setDirectExchange(exchange, "");
 	}
 
-	public PublisherConfigurator setDirectExchange(String exchange, String routingKey) {
+	public PublisherConfigurator0 setDirectExchange(String exchange, String routingKey) {
 		return setDirectExchange(exchange, routingKey, null);
 	}
 
-	public PublisherConfigurator setDirectExchange(String exchange, String[] bindQueues) {
+	public PublisherConfigurator0 setDirectExchange(String exchange, String[] bindQueues) {
 		return setDirectExchange(exchange, "", bindQueues);
 	}
 
-	public PublisherConfigurator setDirectExchange(String exchange, String routingKey, String[] bindQueues) {
+	public PublisherConfigurator0 setDirectExchange(String exchange, String routingKey, String[] bindQueues) {
 		return setExchange(ExchangeType.Direct, exchange, routingKey, bindQueues);
 	}
 
-	public PublisherConfigurator setTopicExchange(String exchange) {
+	public PublisherConfigurator0 setTopicExchange(String exchange) {
 		return setTopicExchange(exchange, "", null);
 	}
 
-	public PublisherConfigurator setTopicExchange(String exchange, String routingKey, String[] bindQueues) {
+	public PublisherConfigurator0 setTopicExchange(String exchange, String routingKey, String[] bindQueues) {
 		return setExchange(ExchangeType.Topic, exchange, routingKey, bindQueues);
 	}
 
-	private PublisherConfigurator setExchange(ExchangeType exchangeType, String exchange, String routingKey,
+	private PublisherConfigurator0 setExchange(ExchangeType exchangeType, String exchange, String routingKey,
 			String[] bindQueues) {
 		if (StringUtil.isNullOrEmpty(exchange))
 			throw new IllegalArgumentException("Param exchange not allowed null");
