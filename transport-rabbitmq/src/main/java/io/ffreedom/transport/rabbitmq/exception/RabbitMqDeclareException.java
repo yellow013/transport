@@ -19,26 +19,27 @@ public class RabbitMqDeclareException extends Exception {
 
 	public static RabbitMqDeclareException declareQueueError(String queue, boolean durable, boolean exclusive,
 			boolean autoDelete, Throwable cause) {
-		return new RabbitMqDeclareException("Declare queue error -> queue == " + queue + ", durable == " + durable
-				+ ", exclusive == " + exclusive + ", autoDelete == " + autoDelete, cause);
+		return new RabbitMqDeclareException("Declare queue error -> queue==[" + queue + "], durable==[" + durable
+				+ "], exclusive==[" + exclusive + "], autoDelete==[" + autoDelete + "]", cause);
 	}
 
 	public static RabbitMqDeclareException declareExchangeError(String exchange, BuiltinExchangeType type,
 			boolean durable, boolean autoDelete, boolean internal, Throwable cause) {
-		return new RabbitMqDeclareException("Declare exchange error -> exchange == " + exchange + ", type == " + type
-				+ ", durable == " + durable + ", autoDelete == " + autoDelete + ", internal == " + internal, cause);
+		return new RabbitMqDeclareException("Declare exchange error -> exchange==[" + exchange + "], type==[" + type
+				+ "], durable==[" + durable + "], autoDelete==[" + autoDelete + "], internal==[" + internal + "]",
+				cause);
 	}
 
 	public static RabbitMqDeclareException bindQueueError(String queue, String exchange, String routingKey,
 			Throwable cause) {
-		return new RabbitMqDeclareException("Declare bind queue error -> queue == " + queue + ", exchange == "
-				+ exchange + ", routingKey == " + routingKey, cause);
+		return new RabbitMqDeclareException("Declare bind queue error -> queue==[" + queue + "], exchange==[" + exchange
+				+ "], routingKey==[" + routingKey + "]", cause);
 	}
 
 	public static RabbitMqDeclareException bindExchangeError(String destExchange, String sourceExchange,
 			String routingKey, Throwable cause) {
-		return new RabbitMqDeclareException("Declare bind exchange error -> destExchange == " + destExchange
-				+ ", sourceExchange == " + sourceExchange + ", routingKey == " + routingKey, cause);
+		return new RabbitMqDeclareException("Declare bind exchange error -> destExchange==[" + destExchange
+				+ "], sourceExchange==[" + sourceExchange + "], routingKey==[" + routingKey + "]", cause);
 	}
 
 	public static RabbitMqDeclareException ofException(Throwable cause) {
