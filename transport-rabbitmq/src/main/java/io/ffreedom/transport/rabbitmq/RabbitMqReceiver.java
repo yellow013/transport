@@ -99,8 +99,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 		} catch (Exception e) {
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			ErrorLogger.error(logger, e,
-					"Call method declare() throw exception -> connection configurator info : {},"
-							+ System.lineSeparator() + "error message : {}",
+					"Call method declare() throw exception -> connection configurator info : {}	, error message : {}",
 					connectionConfigurator.getConfiguratorName(), e.getMessage());
 			destroy();
 			throw new RuntimeException(e);
