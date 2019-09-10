@@ -26,6 +26,10 @@ public class ExchangeDeclare extends BaseDeclare {
 	public static ExchangeDeclare topicExchange(@Nonnull String exchangeName) {
 		return new ExchangeDeclare(Exchange.declareTopic(exchangeName));
 	}
+	
+	public static ExchangeDeclare ofExchange(@Nonnull Exchange exchange) {
+		return new ExchangeDeclare(exchange);
+	}
 
 	private ExchangeDeclare(Exchange exchange) {
 		this.exchange = exchange;

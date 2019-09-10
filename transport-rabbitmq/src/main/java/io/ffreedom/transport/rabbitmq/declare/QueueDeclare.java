@@ -19,6 +19,10 @@ public class QueueDeclare extends BaseDeclare {
 		return new QueueDeclare(Queue.declare(queueName));
 	}
 
+	public static QueueDeclare ofQueue(Queue queue) {
+		return new QueueDeclare(queue);
+	}
+
 	private QueueDeclare(Queue queue) {
 		this.queue = queue;
 	}
