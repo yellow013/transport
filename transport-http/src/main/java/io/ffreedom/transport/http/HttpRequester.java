@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class HttpRequester {
 
@@ -27,10 +28,15 @@ public class HttpRequester {
 	public String httpGet(String url) {
 		Request request = new Request.Builder().url(url).build();
 		try (Response response = client.newCall(request).execute()) {
+			if (response == null)
+				throw new RuntimeException("RuntimeException -> Request Url: [" + url + "]");
 			if (response.code() > 307)
 				throw new RuntimeException(
-						"RuntimeException -> Request Url: [" + url + "] return status code: " + response.code());
-			return response.body().string();
+						"RuntimeException -> Request Url: [" + url + "], return status code: " + response.code());
+			ResponseBody body = response.body();
+			if (body == null)
+				return "";
+			return body.string();
 		} catch (IOException e) {
 			logger.error("IOException -> {}", e.getMessage(), e);
 			throw new RuntimeException(e);
@@ -44,10 +50,15 @@ public class HttpRequester {
 		RequestBody body = RequestBody.create(JsonSerializationUtil.objToJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
 		try (Response response = client.newCall(request).execute()) {
+			if (response == null)
+				throw new RuntimeException("RuntimeException -> Request Url: [" + url + "]");
 			if (response.code() > 307)
 				throw new RuntimeException(
 						"RuntimeException -> Request Url: [" + url + "] return status code: " + response.code());
-			return response.body().string();
+			ResponseBody rtnBody = response.body();
+			if (rtnBody == null)
+				return "";
+			return rtnBody.string();
 		} catch (IOException e) {
 			logger.error("IOException -> {}", e.getMessage(), e);
 			throw new RuntimeException(e);
