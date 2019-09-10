@@ -12,7 +12,6 @@ import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
  * 
  * @author yellow013
  * 
- *         TODO 扩展针对多个routingKey的绑定关系
  */
 public final class PublisherConfigurator extends BaseRabbitMqConfigurator {
 
