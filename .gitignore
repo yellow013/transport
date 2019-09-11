@@ -39,6 +39,7 @@ hs_err_pid*
 common/.factorypath
 transport/.factorypath
 /target/
+*/.attach*
 transport-core/.factorypath
 transport-http/.factorypath
 transport-jeromq/.factorypath
