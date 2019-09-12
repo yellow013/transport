@@ -1,7 +1,7 @@
 package io.ffreedom.transport.rabbitmq;
 
 import io.ffreedom.common.log.ErrorLogger;
-import io.ffreedom.transport.core.role.Receiver;
+import io.ffreedom.transport.core.api.Receiver;
 import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
 import io.ffreedom.transport.rabbitmq.consumer.QosBatchCallBack;
 import io.ffreedom.transport.rabbitmq.consumer.QosBatchProcessConsumer;

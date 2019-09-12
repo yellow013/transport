@@ -11,7 +11,7 @@ import com.rabbitmq.client.Envelope;
 
 import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
-import io.ffreedom.transport.core.role.Receiver;
+import io.ffreedom.transport.core.api.Receiver;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
 import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;

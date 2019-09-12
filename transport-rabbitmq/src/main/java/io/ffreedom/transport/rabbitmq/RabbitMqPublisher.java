@@ -11,7 +11,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.thread.ThreadUtil;
-import io.ffreedom.transport.core.role.Publisher;
+import io.ffreedom.transport.core.api.Publisher;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
 import io.ffreedom.transport.rabbitmq.config.PublisherConfigurator;
 import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
