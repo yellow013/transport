@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 
 import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.common.thread.ThreadUtil;
-import io.ffreedom.transport.core.role.Receiver;
+import io.ffreedom.transport.core.api.Receiver;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
 
 public class SocketReceiver implements Receiver {

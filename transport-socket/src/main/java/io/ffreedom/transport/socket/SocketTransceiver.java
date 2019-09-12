@@ -10,11 +10,11 @@ import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
 
-import io.ffreedom.common.concurrent.queue.api.SCQueue;
-import io.ffreedom.common.concurrent.queue.impl.disruptor.BufferSize;
-import io.ffreedom.common.concurrent.queue.impl.disruptor.SPSCQueue;
+import io.ffreedom.common.collections.queue.api.SCQueue;
+import io.ffreedom.common.concurrent.disruptor.BufferSize;
+import io.ffreedom.common.concurrent.disruptor.SPSCQueue;
 import io.ffreedom.common.thread.ThreadUtil;
-import io.ffreedom.transport.core.role.BaseTransceiver;
+import io.ffreedom.transport.core.base.BaseTransceiver;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
 
 public class SocketTransceiver extends BaseTransceiver<String> {
