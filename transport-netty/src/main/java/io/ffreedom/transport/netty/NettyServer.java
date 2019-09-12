@@ -1,6 +1,6 @@
 package io.ffreedom.transport.netty;
 
-import io.ffreedom.transport.core.role.TransportServer;
+import io.ffreedom.transport.core.api.TransportServer;
 import io.ffreedom.transport.netty.config.NettyConfigurator;
 import io.ffreedom.transport.netty.handler.GeneralNettyHandler;
 import io.netty.bootstrap.ServerBootstrap;

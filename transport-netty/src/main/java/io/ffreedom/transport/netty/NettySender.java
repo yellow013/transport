@@ -5,7 +5,7 @@ import static io.ffreedom.common.log.SysSequence.microsecond;
 import org.slf4j.Logger;
 
 import io.ffreedom.common.log.CommonLoggerFactory;
-import io.ffreedom.transport.core.role.Sender;
+import io.ffreedom.transport.core.api.Sender;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;

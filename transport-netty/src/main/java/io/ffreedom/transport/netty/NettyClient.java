@@ -1,6 +1,6 @@
 package io.ffreedom.transport.netty;
 
-import io.ffreedom.transport.core.role.TransportClient;
+import io.ffreedom.transport.core.api.TransportClient;
 import io.ffreedom.transport.netty.config.NettyConfigurator;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandler;
