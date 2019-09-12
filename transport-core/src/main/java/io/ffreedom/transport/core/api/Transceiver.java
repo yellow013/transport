@@ -1,4 +1,4 @@
-package io.ffreedom.transport.core.role;
+package io.ffreedom.transport.core.api;
 
 public interface Transceiver<T> extends Receiver {
 

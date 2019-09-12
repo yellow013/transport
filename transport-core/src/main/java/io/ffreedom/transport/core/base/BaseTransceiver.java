@@ -1,6 +1,8 @@
-package io.ffreedom.transport.core.role;
+package io.ffreedom.transport.core.base;
 
-import io.ffreedom.common.concurrent.queue.api.SCQueue;
+import io.ffreedom.common.collections.queue.api.SCQueue;
+import io.ffreedom.transport.core.api.Sender;
+import io.ffreedom.transport.core.api.Transceiver;
 
 public abstract class BaseTransceiver<T> implements Transceiver<T> {
 
