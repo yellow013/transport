@@ -6,7 +6,7 @@ import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import io.ffreedom.common.thread.ThreadUtil;
-import io.ffreedom.transport.core.role.Publisher;
+import io.ffreedom.transport.core.api.Publisher;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
 public class JeroMqPublisher implements Publisher<byte[]> {

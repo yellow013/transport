@@ -6,7 +6,7 @@ import org.zeromq.ZMQ.Socket;
 
 import io.ffreedom.common.functional.Pipeline;
 import io.ffreedom.common.thread.ThreadUtil;
-import io.ffreedom.transport.core.role.Receiver;
+import io.ffreedom.transport.core.api.Receiver;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
 public class JeroMqPipeline implements Receiver {

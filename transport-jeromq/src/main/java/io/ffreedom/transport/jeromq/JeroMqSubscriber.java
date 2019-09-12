@@ -7,7 +7,7 @@ import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import io.ffreedom.common.charset.Charsets;
-import io.ffreedom.transport.core.role.Subscriber;
+import io.ffreedom.transport.core.api.Subscriber;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
 public class JeroMqSubscriber implements Subscriber {

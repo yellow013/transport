@@ -5,7 +5,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
-import io.ffreedom.transport.core.role.Sender;
+import io.ffreedom.transport.core.api.Sender;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
 @NotThreadSafe
