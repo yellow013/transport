@@ -12,7 +12,7 @@ import org.apache.commons.io.IOUtils;
 
 import io.ffreedom.common.collections.queue.api.SCQueue;
 import io.ffreedom.common.concurrent.disruptor.BufferSize;
-import io.ffreedom.common.concurrent.disruptor.SPSCQueue;
+import io.ffreedom.common.concurrent.disruptor.SpscQueue;
 import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.transport.core.base.BaseTransceiver;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
@@ -137,7 +137,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 
 	@Override
 	protected SCQueue<String> initSendQueue() {
-		return new SPSCQueue<>("", BufferSize.POW2_10, true, (msg) -> {
+		return new SpscQueue<>("", BufferSize.POW2_10, true, (msg) -> {
 			processSendQueue(msg);
 		});
 	}

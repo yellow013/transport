@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
-import io.ffreedom.common.concurrent.queue.ArrayBlockingMPSCQueue;
+import io.ffreedom.common.concurrent.queue.MpscArrayBlockingQueue;
 import io.ffreedom.common.log.CommonLoggerFactory;
 import io.ffreedom.transport.core.api.Sender;
 import io.ffreedom.transport.socket.config.SocketConfigurator;
@@ -82,7 +82,7 @@ public class SocketSender implements Sender<byte[]> {
 		}
 	}
 
-	private ArrayBlockingMPSCQueue<byte[]> innerQueue = ArrayBlockingMPSCQueue.autoStartQueue(1024,
+	private MpscArrayBlockingQueue<byte[]> innerQueue = MpscArrayBlockingQueue.autoStartQueue(1024,
 			bytes -> processSendQueue(bytes));
 
 	public static void main(String[] args) {
