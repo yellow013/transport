@@ -1,6 +1,7 @@
 package io.ffreedom.transport.rabbitmq;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
@@ -13,7 +14,7 @@ import io.ffreedom.common.charset.Charsets;
 import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.transport.core.api.Receiver;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
-import io.ffreedom.transport.rabbitmq.config.ReceiverConfigurator;
+import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
 import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
 import io.ffreedom.transport.rabbitmq.declare.QueueDeclare;
 
@@ -55,7 +56,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	 * @param configurator
 	 * @param callback
 	 */
-	public RabbitMqReceiver(String tag, @Nonnull ReceiverConfigurator configurator, Consumer<byte[]> callback) {
+	public RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
 		super(tag, configurator.getConnectionConfigurator());
 		this.callback = callback;
 		this.queueDeclare = configurator.getQueueDeclare();
@@ -74,7 +75,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	 * @param callback
 	 */
 	@Deprecated
-	public RabbitMqReceiver(String tag, ReceiverConfigurator configurator) {
+	public RabbitMqReceiver(String tag, RmqReceiverConfigurator configurator) {
 		this(tag, configurator, null);
 	}
 
@@ -136,6 +137,10 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 										consumerTag, envelope.getDeliveryTag(), body.length);
 								callback.accept(body);
 								logger.debug("Callback handleDelivery() end.");
+							} catch (DateTimeException e) {
+								
+							} catch (NumberFormatException e) {
+								
 							} catch (Exception e) {
 								ErrorLogger.error(logger, e, "Call method callback.accept(body) throw Exception -> {}",
 										e.getMessage());
@@ -223,7 +228,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	}
 
 	public static void main(String[] args) {
-		RabbitMqReceiver receiver = new RabbitMqReceiver("", ReceiverConfigurator
+		RabbitMqReceiver receiver = new RabbitMqReceiver("", RmqReceiverConfigurator
 				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build(), QueueDeclare.queue(""))
 				.build(), msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();

@@ -13,7 +13,7 @@ import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.transport.core.api.Publisher;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
-import io.ffreedom.transport.rabbitmq.config.PublisherConfigurator;
+import io.ffreedom.transport.rabbitmq.config.RmqPublisherConfigurator;
 import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
 import io.ffreedom.transport.rabbitmq.exception.NoConfirmException;
 
@@ -44,11 +44,11 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	/**
 	 * @param configurator
 	 */
-	public RabbitMqPublisher(String tag, @Nonnull PublisherConfigurator configurator) {
+	public RabbitMqPublisher(String tag, @Nonnull RmqPublisherConfigurator configurator) {
 		this(tag, configurator, null, null);
 	}
 
-	public RabbitMqPublisher(String tag, @Nonnull PublisherConfigurator configurator, Consumer<Long> ackCallback,
+	public RabbitMqPublisher(String tag, @Nonnull RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
 			Consumer<Long> noAckCallback) {
 		super(tag, configurator.getConnectionConfigurator());
 		// this.configurator = configurator;
@@ -183,7 +183,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 		ExchangeDeclare fanoutExchange = ExchangeDeclare.fanoutExchange("");
 
 		RabbitMqPublisher publisher = new RabbitMqPublisher("",
-				PublisherConfigurator.configuration(connectionConfigurator0, fanoutExchange).build());
+				RmqPublisherConfigurator.configuration(connectionConfigurator0, fanoutExchange).build());
 
 		ThreadUtil.startNewThread(() -> {
 			int count = 0;
