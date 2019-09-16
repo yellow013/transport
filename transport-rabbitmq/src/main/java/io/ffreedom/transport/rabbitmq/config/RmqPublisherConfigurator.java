@@ -13,7 +13,7 @@ import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
  * @author yellow013
  * 
  */
-public final class PublisherConfigurator extends BaseRabbitMqConfigurator {
+public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 	// 发布者ExchangeDeclare
 	private ExchangeDeclare exchangeDeclare;
@@ -28,7 +28,7 @@ public final class PublisherConfigurator extends BaseRabbitMqConfigurator {
 	// 发布确认重试次数
 	private int confirmRetry;
 
-	private PublisherConfigurator(Builder builder) {
+	private RmqPublisherConfigurator(Builder builder) {
 		super(builder.connectionConfigurator);
 		this.exchangeDeclare = builder.exchangeDeclare;
 		this.defaultRoutingKey = builder.defaultRoutingKey;
@@ -105,8 +105,8 @@ public final class PublisherConfigurator extends BaseRabbitMqConfigurator {
 			this.exchangeDeclare = exchangeDeclare;
 		}
 
-		public PublisherConfigurator build() {
-			return new PublisherConfigurator(this);
+		public RmqPublisherConfigurator build() {
+			return new RmqPublisherConfigurator(this);
 		}
 
 		/**

@@ -1,11 +1,11 @@
 package io.ffreedom.transport.rabbitmq.config;
 
-public abstract class BaseRabbitMqConfigurator {
+abstract class RmqConfigurator {
 
 	// 连接配置
 	private ConnectionConfigurator connectionConfigurator;
 
-	protected BaseRabbitMqConfigurator(ConnectionConfigurator connectionConfigurator) {
+	protected RmqConfigurator(ConnectionConfigurator connectionConfigurator) {
 		this.connectionConfigurator = connectionConfigurator;
 	}
 

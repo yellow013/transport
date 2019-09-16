@@ -15,6 +15,8 @@ import io.ffreedom.transport.rabbitmq.declare.BaseEntity.ExchangeType;
  * 
  *         TODO 扩展针对多个routingKey的绑定关系
  */
+
+@Deprecated
 public final class PublisherConfigurator0 {
 
 	/**

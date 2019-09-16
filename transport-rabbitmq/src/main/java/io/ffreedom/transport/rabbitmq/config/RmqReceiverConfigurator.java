@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
 import io.ffreedom.transport.rabbitmq.declare.QueueDeclare;
 
-public final class ReceiverConfigurator extends BaseRabbitMqConfigurator {
+public final class RmqReceiverConfigurator extends RmqConfigurator {
 
 	// 接受者QueueDeclare
 	private QueueDeclare queueDeclare;
@@ -22,7 +22,7 @@ public final class ReceiverConfigurator extends BaseRabbitMqConfigurator {
 	// QOS预取
 	private int qos;
 
-	private ReceiverConfigurator(Builder builder) {
+	private RmqReceiverConfigurator(Builder builder) {
 		super(builder.connectionConfigurator);
 		this.queueDeclare = builder.queueDeclare;
 		this.errorMsgExchange = builder.errorMsgExchange;
@@ -110,8 +110,8 @@ public final class ReceiverConfigurator extends BaseRabbitMqConfigurator {
 			this.queueDeclare = queueDeclare;
 		}
 
-		public ReceiverConfigurator build() {
-			return new ReceiverConfigurator(this);
+		public RmqReceiverConfigurator build() {
+			return new RmqReceiverConfigurator(this);
 		}
 
 		/**

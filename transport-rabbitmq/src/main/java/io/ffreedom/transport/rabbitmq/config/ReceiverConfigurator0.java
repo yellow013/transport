@@ -2,6 +2,12 @@ package io.ffreedom.transport.rabbitmq.config;
 
 import javax.annotation.Nonnull;
 
+/**
+ * 
+ * @author yellow013
+ *
+ */
+@Deprecated
 public final class ReceiverConfigurator0 {
 
 	/**
