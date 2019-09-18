@@ -2,6 +2,7 @@ package io.ffreedom.transport.rabbitmq.config;
 
 import javax.annotation.Nonnull;
 
+import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
 import io.ffreedom.transport.rabbitmq.declare.QueueDeclare;
 
@@ -85,6 +86,15 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	 */
 	public int getQos() {
 		return qos;
+	}
+
+	private String ToStringStr;
+
+	@Override
+	public String toString() {
+		if (ToStringStr == null)
+			ToStringStr = StringUtil.reflectionToString(this);
+		return ToStringStr;
 	}
 
 	public static class Builder {

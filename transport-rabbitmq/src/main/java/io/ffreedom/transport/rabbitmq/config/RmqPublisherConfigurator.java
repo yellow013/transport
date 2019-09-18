@@ -6,6 +6,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.MessageProperties;
 
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.rabbitmq.declare.ExchangeDeclare;
 
 /**
@@ -85,6 +86,15 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		return confirmRetry;
 	}
 
+	private String ToStringStr;
+
+	@Override
+	public String toString() {
+		if (ToStringStr == null)
+			ToStringStr = StringUtil.reflectionToString(this);
+		return ToStringStr;
+	}
+
 	public static class Builder {
 
 		// 连接配置
@@ -153,8 +163,9 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 	public static void main(String[] args) {
 
-		configuration(ConnectionConfigurator.configuration("", 0, "", "").build(),
-				ExchangeDeclare.directExchange("TEST").declareBindingQueue(Queue.declare("TEST_0"))).build();
+		System.out.println(
+				configuration(ConnectionConfigurator.configuration("localhost", 5672, "user0", "userpass").build(),
+						ExchangeDeclare.directExchange("TEST").declareBindingQueue(Queue.declare("TEST_0"))).build());
 
 	}
 

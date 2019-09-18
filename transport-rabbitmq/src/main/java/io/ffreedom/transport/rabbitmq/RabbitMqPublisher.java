@@ -39,19 +39,33 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	@SuppressWarnings("unused")
 	private Consumer<Long> noAckCallback;
 
-	// private PublisherConfigurator configurator;
+	/**
+	 * 
+	 * @param configurator
+	 */
+	public RabbitMqPublisher(@Nonnull RmqPublisherConfigurator configurator) {
+		this(null, configurator, null, null);
+	}
 
 	/**
+	 * 
+	 * @param tag
 	 * @param configurator
 	 */
 	public RabbitMqPublisher(String tag, @Nonnull RmqPublisherConfigurator configurator) {
 		this(tag, configurator, null, null);
 	}
 
+	/**
+	 * 
+	 * @param tag
+	 * @param configurator
+	 * @param ackCallback
+	 * @param noAckCallback
+	 */
 	public RabbitMqPublisher(String tag, @Nonnull RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
 			Consumer<Long> noAckCallback) {
-		super(tag, configurator.getConnectionConfigurator());
-		// this.configurator = configurator;
+		super(tag, "Publisher", configurator.getConnectionConfigurator());
 		this.exchangeDeclare = configurator.getExchangeDeclare();
 		this.defaultRoutingKey = configurator.getDefaultRoutingKey();
 		this.msgProperties = configurator.getMsgProperties();

@@ -53,21 +53,12 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	private String receiverName;
 
 	/**
+	 * 
 	 * @param configurator
-	 * @param callback
 	 */
-	public RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
-		super(tag, configurator.getConnectionConfigurator());
-		this.callback = callback;
-		this.queueDeclare = configurator.getQueueDeclare();
-		this.errorMsgExchange = configurator.getErrorMsgExchange();
-		this.autoAck = configurator.isAutoAck();
-		this.multipleAck = configurator.isMultipleAck();
-		this.maxAckTotal = configurator.getMaxAckTotal();
-		this.maxAckReconnection = configurator.getMaxAckReconnection();
-		this.qos = configurator.getQos();
-		createConnection();
-		init();
+	@Deprecated
+	public RabbitMqReceiver(RmqReceiverConfigurator configurator) {
+		this(null, configurator, null);
 	}
 
 	/**
@@ -79,12 +70,45 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 		this(tag, configurator, null);
 	}
 
+	/**
+	 * 
+	 * @param callback
+	 * @return
+	 */
 	@Deprecated
-	public boolean initCallback(Consumer<byte[]> callback) {
-		if (this.callback != null)
-			return false;
+	public RabbitMqReceiver initCallback(Consumer<byte[]> callback) {
+		if (this.callback == null)
+			this.callback = callback;
+		return this;
+	}
+
+	/**
+	 * 
+	 * @param configurator
+	 * @param callback
+	 */
+	public RabbitMqReceiver(@Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
+		this(null, configurator, callback);
+	}
+
+	/**
+	 * 
+	 * @param tag
+	 * @param configurator
+	 * @param callback
+	 */
+	public RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
+		super(tag, "Receiver", configurator.getConnectionConfigurator());
 		this.callback = callback;
-		return true;
+		this.queueDeclare = configurator.getQueueDeclare();
+		this.errorMsgExchange = configurator.getErrorMsgExchange();
+		this.autoAck = configurator.isAutoAck();
+		this.multipleAck = configurator.isMultipleAck();
+		this.maxAckTotal = configurator.getMaxAckTotal();
+		this.maxAckReconnection = configurator.getMaxAckReconnection();
+		this.qos = configurator.getQos();
+		createConnection();
+		init();
 	}
 
 	private void init() {
@@ -138,9 +162,9 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 								callback.accept(body);
 								logger.debug("Callback handleDelivery() end.");
 							} catch (DateTimeException e) {
-								
+
 							} catch (NumberFormatException e) {
-								
+
 							} catch (Exception e) {
 								ErrorLogger.error(logger, e, "Call method callback.accept(body) throw Exception -> {}",
 										e.getMessage());

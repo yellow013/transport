@@ -1,9 +1,10 @@
 package io.ffreedom.transport.rabbitmq.config;
 
-import io.ffreedom.common.functional.ShutdownEvent;
-import io.ffreedom.transport.core.config.TransportConfigurator;
-
 import javax.net.ssl.SSLContext;
+
+import io.ffreedom.common.functional.ShutdownEvent;
+import io.ffreedom.common.utils.StringUtil;
+import io.ffreedom.transport.core.config.TransportConfigurator;
 
 public final class ConnectionConfigurator implements TransportConfigurator {
 
@@ -35,7 +36,8 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 
 	// 配置器全名
 	private String configuratorName;
-	private String connectionName;
+	//
+	private String connectionInfo;
 
 	private ConnectionConfigurator(Builder builder) {
 		this.host = builder.host;
@@ -51,16 +53,16 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		this.shutdownTimeout = builder.shutdownTimeout;
 		this.requestedHeartbeat = builder.requestedHeartbeat;
 		this.shutdownEvent = builder.shutdownEvent;
-		this.connectionName = newConnectionName();
+		this.connectionInfo = newConnectionInfo();
 		this.configuratorName = newConfiguratorName();
 	}
 
-	private String newConnectionName() {
+	private String newConnectionInfo() {
 		return host + ":" + port + (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
 	}
 
 	private String newConfiguratorName() {
-		return username + "@" + connectionName;
+		return username + "@" + connectionInfo;
 	}
 
 	public static Builder configuration(String host, int port, String username, String password) {
@@ -169,8 +171,17 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 	/**
 	 * @return the connectionName
 	 */
-	public String getConnectionName() {
-		return connectionName;
+	public String getConnectionInfo() {
+		return connectionInfo;
+	}
+
+	private String ToStringStr;
+
+	@Override
+	public String toString() {
+		if (ToStringStr == null)
+			ToStringStr = StringUtil.reflectionToString(this);
+		return ToStringStr;
 	}
 
 	public static class Builder {
@@ -291,7 +302,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 	public static void main(String[] args) {
 
 		ConnectionConfigurator configuration = configuration("localhost", 5672, "admin", "admin", "report").build();
-		System.out.println(configuration.getConnectionName());
+		System.out.println(configuration);
 		System.out.println(configuration.getConfiguratorName());
 
 	}

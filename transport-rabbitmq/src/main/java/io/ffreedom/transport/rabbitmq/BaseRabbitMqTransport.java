@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeoutException;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 
 import com.rabbitmq.client.AMQP;
@@ -46,8 +48,9 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	 * @param tag
 	 * @param configurator
 	 */
-	protected BaseRabbitMqTransport(String tag, ConnectionConfigurator connectionConfigurator) {
-		this.tag = tag == null ? "START_TIME_" + LocalDateTime.now() : tag;
+	protected BaseRabbitMqTransport(String tag, @Nonnull String moduleType,
+			@Nonnull ConnectionConfigurator connectionConfigurator) {
+		this.tag = StringUtil.isNullOrEmpty(tag) ? moduleType + "_StartPoint_" + LocalDateTime.now() : tag;
 		if (connectionConfigurator == null)
 			throw new NullPointerException(this.tag + " : configurator is null.");
 		this.connectionConfigurator = connectionConfigurator;

@@ -36,7 +36,7 @@ public final class OperationalChannel extends BaseRabbitMqTransport {
 	}
 
 	private OperationalChannel(String tag, ConnectionConfigurator configurator) throws IOException, TimeoutException {
-		super(tag, configurator);
+		super(tag, tag, configurator);
 		createConnection();
 	}
 
