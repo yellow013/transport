@@ -11,7 +11,7 @@ import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Exchange;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
 import io.ffreedom.transport.rabbitmq.exception.RabbitMqDeclareException;
 
-public abstract class BaseDeclare {
+public abstract class Relationship {
 
 	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 

@@ -11,7 +11,13 @@ import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Exchange;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
 import io.ffreedom.transport.rabbitmq.exception.RabbitMqDeclareException;
 
-public class ExchangeDeclare extends BaseDeclare {
+/**
+ * 定义Exchange和其他实体绑定关系
+ * 
+ * @author yellow013
+ *
+ */
+public class ExchangeDeclare extends Relationship {
 
 	private Exchange exchange;
 
@@ -26,7 +32,7 @@ public class ExchangeDeclare extends BaseDeclare {
 	public static ExchangeDeclare topicExchange(@Nonnull String exchangeName) {
 		return new ExchangeDeclare(Exchange.declareTopic(exchangeName));
 	}
-	
+
 	public static ExchangeDeclare ofExchange(@Nonnull Exchange exchange) {
 		return new ExchangeDeclare(exchange);
 	}

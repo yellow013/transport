@@ -11,7 +11,13 @@ import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Exchange;
 import io.ffreedom.transport.rabbitmq.declare.BaseEntity.Queue;
 import io.ffreedom.transport.rabbitmq.exception.RabbitMqDeclareException;
 
-public class QueueDeclare extends BaseDeclare {
+/**
+ * 定义Queue和其他实体绑定关系
+ * 
+ * @author yellow013
+ *
+ */
+public class QueueDeclare extends Relationship {
 
 	private Queue queue;
 
