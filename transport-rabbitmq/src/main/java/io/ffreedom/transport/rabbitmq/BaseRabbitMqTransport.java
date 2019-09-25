@@ -1,5 +1,7 @@
 package io.ffreedom.transport.rabbitmq;
 
+import static io.ffreedom.common.utils.StringUtil.isNullOrEmpty;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeoutException;
@@ -17,7 +19,6 @@ import com.rabbitmq.client.ShutdownSignalException;
 
 import io.ffreedom.common.functional.ShutdownEvent;
 import io.ffreedom.common.log.CommonLoggerFactory;
-import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.common.utils.StringUtil;
 import io.ffreedom.transport.core.TransportModule;
@@ -50,7 +51,7 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	 */
 	protected BaseRabbitMqTransport(String tag, @Nonnull String moduleType,
 			@Nonnull ConnectionConfigurator connectionConfigurator) {
-		this.tag = StringUtil.isNullOrEmpty(tag) ? moduleType + "_StartPoint_" + LocalDateTime.now() : tag;
+		this.tag = isNullOrEmpty(tag) ? moduleType + "_StartPoint_" + LocalDateTime.now() : tag;
 		if (connectionConfigurator == null)
 			throw new NullPointerException(this.tag + " : configurator is null.");
 		this.connectionConfigurator = connectionConfigurator;
@@ -58,6 +59,7 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	}
 
 	protected void createConnection() {
+		logger.info("Call method createConnection()");
 		if (connectionFactory == null) {
 			connectionFactory = new ConnectionFactory();
 			connectionFactory.setHost(connectionConfigurator.getHost());
@@ -95,9 +97,9 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 					channel.getChannelNumber());
 			logger.debug("All connection call method successful...");
 		} catch (IOException e) {
-			ErrorLogger.error(logger, e, "Call method createConnection() throw IOException -> {}", e.getMessage());
+			logger.error("Method createConnection() throw IOException -> {}", e.getMessage(), e);
 		} catch (TimeoutException e) {
-			ErrorLogger.error(logger, e, "Call method createConnection() throw TimeoutException -> {}", e.getMessage());
+			logger.error("Method createConnection() throw TimeoutException -> {}", e.getMessage(), e);
 		}
 	}
 
@@ -107,7 +109,7 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	}
 
 	protected boolean closeAndReconnection() {
-		logger.info("Call method closeAndReconnection().");
+		logger.info("Call method closeAndReconnection()");
 		closeConnection();
 		ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval() / 2);
 		createConnection();
@@ -130,6 +132,7 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	}
 
 	protected void closeConnection() {
+		logger.info("Call method closeConnection()");
 		try {
 			if (channel != null && channel.isOpen()) {
 				channel.close();
@@ -140,9 +143,9 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 				logger.info("Connection is closeed!");
 			}
 		} catch (IOException e) {
-			ErrorLogger.error(logger, e, "Call method closeConnection() throw IOException -> {}", e.getMessage());
+			logger.error("Method closeConnection() throw IOException -> {}", e.getMessage(), e);
 		} catch (TimeoutException e) {
-			ErrorLogger.error(logger, e, "Call method closeConnection() throw TimeoutException -> {}", e.getMessage());
+			logger.error("Method closeConnection() throw TimeoutException -> {}", e.getMessage(), e);
 		}
 	}
 

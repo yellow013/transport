@@ -1,5 +1,7 @@
 package io.ffreedom.transport.rabbitmq;
 
+import static io.ffreedom.common.utils.StringUtil.bytesToStr;
+
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
@@ -9,7 +11,6 @@ import javax.annotation.Nonnull;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
 import io.ffreedom.common.charset.Charsets;
-import io.ffreedom.common.log.ErrorLogger;
 import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.transport.core.api.Publisher;
 import io.ffreedom.transport.rabbitmq.config.ConnectionConfigurator;
@@ -81,15 +82,14 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	private void init() {
 		try {
 			this.exchangeDeclare.declare(OperationalChannel.ofChannel(channel));
-			this.exchangeName = exchangeDeclare.getExchange().getName();
 		} catch (Exception e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
-			ErrorLogger.error(logger, e,
-					"Call method declare() throw exception -> connection configurator info : {}	, error message : {}",
-					connectionConfigurator.getConfiguratorName(), e.getMessage());
+			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
+					connectionConfigurator.getConfiguratorName(), e.getMessage(), e);
 			destroy();
 			throw new RuntimeException(e);
 		}
+		this.exchangeName = exchangeDeclare.getExchange().getName();
 		this.publisherName = "Publisher->" + connectionConfigurator.getConfiguratorName() + "$" + exchangeName;
 	}
 
@@ -100,27 +100,34 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 
 	@Override
 	public void publish(String target, byte[] msg) {
-		try {
-			// 记录重试次数
-			int retry = 0;
-			// 调用isConnected()检查channel和connection是否打开, 如果没有打开, 先销毁连接, 再重新创建连接.
-			while (!isConnected()) {
-				logger.error("Detect connection isConnected() == false, retry {}", (++retry));
-				destroy();
-				ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval());
-				createConnection();
-			}
-			if (isConfirm)
-				confirmPublish(target, msg);
-			else
-				basicPublish(target, msg);
-		} catch (IOException e) {
-			ErrorLogger.error(logger, e, "Call method publish() isConfirm==[{}] throw IOException -> {} ", isConfirm,
-					e.getMessage());
+		// 记录重试次数
+		int retry = 0;
+		// 调用isConnected()检查channel和connection是否打开, 如果没有打开, 先销毁连接, 再重新创建连接.
+		while (!isConnected()) {
+			logger.error("Detect connection isConnected() == false, retry {}", (++retry));
 			destroy();
-		} catch (NoConfirmException e) {
-			ErrorLogger.error(logger, e, "Call method publish() isConfirm==[{}] throw NoConfirmException -> {} ",
-					isConfirm, e.getMessage());
+			ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval());
+			createConnection();
+		}
+		if (isConfirm) {
+			try {
+				confirmPublish(target, msg);
+			} catch (IOException e) {
+				logger.error("Method publish isConfirm==[true] throw IOException -> {}, msg==[{}]", e.getMessage(),
+						bytesToStr(msg), e);
+				destroy();
+			} catch (NoConfirmException e) {
+				logger.error("Method publish isConfirm==[true] throw NoConfirmException -> {}, msg==[{}]",
+						e.getMessage(), bytesToStr(msg), e);
+			}
+		} else {
+			try {
+				basicPublish(target, msg);
+			} catch (IOException e) {
+				logger.error("Method publish isConfirm==[false] throw IOException -> {}, msg==[{}]", e.getMessage(),
+						bytesToStr(msg), e);
+				destroy();
+			}
 		}
 	}
 
@@ -140,18 +147,17 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 				throw new NoConfirmException(exchangeName, routingKey, retry, confirmTimeout);
 			confirmPublish0(routingKey, msg, retry);
 		} catch (IOException e) {
-			ErrorLogger.error(logger, e,
-					"Call method channel.confirmSelect() throw IOException from publisherName -> {}, routingKey -> {}",
-					publisherName, routingKey);
+			logger.error("Method channel.confirmSelect() throw IOException from publisherName -> {}, routingKey -> {}",
+					publisherName, routingKey, e);
 			throw new IOException(e.getMessage());
 		} catch (InterruptedException e) {
-			ErrorLogger.error(logger, e,
-					"Call method channel.waitForConfirms() throw InterruptedException from publisherName -> {}, routingKey -> {}",
-					publisherName, routingKey);
+			logger.error(
+					"Method channel.waitForConfirms() throw InterruptedException from publisherName -> {}, routingKey -> {}",
+					publisherName, routingKey, e);
 		} catch (TimeoutException e) {
-			ErrorLogger.error(logger, e,
-					"Call method channel.waitForConfirms() throw TimeoutException from publisherName -> {}, routingKey -> {}",
-					publisherName, routingKey);
+			logger.error(
+					"Method channel.waitForConfirms() throw TimeoutException from publisherName -> {}, routingKey -> {}",
+					publisherName, routingKey, e);
 		}
 	}
 
@@ -167,16 +173,16 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 					// param4: msgBody
 					msg);
 		} catch (IOException e) {
-			ErrorLogger.error(logger, e,
-					"Call method channel.basicPublish(exchange==[{}], routingKey==[{}], properties==[{}], msg==[...]) throw IOException -> {}",
-					exchangeName, routingKey, msgProperties, e.getMessage());
+			logger.error(
+					"Method channel.basicPublish(exchange==[{}], routingKey==[{}], properties==[{}], msg==[...]) throw IOException -> {}",
+					exchangeName, routingKey, msgProperties, e.getMessage(), e);
 			throw new IOException(e.getMessage());
 		}
 	}
 
 	@Override
 	public boolean destroy() {
-		logger.info("Call method -> RabbitPublisher.destroy()");
+		logger.info("Call method destroy() for Publisher tag==[{}]", tag);
 		closeConnection();
 		return true;
 	}
