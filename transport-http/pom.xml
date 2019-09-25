@@ -21,12 +21,12 @@
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>4.1.1</version>
+			<version>4.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okio</groupId>
 			<artifactId>okio</artifactId>
-			<version>2.2.2</version>
+			<version>2.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.60</version>
+			<version>1.2.61</version>
 		</dependency>
 	</dependencies>
 
