@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 
-import io.ffreedom.common.annotations.lang.MayThrowRuntimeException;
+import io.ffreedom.common.annotations.lang.MayThrowsRuntimeException;
 import io.ffreedom.common.log.CommonLoggerFactory;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -24,7 +24,7 @@ public class HttpRequester {
 	public HttpRequester() {
 	}
 
-	@MayThrowRuntimeException
+	@MayThrowsRuntimeException
 	public String httpGet(String url) {
 		Request request = new Request.Builder().url(url).build();
 		try (Response response = client.newCall(request).execute()) {
@@ -45,7 +45,7 @@ public class HttpRequester {
 
 	private static final MediaType APPLICATION_JSON = MediaType.get("application/json; charset=utf-8");
 
-	@MayThrowRuntimeException
+	@MayThrowsRuntimeException
 	public String httpJsonPost(String url, Object obj) throws IOException {
 		RequestBody body = RequestBody.create(JsonSerializationUtil.objToJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
