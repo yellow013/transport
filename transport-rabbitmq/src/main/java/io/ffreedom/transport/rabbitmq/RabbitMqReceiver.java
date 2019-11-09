@@ -21,7 +21,7 @@ import io.ffreedom.transport.rabbitmq.declare.QueueDeclare;
 
 /**
  * 
- * @author yellow013
+ * @author yellow013<br>
  * 
  *         改造升级, 使用共同的创建者建立Exchange, RoutingKey, Queue的绑定关系
  *
