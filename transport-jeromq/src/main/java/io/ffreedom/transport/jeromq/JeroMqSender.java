@@ -1,5 +1,8 @@
 package io.ffreedom.transport.jeromq;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.zeromq.SocketType;
@@ -9,27 +12,27 @@ import io.ffreedom.transport.core.api.Sender;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
 @NotThreadSafe
-public class JeroMqSender implements Sender<byte[]> {
+public class JeroMqSender implements Sender<byte[]>, Closeable {
 
 	private ZMQ.Context context;
 	private ZMQ.Socket socket;
 
-	private String requesterName;
-	
+	private String senderName;
+
 	private JeroMqConfigurator configurator;
 
 	public JeroMqSender(JeroMqConfigurator configurator) {
-		if (configurator == null) 
+		if (configurator == null)
 			throw new IllegalArgumentException("configurator is null in JeroMQPublisher init mothed !");
 		this.configurator = configurator;
 		init();
 	}
-	
-	private void init(){
+
+	private void init() {
 		this.context = ZMQ.context(configurator.getIoThreads());
 		this.socket = context.socket(SocketType.REQ);
 		this.socket.connect(configurator.getHost());
-		this.requesterName = "JeroMQ.REQ$" + configurator.getHost();
+		this.senderName = "JeroMQ.REQ$" + configurator.getHost();
 	}
 
 	@Override
@@ -47,24 +50,34 @@ public class JeroMqSender implements Sender<byte[]> {
 
 	@Override
 	public String getName() {
-		return requesterName;
+		return senderName;
 	}
 
 	public static void main(String[] args) {
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setIoThreads(1)
-				.setHost("tcp://localhost:5551").build();
 
-		JeroMqSender requester = new JeroMqSender(configurator);
+		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setIoThreads(1).setHost("tcp://localhost:5551")
+				.build();
 
-		requester.send("TEST MSG".getBytes());
+		try (JeroMqSender sender = new JeroMqSender(configurator)) {
 
-		requester.destroy();
+			sender.send("TEST MSG".getBytes());
+
+			sender.destroy();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
 	public boolean isConnected() {
-		// TODO Auto-generated method stub
-		return false;
+		return !context.isClosed();
+	}
+
+	@Override
+	public void close() throws IOException {
+		destroy();
 	}
 
 }

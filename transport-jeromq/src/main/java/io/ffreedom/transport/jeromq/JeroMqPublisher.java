@@ -1,5 +1,7 @@
 package io.ffreedom.transport.jeromq;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Random;
 
 import org.zeromq.SocketType;
@@ -9,7 +11,7 @@ import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.transport.core.api.Publisher;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
 
-public class JeroMqPublisher implements Publisher<byte[]> {
+public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 
 	private ZMQ.Context context;
 	private ZMQ.Socket publisher;
@@ -63,19 +65,27 @@ public class JeroMqPublisher implements Publisher<byte[]> {
 		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
 				.setTopic("").build();
 
-		JeroMqPublisher publisher = new JeroMqPublisher(configurator);
+		try (JeroMqPublisher publisher = new JeroMqPublisher(configurator)) {
+			Random random = new Random();
 
-		Random random = new Random();
-
-		for (;;) {
-			publisher.publish(String.valueOf(random.nextInt()).getBytes());
-			ThreadUtil.sleep(1000);
+			for (;;) {
+				publisher.publish(String.valueOf(random.nextInt()).getBytes());
+				ThreadUtil.sleep(1000);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	@Override
 	public boolean isConnected() {
 		return !context.isClosed();
+	}
+
+	@Override
+	public void close() throws IOException {
+		destroy();
 	}
 
 }
