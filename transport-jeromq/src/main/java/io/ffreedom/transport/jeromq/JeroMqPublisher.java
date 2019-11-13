@@ -62,8 +62,11 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 	}
 
 	public static void main(String[] args) {
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
-				.setTopic("").build();
+//		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
+//				.setTopic("").build();
+		
+		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:13001")
+				.setTopic("command").setIoThreads(2).build();
 
 		try (JeroMqPublisher publisher = new JeroMqPublisher(configurator)) {
 			Random random = new Random();

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 
 import io.ffreedom.common.annotations.lang.MayThrowsRuntimeException;
 import io.ffreedom.common.log.CommonLoggerFactory;
+import io.mercury.persistence.json.JsonWrapper;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,7 +48,7 @@ public class HttpRequester {
 
 	@MayThrowsRuntimeException
 	public String httpJsonPost(String url, Object obj) throws IOException {
-		RequestBody body = RequestBody.create(JsonSerializationUtil.objToJson(obj), APPLICATION_JSON);
+		RequestBody body = RequestBody.create(JsonWrapper.toJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
 		try (Response response = client.newCall(request).execute()) {
 			if (response == null)
