@@ -1,18 +1,17 @@
 package io.ffreedom.transport.rabbitmq;
 
-import io.ffreedom.common.log.ErrorLogger;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Predicate;
+
+import javax.annotation.Nonnull;
+
 import io.ffreedom.transport.core.api.Receiver;
 import io.ffreedom.transport.rabbitmq.config.RmqReceiverConfigurator;
 import io.ffreedom.transport.rabbitmq.consumer.QosBatchCallBack;
 import io.ffreedom.transport.rabbitmq.consumer.QosBatchProcessConsumer;
 import io.ffreedom.transport.rabbitmq.consumer.QueueMessageSerializable;
 import io.ffreedom.transport.rabbitmq.consumer.RefreshNowEvent;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author xuejian.sun
@@ -60,9 +59,9 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 		try {
 			channel.queueDeclare(receiveQueue, durable, exclusive, autoDelete, null);
 		} catch (IOException e) {
-			ErrorLogger.error(logger, e,
+			logger.error(
 					"Method channel.queueDeclare(queue==[{}], durable==[{]}, exclusive==[{}], autoDelete==[{}], arguments==null) IOException message -> {}",
-					receiveQueue, durable, exclusive, autoDelete, e.getMessage());
+					receiveQueue, durable, exclusive, autoDelete, e.getMessage(), e);
 			destroy();
 		}
 	}
@@ -72,7 +71,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 		try {
 			channel.basicConsume(receiveQueue, false, tag, consumer);
 		} catch (IOException e) {
-			ErrorLogger.error(logger, e, "consumer error", e.getMessage());
+			logger.error("basicConsume error", e.getMessage(), e);
 		}
 	}
 

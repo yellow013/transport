@@ -22,15 +22,13 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
-import io.ffreedom.common.log.ErrorLogger;
-
 /**
  * @author xuejian.sun
  * @date 2018/11/17 13:14
  */
 public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 
-	private Logger log = LoggerFactory.getLogger(QosBatchProcessConsumer.class);
+	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private Channel channel;
 
@@ -170,9 +168,9 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 			}
 		} catch (IOException e) {
 			// todo do reconnect and clear cache
-			ErrorLogger.error(log, e);
+			log.error("basicAck throw IOException -> message==[{}]", e.getMessage(), e);
 		} catch (Exception e) {
-			log.error("batch process failure,deliverTag[{}]", this.lastDeliveryTag, e);
+			log.error("batch process failure, deliverTag[{}]", this.lastDeliveryTag, e);
 		} finally {
 			lock.unlock();
 		}
