@@ -1,10 +1,11 @@
 package io.ffreedom.transport.jeromq;
 
+import java.util.function.Function;
+
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ.Socket;
 
-import io.ffreedom.common.functional.Pipeline;
 import io.ffreedom.common.thread.ThreadUtil;
 import io.ffreedom.transport.core.api.Receiver;
 import io.ffreedom.transport.jeromq.config.JeroMqConfigurator;
@@ -16,12 +17,12 @@ public class JeroMqPipeline implements Receiver {
 
 	private String receiverName;
 
-	private Pipeline<byte[], byte[]> pipeline;
+	private Function<byte[], byte[]> pipeline;
 	private JeroMqConfigurator configurator;
 
 	private volatile boolean isRun = true;
 
-	public JeroMqPipeline(JeroMqConfigurator configurator, Pipeline<byte[], byte[]> pipeline) {
+	public JeroMqPipeline(JeroMqConfigurator configurator, Function<byte[], byte[]> pipeline) {
 		if (configurator == null || pipeline == null)
 			throw new IllegalArgumentException("configurator is null in JeroMQReceiver init mothed !");
 		this.configurator = configurator;
@@ -40,7 +41,7 @@ public class JeroMqPipeline implements Receiver {
 	public void receive() {
 		while (isRun) {
 			byte[] recvBytes = socket.recv();
-			byte[] bytes = pipeline.stream(recvBytes);
+			byte[] bytes = pipeline.apply(recvBytes);
 			if (bytes == null)
 				bytes = new byte[0];
 			socket.send(bytes);
