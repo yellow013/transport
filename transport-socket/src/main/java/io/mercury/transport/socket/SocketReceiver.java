@@ -42,7 +42,7 @@ public class SocketReceiver implements Receiver {
 
 	private void init() {
 		try {
-			this.socket = new Socket(configurator.getHost(), configurator.getPort());
+			this.socket = new Socket(configurator.host(), configurator.port());
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());
@@ -67,7 +67,7 @@ public class SocketReceiver implements Receiver {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return "SocketReceiver -> " + socket.hashCode();
 	}
 
@@ -94,7 +94,7 @@ public class SocketReceiver implements Receiver {
 				try {
 					int available = inputStream.available();
 					if (available == 0) {
-						ThreadUtil.sleep(configurator.getReceiveInterval());
+						ThreadUtil.sleep(configurator.receiveInterval());
 						continue;
 					}
 					byte[] bytes = new byte[available];
@@ -123,7 +123,7 @@ public class SocketReceiver implements Receiver {
 
 	public static void main(String[] args) {
 
-		SocketConfigurator configurator = SocketConfigurator.builder().setHost("192.168.1.138").setPort(7901).build();
+		SocketConfigurator configurator = SocketConfigurator.builder().host("192.168.1.138").port(7901).build();
 
 		SocketReceiver receiver = new SocketReceiver(configurator, bytes -> System.out.println(new String(bytes)));
 

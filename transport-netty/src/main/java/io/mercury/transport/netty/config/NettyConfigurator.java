@@ -19,7 +19,7 @@ public class NettyConfigurator implements TransportConfigurator {
 
 	private ShutdownEvent<Exception> shutdownEvent;
 
-	private String configuratorName = "NettyConfigurator";
+	private String name = "NettyConfigurator";
 
 	private NettyConfigurator(Builder builder) {
 		this.host = builder.host;
@@ -38,49 +38,51 @@ public class NettyConfigurator implements TransportConfigurator {
 		return new Builder();
 	}
 
-	public String getHost() {
+	@Override
+	public String host() {
 		return host;
 	}
 
-	public int getPort() {
+	@Override
+	public int port() {
 		return port;
 	}
 
-	public int getBacklog() {
+	public int backlog() {
 		return backlog;
 	}
 
-	public boolean isKeepAlive() {
+	public boolean keepAlive() {
 		return keepAlive;
 	}
 
-	public boolean isTcpNoDelay() {
+	public boolean tcpNoDelay() {
 		return tcpNoDelay;
 	}
 
-	public long getSendInterval() {
+	public long sendInterval() {
 		return sendInterval;
 	}
 
-	public TimeUnit getSendIntervalTimeUnit() {
+	public TimeUnit sendIntervalTimeUnit() {
 		return sendIntervalTimeUnit;
 	}
 
-	public int getWriteByteBufSize() {
+	public int writeByteBufSize() {
 		return writeByteBufSize;
 	}
 
-	public char getSeparator() {
+	public char separator() {
 		return separator;
 	}
 
-	public ShutdownEvent<Exception> getShutdownEvent() {
+	public ShutdownEvent<Exception> shutdownEvent() {
 		return shutdownEvent;
 	}
 
 	@Override
-	public String getConfiguratorName() {
-		return configuratorName;
+	public String name() {
+		return name;
 	}
 
 	public static class Builder {
@@ -99,48 +101,48 @@ public class NettyConfigurator implements TransportConfigurator {
 		private Builder() {
 		}
 
-		public Builder setHost(String host) {
+		public Builder host(String host) {
 			this.host = host;
 			return this;
 		}
 
-		public Builder setPort(int port) {
+		public Builder port(int port) {
 			this.port = port;
 			return this;
 		}
 
-		public Builder setBacklog(int backlog) {
+		public Builder backlog(int backlog) {
 			this.backlog = backlog;
 			return this;
 		}
 
-		public Builder setKeepAlive(boolean keepAlive) {
+		public Builder keepAlive(boolean keepAlive) {
 			this.keepAlive = keepAlive;
 			return this;
 		}
 
-		public Builder setTcpNoDelay(boolean tcpNoDelay) {
+		public Builder tcpNoDelay(boolean tcpNoDelay) {
 			this.tcpNoDelay = tcpNoDelay;
 			return this;
 		}
 
-		public Builder setSendInterval(long sendInterval, TimeUnit sendIntervalTimeUnit) {
+		public Builder sendInterval(long sendInterval, TimeUnit sendIntervalTimeUnit) {
 			this.sendInterval = sendInterval;
 			this.sendIntervalTimeUnit = sendIntervalTimeUnit;
 			return this;
 		}
 
-		public Builder setWriteByteBufSize(int writeByteBufSize) {
+		public Builder writeByteBufSize(int writeByteBufSize) {
 			this.writeByteBufSize = writeByteBufSize;
 			return this;
 		}
 
-		public Builder setSeparator(char separator) {
+		public Builder separator(char separator) {
 			this.separator = separator;
 			return this;
 		}
 
-		public Builder setShutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
+		public Builder shutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
 			this.shutdownEvent = shutdownEvent;
 			return this;
 		}

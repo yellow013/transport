@@ -38,17 +38,17 @@ public class NettyServer extends NettyTransport implements TransportServer {
 					public void initChannel(SocketChannel socketChannel) throws Exception {
 						socketChannel.pipeline().addLast(channelHandlers);
 					}
-				}).option(ChannelOption.SO_BACKLOG, configurator.getBacklog())
-				.childOption(ChannelOption.SO_KEEPALIVE, configurator.isKeepAlive())
-				.childOption(ChannelOption.TCP_NODELAY, configurator.isTcpNoDelay());
-		logger.info(tag + " : Init-ServerBootStrap.bind -> " + configurator.getPort());
+				}).option(ChannelOption.SO_BACKLOG, configurator.backlog())
+				.childOption(ChannelOption.SO_KEEPALIVE, configurator.keepAlive())
+				.childOption(ChannelOption.TCP_NODELAY, configurator.tcpNoDelay());
+		logger.info(tag + " : Init-ServerBootStrap.bind -> " + configurator.port());
 	}
 
 	@Override
 	public void startup() {
 		try {
 			// Start server.
-			serverBootstrap.bind(configurator.getHost(), configurator.getPort()).sync()
+			serverBootstrap.bind(configurator.host(), configurator.port()).sync()
 					// Wait close.
 					.channel().closeFuture().sync();
 		} catch (InterruptedException e) {
@@ -72,7 +72,7 @@ public class NettyServer extends NettyTransport implements TransportServer {
 
 	public static void main(String[] args) throws Exception {
 
-		NettyConfigurator configurator = NettyConfigurator.builder().setHost("192.168.1.138").setPort(7901).build();
+		NettyConfigurator configurator = NettyConfigurator.builder().host("192.168.1.138").port(7901).build();
 
 		NettyServer nettyServer = new NettyServer("LocalTest", configurator, new GeneralNettyHandler() {
 

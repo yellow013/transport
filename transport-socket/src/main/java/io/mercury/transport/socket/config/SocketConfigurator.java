@@ -9,7 +9,7 @@ public class SocketConfigurator implements TransportConfigurator {
 	private long receiveInterval;
 	private int sendQueueSize;
 
-	private final String configuratorName = "SocketConfigurator";
+	private final String name = "SocketConfigurator";
 
 	private SocketConfigurator(Builder builder) {
 		this.host = builder.host;
@@ -22,25 +22,27 @@ public class SocketConfigurator implements TransportConfigurator {
 		return new Builder();
 	}
 
-	public String getHost() {
+	@Override
+	public String host() {
 		return host;
 	}
 
-	public int getPort() {
+	@Override
+	public int port() {
 		return port;
 	}
 
-	public long getReceiveInterval() {
+	public long receiveInterval() {
 		return receiveInterval;
 	}
 
-	public int getSendQueueSize() {
+	public int sendQueueSize() {
 		return sendQueueSize;
 	}
 
 	@Override
-	public String getConfiguratorName() {
-		return configuratorName;
+	public String name() {
+		return name;
 	}
 
 	public static class Builder {
@@ -53,22 +55,22 @@ public class SocketConfigurator implements TransportConfigurator {
 		private Builder() {
 		}
 
-		public Builder setHost(String host) {
+		public Builder host(String host) {
 			this.host = host;
 			return this;
 		}
 
-		public Builder setPort(int port) {
+		public Builder port(int port) {
 			this.port = port;
 			return this;
 		}
 
-		public Builder setReceiveInterval(long receiveInterval) {
+		public Builder receiveInterval(long receiveInterval) {
 			this.receiveInterval = receiveInterval;
 			return this;
 		}
 
-		public Builder setSendQueueSize(int sendQueueSize) {
+		public Builder sendQueueSize(int sendQueueSize) {
 			this.sendQueueSize = sendQueueSize;
 			return this;
 		}

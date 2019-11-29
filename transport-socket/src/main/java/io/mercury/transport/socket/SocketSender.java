@@ -32,7 +32,7 @@ public class SocketSender implements Sender<byte[]> {
 
 	private void init() {
 		try {
-			this.socket = new Socket(configurator.getHost(), configurator.getPort());
+			this.socket = new Socket(configurator.host(), configurator.port());
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());
@@ -58,7 +58,7 @@ public class SocketSender implements Sender<byte[]> {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return "SocketSender -> " + socket.hashCode();
 	}
 
@@ -86,7 +86,7 @@ public class SocketSender implements Sender<byte[]> {
 			bytes -> processSendQueue(bytes));
 
 	public static void main(String[] args) {
-		SocketConfigurator configurator = SocketConfigurator.builder().setHost("192.168.1.138").setPort(7901).build();
+		SocketConfigurator configurator = SocketConfigurator.builder().host("192.168.1.138").port(7901).build();
 		SocketSender sender = new SocketSender(configurator);
 		sender.send("hello".getBytes());
 	}

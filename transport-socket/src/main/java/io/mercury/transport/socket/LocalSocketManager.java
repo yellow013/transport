@@ -17,15 +17,15 @@ public class LocalSocketManager {
 	 * @param callback
 	 * @return
 	 */
-	public static synchronized SocketTransceiver getSocketTransceiver(String name, int port,
+	public static synchronized SocketTransceiver getSocketTransceiver(String host, int port,
 			Consumer<byte[]> callback) {
-		String socketName = getSocketName(name, port);
+		String socketName = socketName(host, port);
 		if (serverSocketMap.containsKey(socketName))
 			return serverSocketMap.get(socketName);
 		else {
 			if (port <= 7000 || port >= 8000)
 				throw new RuntimeException("port error.");
-			SocketTransceiver transceiver = new SocketTransceiver(SocketConfigurator.builder().setPort(port).build(),
+			SocketTransceiver transceiver = new SocketTransceiver(SocketConfigurator.builder().port(port).build(),
 					callback);
 			serverSocketMap.put(socketName, transceiver);
 			return transceiver;
@@ -39,14 +39,14 @@ public class LocalSocketManager {
 	 * @param port
 	 * @return
 	 */
-	public static SocketTransceiver getSocketTransceiver(String name, int port) {
+	public static SocketTransceiver acquireSocketTransceiver(String name, int port) {
 		if (serverSocketMap.containsKey(name))
 			return serverSocketMap.get(name);
 		else
 			return null;
 	}
 
-	private static String getSocketName(String name, int port) {
+	private static String socketName(String name, int port) {
 		return name + ":" + port;
 	}
 

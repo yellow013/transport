@@ -26,9 +26,9 @@ public class NettyClient extends NettyTransport implements TransportClient {
 					public void initChannel(SocketChannel ch) throws Exception {
 						ch.pipeline().addLast(channelHandlers);
 					}
-				}).option(ChannelOption.SO_KEEPALIVE, configurator.isKeepAlive())
-				.option(ChannelOption.TCP_NODELAY, configurator.isTcpNoDelay());
-		logger.info(tag + ": Init-BootStrap.connect -> " + configurator.getPort());
+				}).option(ChannelOption.SO_KEEPALIVE, configurator.keepAlive())
+				.option(ChannelOption.TCP_NODELAY, configurator.tcpNoDelay());
+		logger.info(tag + ": Init-BootStrap.connect -> " + configurator.port());
 
 	}
 
@@ -36,7 +36,7 @@ public class NettyClient extends NettyTransport implements TransportClient {
 	public void connect() {
 		try {
 			// Start the client.
-			bootstrap.connect(configurator.getHost(), configurator.getPort()).sync()
+			bootstrap.connect(configurator.host(), configurator.port()).sync()
 					// Wait until the connection is closed.
 					.channel().closeFuture().sync();
 		} catch (InterruptedException e) {

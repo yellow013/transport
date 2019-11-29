@@ -46,7 +46,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 
 	private void init() {
 		try {
-			this.socket = new Socket(configurator.getHost(), configurator.getPort());
+			this.socket = new Socket(configurator.host(), configurator.port());
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());
@@ -75,7 +75,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return null;
 	}
 
@@ -99,7 +99,7 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 					inputStream = socket.getInputStream();
 					int available = inputStream.available();
 					if (available == 0) {
-						ThreadUtil.sleep(configurator.getReceiveInterval());
+						ThreadUtil.sleep(configurator.receiveInterval());
 						continue;
 					}
 					byte[] bytes = new byte[available];

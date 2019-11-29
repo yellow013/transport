@@ -35,7 +35,7 @@ public abstract class NettyTransport {
 
 	protected abstract void init();
 
-	public String getName() {
+	public String name() {
 		return tag;
 	}
 
