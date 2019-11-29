@@ -2,7 +2,7 @@ package io.mercury.transport.rabbitmq.declare;
 
 import static java.lang.String.valueOf;
 
-public class BaseEntity {
+public interface EntityDeclare {
 
 	public static class Exchange {
 
@@ -17,20 +17,19 @@ public class BaseEntity {
 		// 是否为内部Exchange
 		private boolean internal = false;
 
-		public static Exchange declareFanout(String name) {
+		public static Exchange fanout(String name) {
 			return new Exchange(ExchangeType.Fanout, name);
 		}
 
-		public static Exchange declareDirect(String name) {
+		public static Exchange direct(String name) {
 			return new Exchange(ExchangeType.Direct, name);
 		}
 
-		public static Exchange declareTopic(String name) {
+		public static Exchange topic(String name) {
 			return new Exchange(ExchangeType.Topic, name);
 		}
 
 		private Exchange(ExchangeType type, String name) {
-			super();
 			this.type = type;
 			this.name = name;
 		}
@@ -38,42 +37,42 @@ public class BaseEntity {
 		/**
 		 * @return the type
 		 */
-		public ExchangeType getType() {
+		public ExchangeType type() {
 			return type;
 		}
 
 		/**
 		 * @return the name
 		 */
-		public String getName() {
+		public String name() {
 			return name;
 		}
 
 		/**
 		 * @return the durable
 		 */
-		public boolean isDurable() {
+		public boolean durable() {
 			return durable;
 		}
 
 		/**
 		 * @return the autoDelete
 		 */
-		public boolean isAutoDelete() {
+		public boolean autoDelete() {
 			return autoDelete;
 		}
 
 		/**
 		 * @return the internal
 		 */
-		public boolean isInternal() {
+		public boolean internal() {
 			return internal;
 		}
 
 		/**
 		 * @param durable the durable to set
 		 */
-		public Exchange setDurable(boolean durable) {
+		public Exchange durable(boolean durable) {
 			this.durable = durable;
 			return this;
 		}
@@ -81,7 +80,7 @@ public class BaseEntity {
 		/**
 		 * @param autoDelete the autoDelete to set
 		 */
-		public Exchange setAutoDelete(boolean autoDelete) {
+		public Exchange autoDelete(boolean autoDelete) {
 			this.autoDelete = autoDelete;
 			return this;
 		}
@@ -89,7 +88,7 @@ public class BaseEntity {
 		/**
 		 * @param internal the internal to set
 		 */
-		public Exchange setInternal(boolean internal) {
+		public Exchange internal(boolean internal) {
 			this.internal = internal;
 			return this;
 		}
@@ -125,42 +124,41 @@ public class BaseEntity {
 		}
 
 		private Queue(String name) {
-			super();
 			this.name = name;
 		}
 
 		/**
 		 * @return the name
 		 */
-		public String getName() {
+		public String name() {
 			return name;
 		}
 
 		/**
 		 * @return the durable
 		 */
-		public boolean isDurable() {
+		public boolean durable() {
 			return durable;
 		}
 
 		/**
 		 * @return the exclusive
 		 */
-		public boolean isExclusive() {
+		public boolean exclusive() {
 			return exclusive;
 		}
 
 		/**
 		 * @return the autoDelete
 		 */
-		public boolean isAutoDelete() {
+		public boolean autoDelete() {
 			return autoDelete;
 		}
 
 		/**
 		 * @param durable the durable to set
 		 */
-		public Queue setDurable(boolean durable) {
+		public Queue durable(boolean durable) {
 			this.durable = durable;
 			return this;
 		}
@@ -168,7 +166,7 @@ public class BaseEntity {
 		/**
 		 * @param exclusive the exclusive to set
 		 */
-		public Queue setExclusive(boolean exclusive) {
+		public Queue exclusive(boolean exclusive) {
 			this.exclusive = exclusive;
 			return this;
 		}
@@ -176,7 +174,7 @@ public class BaseEntity {
 		/**
 		 * @param autoDelete the autoDelete to set
 		 */
-		public Queue setAutoDelete(boolean autoDelete) {
+		public Queue autoDelete(boolean autoDelete) {
 			this.autoDelete = autoDelete;
 			return this;
 		}
@@ -232,35 +230,35 @@ public class BaseEntity {
 		/**
 		 * @return the source
 		 */
-		public Exchange getSource() {
+		public Exchange source() {
 			return source;
 		}
 
 		/**
 		 * @return the routingKey
 		 */
-		public String getRoutingKey() {
+		public String routingKey() {
 			return routingKey;
 		}
 
 		/**
 		 * @return the destExchange
 		 */
-		public Exchange getDestExchange() {
+		public Exchange destExchange() {
 			return destExchange;
 		}
 
 		/**
 		 * @return the destQueue
 		 */
-		public Queue getDestQueue() {
+		public Queue destQueue() {
 			return destQueue;
 		}
 
 		/**
 		 * @return the destinationType
 		 */
-		public DestinationType getDestinationType() {
+		public DestinationType destinationType() {
 			return destinationType;
 		}
 	}
@@ -275,14 +273,14 @@ public class BaseEntity {
 
 	public static void main(String[] args) {
 
-		Exchange exchange0 = Exchange.declareDirect("ABC");
-		Exchange exchange1 = Exchange.declareDirect("ABC");
+		Exchange exchange0 = Exchange.direct("ABC");
+		Exchange exchange1 = Exchange.direct("ABC");
 		System.out.println(exchange0);
 		System.out.println(exchange1);
 		System.out.println(exchange0 == exchange1);
 		System.out.println(exchange0.idempotent(exchange1));
 
-		System.out.println(Exchange.declareDirect("ABC"));
+		System.out.println(Exchange.direct("ABC"));
 		System.out.println(Queue.declare("ABC"));
 
 	}

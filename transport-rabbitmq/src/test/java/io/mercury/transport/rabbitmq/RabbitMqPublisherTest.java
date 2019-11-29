@@ -6,7 +6,7 @@ import io.mercury.transport.rabbitmq.RabbitMqPublisher;
 import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
 import io.mercury.transport.rabbitmq.config.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 
 public class RabbitMqPublisherTest {
 
@@ -16,10 +16,9 @@ public class RabbitMqPublisherTest {
 				.configuration("10.0.64.201", 5672, "global", "global2018").build();
 
 		RmqPublisherConfigurator publisherConfigurator = RmqPublisherConfigurator
-				.configuration(connectionConfigurator,
-						ExchangeDeclare.fanoutExchange("TEST_DIR").declareBindingQueue(
-								Arrays.asList(Queue.declare("TEST_D1")), Arrays.asList("K1", "K2")))
-				.setDefaultRoutingKey("K1").build();
+				.configuration(connectionConfigurator, ExchangeDeclare.fanout("TEST_DIR")
+						.bindingQueue(Arrays.asList(Queue.declare("TEST_D1")), Arrays.asList("K1", "K2")))
+				.defaultRoutingKey("K1").build();
 
 		RabbitMqPublisher publisher = new RabbitMqPublisher("TEST_PUB", publisherConfigurator);
 

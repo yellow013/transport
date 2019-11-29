@@ -36,10 +36,10 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
 		super(tag, "QosBatchReceiver", configurator.getConnectionConfigurator());
-		this.receiveQueue = configurator.getQueueDeclare().getQueue().getName();
+		this.receiveQueue = configurator.queueDeclare().queue().name();
 		createConnection();
 		queueDeclare();
-		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.getQos(), autoFlushInterval, callBack,
+		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, callBack,
 				serializable, refreshNowEvent, filter);
 	}
 
@@ -47,15 +47,15 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent) {
 		super(tag, "QosBatchReceiver", configurator.getConnectionConfigurator());
-		this.receiveQueue = configurator.getQueueDeclare().getQueue().getName();
+		this.receiveQueue = configurator.queueDeclare().queue().name();
 		createConnection();
 		queueDeclare();
-		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.getQos(), autoFlushInterval, callBack,
+		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, callBack,
 				serializable, refreshNowEvent, null);
 	}
 
 	private void queueDeclare() {
-		this.receiverName = "Receiver->" + connectionConfigurator.getConfiguratorName() + "$" + receiveQueue;
+		this.receiverName = "Receiver->" + connectionConfigurator.name() + "$" + receiveQueue;
 		try {
 			channel.queueDeclare(receiveQueue, durable, exclusive, autoDelete, null);
 		} catch (IOException e) {
@@ -76,7 +76,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return receiverName;
 	}
 

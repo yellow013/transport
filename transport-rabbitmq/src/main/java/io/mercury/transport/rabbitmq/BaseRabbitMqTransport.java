@@ -1,9 +1,9 @@
 package io.mercury.transport.rabbitmq;
 
 import static io.mercury.common.utils.StringUtil.isNullOrEmpty;
+import static java.time.LocalDateTime.now;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Nonnull;
@@ -51,30 +51,30 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	 */
 	protected BaseRabbitMqTransport(String tag, @Nonnull String moduleType,
 			@Nonnull ConnectionConfigurator connectionConfigurator) {
-		this.tag = isNullOrEmpty(tag) ? moduleType + "_StartPoint_" + LocalDateTime.now() : tag;
+		this.tag = isNullOrEmpty(tag) ? moduleType + "_StartPoint_" + now() : tag;
 		if (connectionConfigurator == null)
 			throw new NullPointerException(this.tag + " : configurator is null.");
 		this.connectionConfigurator = connectionConfigurator;
-		this.shutdownEvent = connectionConfigurator.getShutdownEvent();
+		this.shutdownEvent = connectionConfigurator.shutdownEvent();
 	}
 
 	protected void createConnection() {
 		logger.info("Call method createConnection()");
 		if (connectionFactory == null) {
 			connectionFactory = new ConnectionFactory();
-			connectionFactory.setHost(connectionConfigurator.getHost());
-			connectionFactory.setPort(connectionConfigurator.getPort());
-			connectionFactory.setUsername(connectionConfigurator.getUsername());
-			connectionFactory.setPassword(connectionConfigurator.getPassword());
-			connectionFactory.setVirtualHost(connectionConfigurator.getVirtualHost());
-			connectionFactory.setAutomaticRecoveryEnabled(connectionConfigurator.isAutomaticRecovery());
-			connectionFactory.setNetworkRecoveryInterval(connectionConfigurator.getRecoveryInterval());
-			connectionFactory.setHandshakeTimeout(connectionConfigurator.getHandshakeTimeout());
-			connectionFactory.setConnectionTimeout(connectionConfigurator.getConnectionTimeout());
-			connectionFactory.setShutdownTimeout(connectionConfigurator.getShutdownTimeout());
-			connectionFactory.setRequestedHeartbeat(connectionConfigurator.getRequestedHeartbeat());
-			if (connectionConfigurator.getSslContext() != null)
-				connectionFactory.useSslProtocol(connectionConfigurator.getSslContext());
+			connectionFactory.setHost(connectionConfigurator.host());
+			connectionFactory.setPort(connectionConfigurator.port());
+			connectionFactory.setUsername(connectionConfigurator.username());
+			connectionFactory.setPassword(connectionConfigurator.password());
+			connectionFactory.setVirtualHost(connectionConfigurator.virtualHost());
+			connectionFactory.setAutomaticRecoveryEnabled(connectionConfigurator.automaticRecovery());
+			connectionFactory.setNetworkRecoveryInterval(connectionConfigurator.recoveryInterval());
+			connectionFactory.setHandshakeTimeout(connectionConfigurator.handshakeTimeout());
+			connectionFactory.setConnectionTimeout(connectionConfigurator.connectionTimeout());
+			connectionFactory.setShutdownTimeout(connectionConfigurator.shutdownTimeout());
+			connectionFactory.setRequestedHeartbeat(connectionConfigurator.requestedHeartbeat());
+			if (connectionConfigurator.sslContext() != null)
+				connectionFactory.useSslProtocol(connectionConfigurator.sslContext());
 		}
 		try {
 			connection = connectionFactory.newConnection();
@@ -111,9 +111,9 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	protected boolean closeAndReconnection() {
 		logger.info("Call method closeAndReconnection()");
 		closeConnection();
-		ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval() / 2);
+		ThreadUtil.sleep(connectionConfigurator.recoveryInterval() / 2);
 		createConnection();
-		ThreadUtil.sleep(connectionConfigurator.getRecoveryInterval() / 2);
+		ThreadUtil.sleep(connectionConfigurator.recoveryInterval() / 2);
 		return isConnected();
 	}
 

@@ -10,8 +10,8 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
 import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Exchange;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Exchange;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 public final class OperationalChannel extends BaseRabbitMqTransport {
@@ -60,7 +60,7 @@ public final class OperationalChannel extends BaseRabbitMqTransport {
 	public boolean declareQueue(@Nonnull Queue queue) throws RabbitMqDeclareException {
 		if (queue == null)
 			throw RabbitMqDeclareException.ofException(new NullPointerException("param queue is can't null."));
-		return declareQueue(queue.getName(), queue.isDurable(), queue.isExclusive(), queue.isAutoDelete());
+		return declareQueue(queue.name(), queue.durable(), queue.exclusive(), queue.autoDelete());
 	}
 
 	public boolean declareQueue(@Nonnull String queue, boolean durable, boolean exclusive, boolean autoDelete)
@@ -84,16 +84,16 @@ public final class OperationalChannel extends BaseRabbitMqTransport {
 	public boolean declareExchange(@Nonnull Exchange exchange) throws RabbitMqDeclareException {
 		if (exchange == null)
 			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
-		switch (exchange.getType()) {
+		switch (exchange.type()) {
 		case Direct:
-			return declareDirectExchange(exchange.getName(), exchange.isDurable(), exchange.isAutoDelete(),
-					exchange.isInternal());
+			return declareDirectExchange(exchange.name(), exchange.durable(), exchange.autoDelete(),
+					exchange.internal());
 		case Fanout:
-			return declareFanoutExchange(exchange.getName(), exchange.isDurable(), exchange.isAutoDelete(),
-					exchange.isInternal());
+			return declareFanoutExchange(exchange.name(), exchange.durable(), exchange.autoDelete(),
+					exchange.internal());
 		case Topic:
-			return declareTopicExchange(exchange.getName(), exchange.isDurable(), exchange.isAutoDelete(),
-					exchange.isInternal());
+			return declareTopicExchange(exchange.name(), exchange.durable(), exchange.autoDelete(),
+					exchange.internal());
 		default:
 			return false;
 		}
@@ -197,7 +197,7 @@ public final class OperationalChannel extends BaseRabbitMqTransport {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return tag;
 	}
 

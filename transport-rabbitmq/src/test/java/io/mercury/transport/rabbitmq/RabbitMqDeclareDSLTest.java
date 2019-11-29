@@ -9,7 +9,7 @@ public class RabbitMqDeclareDSLTest {
 	@Test
 	public void test() {
 		
-		ExchangeDeclare.fanoutExchange("FAN_T1");
+		ExchangeDeclare.fanout("FAN_T1");
 		
 	
 	}

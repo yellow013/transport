@@ -13,9 +13,9 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	// 错误消息ExchangeDeclare
 	private ExchangeDeclare errorMsgExchange;
 	// 自动ACK
-	private boolean isAutoAck;
+	private boolean autoAck;
 	// 一次ACK多条
-	private boolean isMultipleAck;
+	private boolean multipleAck;
 	// 最大重新ACK次数
 	private int maxAckTotal;
 	// 最大ACK重连次数
@@ -27,8 +27,8 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		super(builder.connectionConfigurator);
 		this.queueDeclare = builder.queueDeclare;
 		this.errorMsgExchange = builder.errorMsgExchange;
-		this.isAutoAck = builder.isAutoAck;
-		this.isMultipleAck = builder.isMultipleAck;
+		this.autoAck = builder.autoAck;
+		this.multipleAck = builder.multipleAck;
 		this.maxAckTotal = builder.maxAckTotal;
 		this.maxAckReconnection = builder.maxAckReconnection;
 		this.qos = builder.qos;
@@ -42,49 +42,49 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	/**
 	 * @return the queueDeclare
 	 */
-	public QueueDeclare getQueueDeclare() {
+	public QueueDeclare queueDeclare() {
 		return queueDeclare;
 	}
 
 	/**
 	 * @return the errorMsgExchange
 	 */
-	public ExchangeDeclare getErrorMsgExchange() {
+	public ExchangeDeclare errorMsgExchange() {
 		return errorMsgExchange;
 	}
 
 	/**
 	 * @return the isAutoAck
 	 */
-	public boolean isAutoAck() {
-		return isAutoAck;
+	public boolean autoAck() {
+		return autoAck;
 	}
 
 	/**
 	 * @return the isMultipleAck
 	 */
-	public boolean isMultipleAck() {
-		return isMultipleAck;
+	public boolean multipleAck() {
+		return multipleAck;
 	}
 
 	/**
 	 * @return the maxAckTotal
 	 */
-	public int getMaxAckTotal() {
+	public int maxAckTotal() {
 		return maxAckTotal;
 	}
 
 	/**
 	 * @return the maxAckReconnection
 	 */
-	public int getMaxAckReconnection() {
+	public int maxAckReconnection() {
 		return maxAckReconnection;
 	}
 
 	/**
 	 * @return the qos
 	 */
-	public int getQos() {
+	public int qos() {
 		return qos;
 	}
 
@@ -105,9 +105,9 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// 错误消息ExchangeDeclare
 		private ExchangeDeclare errorMsgExchange;
 		// 自动ACK
-		private boolean isAutoAck = true;
+		private boolean autoAck = true;
 		// 一次ACK多条
-		private boolean isMultipleAck = false;
+		private boolean multipleAck = false;
 		// 最大重新ACK次数
 		private int maxAckTotal = 16;
 		// 最大ACK重连次数
@@ -120,14 +120,10 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 			this.queueDeclare = queueDeclare;
 		}
 
-		public RmqReceiverConfigurator build() {
-			return new RmqReceiverConfigurator(this);
-		}
-
 		/**
 		 * @param errorMsgExchange the errorMsgExchange to set
 		 */
-		public Builder setErrorMsgExchange(ExchangeDeclare errorMsgExchange) {
+		public Builder errorMsgExchange(ExchangeDeclare errorMsgExchange) {
 			this.errorMsgExchange = errorMsgExchange;
 			return this;
 		}
@@ -135,23 +131,23 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param isAutoAck the isAutoAck to set
 		 */
-		public Builder setAutoAck(boolean isAutoAck) {
-			this.isAutoAck = isAutoAck;
+		public Builder autoAck(boolean autoAck) {
+			this.autoAck = autoAck;
 			return this;
 		}
 
 		/**
 		 * @param isMultipleAck the isMultipleAck to set
 		 */
-		public Builder setMultipleAck(boolean isMultipleAck) {
-			this.isMultipleAck = isMultipleAck;
+		public Builder multipleAck(boolean multipleAck) {
+			this.multipleAck = multipleAck;
 			return this;
 		}
 
 		/**
 		 * @param maxAckTotal the maxAckTotal to set
 		 */
-		public Builder setMaxAckTotal(int maxAckTotal) {
+		public Builder maxAckTotal(int maxAckTotal) {
 			this.maxAckTotal = maxAckTotal;
 			return this;
 		}
@@ -159,7 +155,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param maxAckReconnection the maxAckReconnection to set
 		 */
-		public Builder setMaxAckReconnection(int maxAckReconnection) {
+		public Builder maxAckReconnection(int maxAckReconnection) {
 			this.maxAckReconnection = maxAckReconnection;
 			return this;
 		}
@@ -167,9 +163,13 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param qos the qos to set
 		 */
-		public Builder setQos(int qos) {
+		public Builder qos(int qos) {
 			this.qos = qos;
 			return this;
+		}
+
+		public RmqReceiverConfigurator build() {
+			return new RmqReceiverConfigurator(this);
 		}
 
 	}

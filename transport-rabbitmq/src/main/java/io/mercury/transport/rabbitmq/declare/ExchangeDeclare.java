@@ -6,9 +6,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import io.mercury.transport.rabbitmq.OperationalChannel;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Binding;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Exchange;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Binding;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Exchange;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 /**
@@ -21,16 +21,16 @@ public class ExchangeDeclare extends Relationship {
 
 	private Exchange exchange;
 
-	public static ExchangeDeclare fanoutExchange(@Nonnull String exchangeName) {
-		return new ExchangeDeclare(Exchange.declareFanout(exchangeName));
+	public static ExchangeDeclare fanout(@Nonnull String exchangeName) {
+		return new ExchangeDeclare(Exchange.fanout(exchangeName));
 	}
 
-	public static ExchangeDeclare directExchange(@Nonnull String exchangeName) {
-		return new ExchangeDeclare(Exchange.declareDirect(exchangeName));
+	public static ExchangeDeclare direct(@Nonnull String exchangeName) {
+		return new ExchangeDeclare(Exchange.direct(exchangeName));
 	}
 
-	public static ExchangeDeclare topicExchange(@Nonnull String exchangeName) {
-		return new ExchangeDeclare(Exchange.declareTopic(exchangeName));
+	public static ExchangeDeclare topic(@Nonnull String exchangeName) {
+		return new ExchangeDeclare(Exchange.topic(exchangeName));
 	}
 
 	public static ExchangeDeclare ofExchange(@Nonnull Exchange exchange) {
@@ -54,30 +54,30 @@ public class ExchangeDeclare extends Relationship {
 	/**
 	 * @return the exchange
 	 */
-	public Exchange getExchange() {
+	public Exchange exchange() {
 		return exchange;
 	}
 
-	public ExchangeDeclare setDurable(boolean durable) {
-		exchange.setDurable(durable);
+	public ExchangeDeclare durable(boolean durable) {
+		exchange.durable(durable);
 		return this;
 	}
 
-	public ExchangeDeclare setAutoDelete(boolean autoDelete) {
-		exchange.setAutoDelete(autoDelete);
+	public ExchangeDeclare autoDelete(boolean autoDelete) {
+		exchange.autoDelete(autoDelete);
 		return this;
 	}
 
-	public ExchangeDeclare setInternal(boolean internal) {
-		exchange.setInternal(internal);
+	public ExchangeDeclare internal(boolean internal) {
+		exchange.internal(internal);
 		return this;
 	}
 
-	public ExchangeDeclare declareBindingExchange(Exchange... exchanges) {
-		return declareBindingExchange(exchanges != null ? Arrays.asList(exchanges) : null, null);
+	public ExchangeDeclare bindingExchange(Exchange... exchanges) {
+		return bindingExchange(exchanges != null ? Arrays.asList(exchanges) : null, null);
 	}
 
-	public ExchangeDeclare declareBindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
+	public ExchangeDeclare bindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (routingKeys != null)
@@ -89,11 +89,11 @@ public class ExchangeDeclare extends Relationship {
 		return this;
 	}
 
-	public ExchangeDeclare declareBindingQueue(Queue... queues) {
-		return declareBindingQueue(queues != null ? Arrays.asList(queues) : null, null);
+	public ExchangeDeclare bindingQueue(Queue... queues) {
+		return bindingQueue(queues != null ? Arrays.asList(queues) : null, null);
 	}
 
-	public ExchangeDeclare declareBindingQueue(List<Queue> queues, List<String> routingKeys) {
+	public ExchangeDeclare bindingQueue(List<Queue> queues, List<String> routingKeys) {
 		if (queues != null) {
 			queues.forEach(queue -> {
 				if (routingKeys != null)
@@ -107,7 +107,7 @@ public class ExchangeDeclare extends Relationship {
 
 	public static void main(String[] args) {
 
-		ExchangeDeclare.directExchange("TEST_DIRECT").setAutoDelete(true).setInternal(true);
+		ExchangeDeclare.direct("TEST_DIRECT").autoDelete(true).internal(true);
 
 	}
 

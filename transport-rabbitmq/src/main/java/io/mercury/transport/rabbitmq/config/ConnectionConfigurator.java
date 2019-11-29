@@ -35,8 +35,8 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 	private ShutdownEvent<Exception> shutdownEvent;
 
 	// 配置器全名
-	private String configuratorName;
-	//
+	private String name;
+	// 配置信息
 	private String connectionInfo;
 
 	private ConnectionConfigurator(Builder builder) {
@@ -54,7 +54,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		this.requestedHeartbeat = builder.requestedHeartbeat;
 		this.shutdownEvent = builder.shutdownEvent;
 		this.connectionInfo = newConnectionInfo();
-		this.configuratorName = newConfiguratorName();
+		this.name = newConfiguratorName();
 	}
 
 	private String newConnectionInfo() {
@@ -77,101 +77,101 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 	 * 
 	 */
 	@Override
-	public String getConfiguratorName() {
-		return configuratorName;
+	public String name() {
+		return name;
 	}
 
 	@Override
-	public String getHost() {
+	public String host() {
 		return host;
 	}
 
 	@Override
-	public int getPort() {
+	public int port() {
 		return port;
 	}
 
 	/**
 	 * @return the username
 	 */
-	public String getUsername() {
+	public String username() {
 		return username;
 	}
 
 	/**
 	 * @return the password
 	 */
-	public String getPassword() {
+	public String password() {
 		return password;
 	}
 
 	/**
 	 * @return the virtualHost
 	 */
-	public String getVirtualHost() {
+	public String virtualHost() {
 		return virtualHost;
 	}
 
 	/**
 	 * @return the sslContext
 	 */
-	public SSLContext getSslContext() {
+	public SSLContext sslContext() {
 		return sslContext;
 	}
 
 	/**
 	 * @return the connectionTimeout
 	 */
-	public int getConnectionTimeout() {
+	public int connectionTimeout() {
 		return connectionTimeout;
 	}
 
 	/**
 	 * @return the automaticRecovery
 	 */
-	public boolean isAutomaticRecovery() {
+	public boolean automaticRecovery() {
 		return automaticRecovery;
 	}
 
 	/**
 	 * @return the recoveryInterval
 	 */
-	public long getRecoveryInterval() {
+	public long recoveryInterval() {
 		return recoveryInterval;
 	}
 
 	/**
 	 * @return the handshakeTimeout
 	 */
-	public int getHandshakeTimeout() {
+	public int handshakeTimeout() {
 		return handshakeTimeout;
 	}
 
 	/**
 	 * @return the shutdownTimeout
 	 */
-	public int getShutdownTimeout() {
+	public int shutdownTimeout() {
 		return shutdownTimeout;
 	}
 
 	/**
 	 * @return the requestedHeartbeat
 	 */
-	public int getRequestedHeartbeat() {
+	public int requestedHeartbeat() {
 		return requestedHeartbeat;
 	}
 
 	/**
 	 * @return the shutdownEvent
 	 */
-	public ShutdownEvent<Exception> getShutdownEvent() {
+	public ShutdownEvent<Exception> shutdownEvent() {
 		return shutdownEvent;
 	}
 
 	/**
 	 * @return the connectionName
 	 */
-	public String getConnectionInfo() {
+	public String connectionInfo() {
 		return connectionInfo;
 	}
 
@@ -212,7 +212,6 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		private ShutdownEvent<Exception> shutdownEvent;
 
 		private Builder(String host, int port, String username, String password) {
-			super();
 			this.host = host;
 			this.port = port;
 			this.username = username;
@@ -220,7 +219,6 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		}
 
 		private Builder(String host, int port, String username, String password, String virtualHost) {
-			super();
 			this.host = host;
 			this.port = port;
 			this.username = username;
@@ -236,7 +234,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param sslContext the sslContext to set
 		 */
-		public Builder setSslContext(SSLContext sslContext) {
+		public Builder sslContext(SSLContext sslContext) {
 			this.sslContext = sslContext;
 			return this;
 		}
@@ -244,7 +242,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param connectionTimeout the connectionTimeout to set
 		 */
-		public Builder setConnectionTimeout(int connectionTimeout) {
+		public Builder connectionTimeout(int connectionTimeout) {
 			this.connectionTimeout = connectionTimeout;
 			return this;
 		}
@@ -252,7 +250,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param automaticRecovery the automaticRecovery to set
 		 */
-		public Builder setAutomaticRecovery(boolean automaticRecovery) {
+		public Builder automaticRecovery(boolean automaticRecovery) {
 			this.automaticRecovery = automaticRecovery;
 			return this;
 		}
@@ -260,7 +258,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param recoveryInterval the recoveryInterval to set
 		 */
-		public Builder setRecoveryInterval(long recoveryInterval) {
+		public Builder recoveryInterval(long recoveryInterval) {
 			this.recoveryInterval = recoveryInterval;
 			return this;
 		}
@@ -268,7 +266,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param handshakeTimeout the handshakeTimeout to set
 		 */
-		public Builder setHandshakeTimeout(int handshakeTimeout) {
+		public Builder handshakeTimeout(int handshakeTimeout) {
 			this.handshakeTimeout = handshakeTimeout;
 			return this;
 		}
@@ -276,7 +274,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param shutdownTimeout the shutdownTimeout to set
 		 */
-		public Builder setShutdownTimeout(int shutdownTimeout) {
+		public Builder shutdownTimeout(int shutdownTimeout) {
 			this.shutdownTimeout = shutdownTimeout;
 			return this;
 		}
@@ -284,7 +282,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param requestedHeartbeat the requestedHeartbeat to set
 		 */
-		public Builder setRequestedHeartbeat(int requestedHeartbeat) {
+		public Builder requestedHeartbeat(int requestedHeartbeat) {
 			this.requestedHeartbeat = requestedHeartbeat;
 			return this;
 		}
@@ -292,7 +290,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		/**
 		 * @param shutdownEvent the shutdownEvent to set
 		 */
-		public Builder setShutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
+		public Builder shutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
 			this.shutdownEvent = shutdownEvent;
 			return this;
 		}
@@ -303,7 +301,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 
 		ConnectionConfigurator configuration = configuration("localhost", 5672, "admin", "admin", "report").build();
 		System.out.println(configuration);
-		System.out.println(configuration.getConfiguratorName());
+		System.out.println(configuration.name());
 
 	}
 

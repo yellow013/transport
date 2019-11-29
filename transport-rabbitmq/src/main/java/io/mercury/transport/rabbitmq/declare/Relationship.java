@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import io.mercury.common.collections.MutableLists;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.OperationalChannel;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Binding;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Exchange;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Binding;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Exchange;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 public abstract class Relationship {
@@ -24,17 +24,17 @@ public abstract class Relationship {
 	}
 
 	private void handleBinding(OperationalChannel channel, Binding binding) throws RabbitMqDeclareException {
-		Exchange source = binding.getSource();
+		Exchange source = binding.source();
 		try {
 			channel.declareExchange(source);
 		} catch (RabbitMqDeclareException declareException) {
 			logger.error("Declare source exchange failure -> {}", source);
 			throw declareException;
 		}
-		String routingKey = binding.getRoutingKey();
-		switch (binding.getDestinationType()) {
+		String routingKey = binding.routingKey();
+		switch (binding.destinationType()) {
 		case Exchange:
-			Exchange destExchange = binding.getDestExchange();
+			Exchange destExchange = binding.destExchange();
 			try {
 				channel.declareExchange(destExchange);
 			} catch (RabbitMqDeclareException declareException) {
@@ -42,7 +42,7 @@ public abstract class Relationship {
 				throw declareException;
 			}
 			try {
-				channel.bindExchange(destExchange.getName(), source.getName(), routingKey);
+				channel.bindExchange(destExchange.name(), source.name(), routingKey);
 			} catch (RabbitMqDeclareException declareException) {
 				logger.error("Declare bind exchange failure -> dest==[{}], source==[{}], routingKey==[{}]",
 						destExchange, source, routingKey);
@@ -50,7 +50,7 @@ public abstract class Relationship {
 			}
 			return;
 		case Queue:
-			Queue destQueue = binding.getDestQueue();
+			Queue destQueue = binding.destQueue();
 			try {
 				channel.declareQueue(destQueue);
 			} catch (RabbitMqDeclareException declareException) {
@@ -58,7 +58,7 @@ public abstract class Relationship {
 				throw declareException;
 			}
 			try {
-				channel.bindQueue(destQueue.getName(), source.getName(), routingKey);
+				channel.bindQueue(destQueue.name(), source.name(), routingKey);
 			} catch (RabbitMqDeclareException declareException) {
 				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue);
 				throw declareException;

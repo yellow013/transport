@@ -6,9 +6,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import io.mercury.transport.rabbitmq.OperationalChannel;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Binding;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Exchange;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Binding;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Exchange;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 /**
@@ -21,11 +21,11 @@ public class QueueDeclare extends Relationship {
 
 	private Queue queue;
 
-	public static QueueDeclare queue(String queueName) {
+	public static QueueDeclare name(String queueName) {
 		return new QueueDeclare(Queue.declare(queueName));
 	}
 
-	public static QueueDeclare ofQueue(Queue queue) {
+	public static QueueDeclare with(Queue queue) {
 		return new QueueDeclare(queue);
 	}
 
@@ -46,30 +46,30 @@ public class QueueDeclare extends Relationship {
 	/**
 	 * @return the queue
 	 */
-	public Queue getQueue() {
+	public Queue queue() {
 		return queue;
 	}
 
-	public QueueDeclare setDurable(boolean durable) {
-		queue.setDurable(durable);
+	public QueueDeclare durable(boolean durable) {
+		queue.durable(durable);
 		return this;
 	}
 
-	public QueueDeclare setAutoDelete(boolean autoDelete) {
-		queue.setAutoDelete(autoDelete);
+	public QueueDeclare autoDelete(boolean autoDelete) {
+		queue.autoDelete(autoDelete);
 		return this;
 	}
 
-	public QueueDeclare setExclusive(boolean exclusive) {
-		queue.setExclusive(exclusive);
+	public QueueDeclare exclusive(boolean exclusive) {
+		queue.exclusive(exclusive);
 		return this;
 	}
 
-	public QueueDeclare declareBinding(Exchange... exchanges) {
-		return declareBinding(exchanges != null ? Arrays.asList(exchanges) : null, null);
+	public QueueDeclare binding(Exchange... exchanges) {
+		return binding(exchanges != null ? Arrays.asList(exchanges) : null, null);
 	}
 
-	public QueueDeclare declareBinding(@Nonnull List<Exchange> exchanges, List<String> routingKeys) {
+	public QueueDeclare binding(@Nonnull List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (routingKeys != null)

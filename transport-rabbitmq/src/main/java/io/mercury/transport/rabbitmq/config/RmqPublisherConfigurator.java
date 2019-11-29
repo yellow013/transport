@@ -7,7 +7,7 @@ import com.rabbitmq.client.MessageProperties;
 
 import io.mercury.common.utils.StringUtil;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
-import io.mercury.transport.rabbitmq.declare.BaseEntity.Queue;
+import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 
 /**
  * 
@@ -22,8 +22,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	private String defaultRoutingKey;
 	// 默认消息发布参数
 	private BasicProperties msgProperties;
-	// 是否进行发表确认
-	private boolean isConfirm;
+	// 是否进行发布确认
+	private boolean confirm;
 	// 发布确认超时时间
 	private long confirmTimeout;
 	// 发布确认重试次数
@@ -34,7 +34,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		this.exchangeDeclare = builder.exchangeDeclare;
 		this.defaultRoutingKey = builder.defaultRoutingKey;
 		this.msgProperties = builder.msgProperties;
-		this.isConfirm = builder.isConfirm;
+		this.confirm = builder.confirm;
 		this.confirmTimeout = builder.confirmTimeout;
 		this.confirmRetry = builder.confirmRetry;
 	}
@@ -47,42 +47,42 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	/**
 	 * @return the exchangeDeclare
 	 */
-	public ExchangeDeclare getExchangeDeclare() {
+	public ExchangeDeclare exchangeDeclare() {
 		return exchangeDeclare;
 	}
 
 	/**
 	 * @return the defaultRoutingKey
 	 */
-	public String getDefaultRoutingKey() {
+	public String defaultRoutingKey() {
 		return defaultRoutingKey;
 	}
 
 	/**
 	 * @return the msgProperties
 	 */
-	public BasicProperties getMsgProperties() {
+	public BasicProperties msgProperties() {
 		return msgProperties;
 	}
 
 	/**
 	 * @return the isConfirm
 	 */
-	public boolean isConfirm() {
-		return isConfirm;
+	public boolean confirm() {
+		return confirm;
 	}
 
 	/**
 	 * @return the confirmTimeout
 	 */
-	public long getConfirmTimeout() {
+	public long confirmTimeout() {
 		return confirmTimeout;
 	}
 
 	/**
 	 * @return the confirmRetry
 	 */
-	public int getConfirmRetry() {
+	public int confirmRetry() {
 		return confirmRetry;
 	}
 
@@ -105,7 +105,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		private String defaultRoutingKey = "";
 		private BasicProperties msgProperties = MessageProperties.PERSISTENT_BASIC;
 
-		private boolean isConfirm = false;
+		private boolean confirm = false;
 		private long confirmTimeout = 5000;
 		private int confirmRetry = 3;
 
@@ -122,7 +122,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param defaultRoutingKey the defaultRoutingKey to set
 		 */
-		public Builder setDefaultRoutingKey(String defaultRoutingKey) {
+		public Builder defaultRoutingKey(String defaultRoutingKey) {
 			this.defaultRoutingKey = defaultRoutingKey;
 			return this;
 		}
@@ -130,7 +130,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param msgProperties the msgProperties to set
 		 */
-		public Builder setMsgProperties(BasicProperties msgProperties) {
+		public Builder msgProperties(BasicProperties msgProperties) {
 			this.msgProperties = msgProperties;
 			return this;
 		}
@@ -138,15 +138,15 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param isConfirm the isConfirm to set
 		 */
-		public Builder setConfirm(boolean isConfirm) {
-			this.isConfirm = isConfirm;
+		public Builder confirm(boolean confirm) {
+			this.confirm = confirm;
 			return this;
 		}
 
 		/**
 		 * @param confirmTimeout the confirmTimeout to set
 		 */
-		public Builder setConfirmTimeout(long confirmTimeout) {
+		public Builder confirmTimeout(long confirmTimeout) {
 			this.confirmTimeout = confirmTimeout;
 			return this;
 		}
@@ -154,7 +154,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param confirmRetry the confirmRetry to set
 		 */
-		public Builder setConfirmRetry(int confirmRetry) {
+		public Builder confirmRetry(int confirmRetry) {
 			this.confirmRetry = confirmRetry;
 			return this;
 		}
@@ -165,7 +165,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 		System.out.println(
 				configuration(ConnectionConfigurator.configuration("localhost", 5672, "user0", "userpass").build(),
-						ExchangeDeclare.directExchange("TEST").declareBindingQueue(Queue.declare("TEST_0"))).build());
+						ExchangeDeclare.direct("TEST").bindingQueue(Queue.declare("TEST_0"))).build());
 
 	}
 

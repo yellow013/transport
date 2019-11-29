@@ -101,13 +101,13 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	public RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
 		super(tag, "Receiver", configurator.getConnectionConfigurator());
 		this.callback = callback;
-		this.queueDeclare = configurator.getQueueDeclare();
-		this.errorMsgExchange = configurator.getErrorMsgExchange();
-		this.autoAck = configurator.isAutoAck();
-		this.multipleAck = configurator.isMultipleAck();
-		this.maxAckTotal = configurator.getMaxAckTotal();
-		this.maxAckReconnection = configurator.getMaxAckReconnection();
-		this.qos = configurator.getQos();
+		this.queueDeclare = configurator.queueDeclare();
+		this.errorMsgExchange = configurator.errorMsgExchange();
+		this.autoAck = configurator.autoAck();
+		this.multipleAck = configurator.multipleAck();
+		this.maxAckTotal = configurator.maxAckTotal();
+		this.maxAckReconnection = configurator.maxAckReconnection();
+		this.qos = configurator.qos();
 		createConnection();
 		init();
 	}
@@ -118,27 +118,27 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 			this.queueDeclare.declare(operationalChannel);
 		} catch (Exception e) {
 			logger.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
-					connectionConfigurator.getConfiguratorName(), e.getMessage(), e);
+					connectionConfigurator.name(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
 			throw new RuntimeException(e);
 		}
-		this.queueName = queueDeclare.getQueue().getName();
+		this.queueName = queueDeclare.queue().name();
 		if (errorMsgExchange != null) {
 			try {
 				this.errorMsgExchange.declare(operationalChannel);
 			} catch (Exception e) {
 				logger.error(
 						"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
-						connectionConfigurator.getConfiguratorName(), e.getMessage(), e);
+						connectionConfigurator.name(), e.getMessage(), e);
 				// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 				destroy();
 				throw new RuntimeException(e);
 			}
-			this.errorMsgExchangeName = errorMsgExchange.getExchange().getName();
+			this.errorMsgExchangeName = errorMsgExchange.exchange().name();
 			this.hasErrorMsgExchange = true;
 		}
-		this.receiverName = "Receiver->" + connectionConfigurator.getConfiguratorName() + "$" + queueName;
+		this.receiverName = "Receiver->" + connectionConfigurator.name() + "$" + queueName;
 	}
 
 	@Override
@@ -259,13 +259,13 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return receiverName;
 	}
 
 	public static void main(String[] args) {
 		RabbitMqReceiver receiver = new RabbitMqReceiver("", RmqReceiverConfigurator
-				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build(), QueueDeclare.queue(""))
+				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build(), QueueDeclare.name(""))
 				.build(), msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}
