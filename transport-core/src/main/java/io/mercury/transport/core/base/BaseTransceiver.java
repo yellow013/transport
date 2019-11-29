@@ -29,7 +29,7 @@ public abstract class BaseTransceiver<T> implements Transceiver<T> {
 		}
 
 		@Override
-		public String getName() {
+		public String name() {
 			// TODO Auto-generated method stub
 			return null;
 		}

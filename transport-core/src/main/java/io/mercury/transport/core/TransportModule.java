@@ -2,7 +2,7 @@ package io.mercury.transport.core;
 
 public interface TransportModule {
 
-	String getName();
+	String name();
 
 	boolean isConnected();
 
