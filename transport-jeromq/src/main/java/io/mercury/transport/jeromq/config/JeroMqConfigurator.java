@@ -22,24 +22,26 @@ public class JeroMqConfigurator implements TransportConfigurator {
 		return new Builder();
 	}
 
-	public String getHost() {
+	@Override
+	public String host() {
 		return host;
 	}
 
-	public int getPort() {
+	@Override
+	public int port() {
 		return port;
 	}
 
-	public String getTopic() {
+	public String topic() {
 		return topic;
 	}
 
-	public int getIoThreads() {
+	public int ioThreads() {
 		return ioThreads;
 	}
 
 	@Override
-	public String getConfiguratorName() {
+	public String name() {
 		return configuratorName;
 	}
 
@@ -53,22 +55,22 @@ public class JeroMqConfigurator implements TransportConfigurator {
 		private Builder() {
 		}
 
-		public Builder setHost(String host) {
+		public Builder host(String host) {
 			this.host = host;
 			return this;
 		}
 
-		public Builder setPort(int port) {
+		public Builder port(int port) {
 			this.port = port;
 			return this;
 		}
 
-		public Builder setTopic(String topic) {
+		public Builder topic(String topic) {
 			this.topic = topic;
 			return this;
 		}
 
-		public Builder setIoThreads(int ioThreads) {
+		public Builder ioThreads(int ioThreads) {
 			this.ioThreads = ioThreads;
 			return this;
 		}

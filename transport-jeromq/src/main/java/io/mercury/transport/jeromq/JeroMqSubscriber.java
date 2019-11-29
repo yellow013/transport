@@ -31,15 +31,15 @@ public class JeroMqSubscriber implements Subscriber {
 	}
 
 	private void init() {
-		this.context = ZMQ.context(configurator.getIoThreads());
+		this.context = ZMQ.context(configurator.ioThreads());
 		this.subscriber = context.socket(SocketType.SUB);
-		this.subscriber.connect(configurator.getHost());
-		this.subscriber.subscribe(configurator.getTopic().getBytes());
+		this.subscriber.connect(configurator.host());
+		this.subscriber.subscribe(configurator.topic().getBytes());
 		this.subscriber.setTCPKeepAlive(1);
 		this.subscriber.setTCPKeepAliveCount(10);
 		this.subscriber.setTCPKeepAliveIdle(15);
 		this.subscriber.setTCPKeepAliveInterval(15);
-		this.subscriberName = "JeroMQ.SUB$" + configurator.getHost() + "::" + configurator.getTopic();
+		this.subscriberName = "JeroMQ.SUB$" + configurator.host() + "::" + configurator.topic();
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class JeroMqSubscriber implements Subscriber {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return subscriberName;
 	}
 
@@ -69,8 +69,8 @@ public class JeroMqSubscriber implements Subscriber {
 		// JeroMqConfigurator configurator =
 		// JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:10001").setIoThreads(2).setTopic("").build();
 
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:13001")
-				.setTopic("command").setIoThreads(2).build();
+		JeroMqConfigurator configurator = JeroMqConfigurator.builder().host("tcp://127.0.0.1:13001")
+				.topic("command").ioThreads(2).build();
 
 		JeroMqSubscriber jeroMQSubscriber = new JeroMqSubscriber(configurator,
 				(byte[] byteMsg) -> System.out.println(new String(byteMsg, Charsets.UTF8)));

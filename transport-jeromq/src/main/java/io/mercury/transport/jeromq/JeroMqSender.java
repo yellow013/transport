@@ -29,10 +29,10 @@ public class JeroMqSender implements Sender<byte[]>, Closeable {
 	}
 
 	private void init() {
-		this.context = ZMQ.context(configurator.getIoThreads());
+		this.context = ZMQ.context(configurator.ioThreads());
 		this.socket = context.socket(SocketType.REQ);
-		this.socket.connect(configurator.getHost());
-		this.senderName = "JeroMQ.REQ$" + configurator.getHost();
+		this.socket.connect(configurator.host());
+		this.senderName = "JeroMQ.REQ$" + configurator.host();
 	}
 
 	@Override
@@ -49,13 +49,13 @@ public class JeroMqSender implements Sender<byte[]>, Closeable {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return senderName;
 	}
 
 	public static void main(String[] args) {
 
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setIoThreads(1).setHost("tcp://localhost:5551")
+		JeroMqConfigurator configurator = JeroMqConfigurator.builder().ioThreads(1).host("tcp://localhost:5551")
 				.build();
 
 		try (JeroMqSender sender = new JeroMqSender(configurator)) {

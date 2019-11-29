@@ -31,10 +31,10 @@ public class JeroMqPipeline implements Receiver {
 	}
 
 	private void init() {
-		this.context = new ZContext(configurator.getIoThreads());
+		this.context = new ZContext(configurator.ioThreads());
 		this.socket = context.createSocket(SocketType.REP);
-		this.socket.bind(configurator.getHost());
-		this.receiverName = "JeroMQ.REP$" + configurator.getHost();
+		this.socket.bind(configurator.host());
+		this.receiverName = "JeroMQ.REP$" + configurator.host();
 	}
 
 	@Override
@@ -59,14 +59,14 @@ public class JeroMqPipeline implements Receiver {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return receiverName;
 	}
 
 	public static void main(String[] args) {
 
 		JeroMqPipeline receiver = new JeroMqPipeline(
-				JeroMqConfigurator.builder().setIoThreads(10).setHost("tcp://*:5551").build(), (byte[] byteMsg) -> {
+				JeroMqConfigurator.builder().ioThreads(10).host("tcp://*:5551").build(), (byte[] byteMsg) -> {
 					System.out.println(new String(byteMsg));
 					return null;
 				});

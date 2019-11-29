@@ -30,11 +30,11 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 	}
 
 	private void init() {
-		this.context = ZMQ.context(configurator.getIoThreads());
+		this.context = ZMQ.context(configurator.ioThreads());
 		this.publisher = context.socket(SocketType.PUB);
-		this.publisher.bind(configurator.getHost());
-		this.topic = configurator.getTopic();
-		this.publisherName = "JeroMQ.Pub$" + configurator.getHost();
+		this.publisher.bind(configurator.host());
+		this.topic = configurator.topic();
+		this.publisherName = "JeroMQ.Pub$" + configurator.host();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 	}
 
 	@Override
-	public String getName() {
+	public String name() {
 		return publisherName;
 	}
 
@@ -65,8 +65,8 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 //		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
 //				.setTopic("").build();
 		
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:13001")
-				.setTopic("command").setIoThreads(2).build();
+		JeroMqConfigurator configurator = JeroMqConfigurator.builder().host("tcp://127.0.0.1:13001")
+				.topic("command").ioThreads(2).build();
 
 		try (JeroMqPublisher publisher = new JeroMqPublisher(configurator)) {
 			Random random = new Random();
