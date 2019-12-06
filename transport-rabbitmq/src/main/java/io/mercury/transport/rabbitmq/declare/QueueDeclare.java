@@ -21,7 +21,7 @@ public class QueueDeclare extends Relationship {
 
 	private Queue queue;
 
-	public static QueueDeclare name(String queueName) {
+	public static QueueDeclare named(String queueName) {
 		return new QueueDeclare(Queue.declare(queueName));
 	}
 

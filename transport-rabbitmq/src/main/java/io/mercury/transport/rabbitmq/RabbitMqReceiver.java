@@ -265,7 +265,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 
 	public static void main(String[] args) {
 		RabbitMqReceiver receiver = new RabbitMqReceiver("", RmqReceiverConfigurator
-				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build(), QueueDeclare.name(""))
+				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build(), QueueDeclare.named(""))
 				.build(), msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}
