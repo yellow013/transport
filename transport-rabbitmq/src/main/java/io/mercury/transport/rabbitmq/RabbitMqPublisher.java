@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 
 import com.rabbitmq.client.AMQP.BasicProperties;
 
-import io.mercury.common.charset.Charsets;
+import io.mercury.common.character.Charsets;
 import io.mercury.common.thread.ThreadUtil;
 import io.mercury.transport.core.api.Publisher;
 import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;

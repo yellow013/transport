@@ -12,7 +12,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
-import io.mercury.common.charset.Charsets;
+import io.mercury.common.character.Charsets;
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
 import io.mercury.transport.rabbitmq.config.RmqReceiverConfigurator;
