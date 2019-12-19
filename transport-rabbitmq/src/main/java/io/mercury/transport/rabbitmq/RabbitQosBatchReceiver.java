@@ -35,7 +35,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 	public RabbitQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
-		super(tag, "QosBatchReceiver", configurator.getConnectionConfigurator());
+		super(tag, "QosBatchReceiver", configurator.connectionConfigurator());
 		this.receiveQueue = configurator.queueDeclare().queue().name();
 		createConnection();
 		queueDeclare();
@@ -46,7 +46,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 	public RabbitQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent) {
-		super(tag, "QosBatchReceiver", configurator.getConnectionConfigurator());
+		super(tag, "QosBatchReceiver", configurator.connectionConfigurator());
 		this.receiveQueue = configurator.queueDeclare().queue().name();
 		createConnection();
 		queueDeclare();

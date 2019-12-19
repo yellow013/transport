@@ -109,8 +109,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		private long confirmTimeout = 5000;
 		private int confirmRetry = 3;
 
-		public Builder(ConnectionConfigurator connectionConfigurator, ExchangeDeclare exchangeDeclare) {
-			super();
+		private Builder(ConnectionConfigurator connectionConfigurator, ExchangeDeclare exchangeDeclare) {
 			this.connectionConfigurator = connectionConfigurator;
 			this.exchangeDeclare = exchangeDeclare;
 		}

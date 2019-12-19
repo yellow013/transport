@@ -12,7 +12,7 @@ abstract class RmqConfigurator {
 	/**
 	 * @return the connectionConfigurator
 	 */
-	public ConnectionConfigurator getConnectionConfigurator() {
+	public ConnectionConfigurator connectionConfigurator() {
 		return connectionConfigurator;
 	}
 

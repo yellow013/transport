@@ -115,7 +115,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// QOS预取
 		private int qos = 256;
 
-		public Builder(ConnectionConfigurator connectionConfigurator, QueueDeclare queueDeclare) {
+		private Builder(ConnectionConfigurator connectionConfigurator, QueueDeclare queueDeclare) {
 			this.connectionConfigurator = connectionConfigurator;
 			this.queueDeclare = queueDeclare;
 		}
