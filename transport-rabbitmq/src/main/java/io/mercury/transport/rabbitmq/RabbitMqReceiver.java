@@ -99,7 +99,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	 * @param callback
 	 */
 	public RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
-		super(tag, "Receiver", configurator.connectionConfigurator());
+		super(tag, "receiver", configurator.connectionConfigurator());
 		this.callback = callback;
 		this.queueDeclare = configurator.queueDeclare();
 		this.errorMsgExchange = configurator.errorMsgExchange();

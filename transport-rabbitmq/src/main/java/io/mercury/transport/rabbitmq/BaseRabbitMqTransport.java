@@ -49,9 +49,9 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	 * @param tag
 	 * @param configurator
 	 */
-	protected BaseRabbitMqTransport(String tag, @Nonnull String moduleType,
+	protected BaseRabbitMqTransport(String tag, @Nonnull String moduleName,
 			@Nonnull ConnectionConfigurator connectionConfigurator) {
-		this.tag = isNullOrEmpty(tag) ? moduleType + "_StartPoint_" + now() : tag;
+		this.tag = isNullOrEmpty(tag) ? moduleName + "-" + now() : tag;
 		if (connectionConfigurator == null)
 			throw new NullPointerException(this.tag + " : configurator is null.");
 		this.connectionConfigurator = connectionConfigurator;

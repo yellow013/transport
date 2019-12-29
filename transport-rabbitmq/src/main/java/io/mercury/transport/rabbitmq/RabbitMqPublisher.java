@@ -66,7 +66,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	 */
 	public RabbitMqPublisher(String tag, @Nonnull RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
 			Consumer<Long> noAckCallback) {
-		super(tag, "Publisher", configurator.connectionConfigurator());
+		super(tag, "publisher", configurator.connectionConfigurator());
 		this.exchangeDeclare = configurator.exchangeDeclare();
 		this.defaultRoutingKey = configurator.defaultRoutingKey();
 		this.msgProperties = configurator.msgProperties();
