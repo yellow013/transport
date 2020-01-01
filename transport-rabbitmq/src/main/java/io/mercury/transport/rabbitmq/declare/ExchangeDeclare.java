@@ -6,9 +6,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import io.mercury.transport.rabbitmq.OperationalChannel;
-import io.mercury.transport.rabbitmq.declare.EntityDeclare.Binding;
-import io.mercury.transport.rabbitmq.declare.EntityDeclare.Exchange;
-import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
+import io.mercury.transport.rabbitmq.declare.AmqpEntity.Binding;
+import io.mercury.transport.rabbitmq.declare.AmqpEntity.Exchange;
+import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 /**

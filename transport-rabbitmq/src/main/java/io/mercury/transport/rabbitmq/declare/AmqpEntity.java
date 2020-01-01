@@ -2,7 +2,7 @@ package io.mercury.transport.rabbitmq.declare;
 
 import static java.lang.String.valueOf;
 
-public interface EntityDeclare {
+public interface AmqpEntity {
 
 	public static class Exchange {
 
@@ -119,7 +119,7 @@ public interface EntityDeclare {
 		// channel关闭后自动删除队列
 		private boolean autoDelete = false;
 
-		public static Queue declare(String name) {
+		public static Queue named(String name) {
 			return new Queue(name);
 		}
 
@@ -281,7 +281,7 @@ public interface EntityDeclare {
 		System.out.println(exchange0.idempotent(exchange1));
 
 		System.out.println(Exchange.direct("ABC"));
-		System.out.println(Queue.declare("ABC"));
+		System.out.println(Queue.named("ABC"));
 
 	}
 
