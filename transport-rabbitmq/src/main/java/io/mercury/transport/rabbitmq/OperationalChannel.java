@@ -10,8 +10,8 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
 import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
-import io.mercury.transport.rabbitmq.declare.EntityDeclare.Exchange;
-import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
+import io.mercury.transport.rabbitmq.declare.AmqpEntity.Exchange;
+import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 public final class OperationalChannel extends BaseRabbitMqTransport {

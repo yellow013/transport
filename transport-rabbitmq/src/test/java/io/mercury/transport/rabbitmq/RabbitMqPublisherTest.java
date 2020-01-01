@@ -2,11 +2,10 @@ package io.mercury.transport.rabbitmq;
 
 import java.util.Arrays;
 
-import io.mercury.transport.rabbitmq.RabbitMqPublisher;
 import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
 import io.mercury.transport.rabbitmq.config.RmqPublisherConfigurator;
+import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
-import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 
 public class RabbitMqPublisherTest {
 
@@ -17,7 +16,7 @@ public class RabbitMqPublisherTest {
 
 		RmqPublisherConfigurator publisherConfigurator = RmqPublisherConfigurator
 				.configuration(connectionConfigurator, ExchangeDeclare.fanout("TEST_DIR")
-						.bindingQueue(Arrays.asList(Queue.declare("TEST_D1")), Arrays.asList("K1", "K2")))
+						.bindingQueue(Arrays.asList(Queue.named("TEST_D1")), Arrays.asList("K1", "K2")))
 				.defaultRoutingKey("K1").build();
 
 		RabbitMqPublisher publisher = new RabbitMqPublisher("TEST_PUB", publisherConfigurator);

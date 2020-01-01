@@ -83,13 +83,23 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 		return this;
 	}
 
+	public static final RabbitMqReceiver create(@Nonnull RmqReceiverConfigurator configurator,
+			@Nonnull Consumer<byte[]> callback) {
+		return new RabbitMqReceiver(configurator, callback);
+	}
+
 	/**
 	 * 
 	 * @param configurator
 	 * @param callback
 	 */
-	public RabbitMqReceiver(@Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
+	private RabbitMqReceiver(@Nonnull RmqReceiverConfigurator configurator, @Nonnull Consumer<byte[]> callback) {
 		this(null, configurator, callback);
+	}
+
+	public static final RabbitMqReceiver create(String tag, @Nonnull RmqReceiverConfigurator configurator,
+			@Nonnull Consumer<byte[]> callback) {
+		return new RabbitMqReceiver(tag, configurator, callback);
 	}
 
 	/**
@@ -98,7 +108,8 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	 * @param configurator
 	 * @param callback
 	 */
-	public RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, Consumer<byte[]> callback) {
+	private RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator,
+			@Nonnull Consumer<byte[]> callback) {
 		super(tag, "receiver", configurator.connectionConfigurator());
 		this.callback = callback;
 		this.queueDeclare = configurator.queueDeclare();
