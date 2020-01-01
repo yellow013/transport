@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 
 import io.mercury.transport.core.api.Receiver;
-import io.mercury.transport.rabbitmq.config.RmqReceiverConfigurator;
+import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
 import io.mercury.transport.rabbitmq.consumer.QosBatchCallBack;
 import io.mercury.transport.rabbitmq.consumer.QosBatchProcessConsumer;
 import io.mercury.transport.rabbitmq.consumer.QueueMessageSerializable;
@@ -17,7 +17,7 @@ import io.mercury.transport.rabbitmq.consumer.RefreshNowEvent;
  * @author xuejian.sun
  * @date 2019/1/14 19:16
  */
-public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements Receiver {
+public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport implements Receiver {
 
 	private String receiverName;
 
@@ -32,10 +32,10 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 
 	private QosBatchProcessConsumer<T> consumer;
 
-	public RabbitQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
+	public RabbitMqQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
-		super(tag, "QosBatchReceiver", configurator.connectionConfigurator());
+		super(tag, "QosBatchReceiver", configurator.connection());
 		this.receiveQueue = configurator.queueDeclare().queue().name();
 		createConnection();
 		queueDeclare();
@@ -43,10 +43,10 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 				serializable, refreshNowEvent, filter);
 	}
 
-	public RabbitQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
+	public RabbitMqQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent) {
-		super(tag, "QosBatchReceiver", configurator.connectionConfigurator());
+		super(tag, "QosBatchReceiver", configurator.connection());
 		this.receiveQueue = configurator.queueDeclare().queue().name();
 		createConnection();
 		queueDeclare();
@@ -55,7 +55,7 @@ public class RabbitQosBatchReceiver<T> extends BaseRabbitMqTransport implements 
 	}
 
 	private void queueDeclare() {
-		this.receiverName = "Receiver->" + connectionConfigurator.name() + "$" + receiveQueue;
+		this.receiverName = "Receiver->" + rmqConnection.name() + "$" + receiveQueue;
 		try {
 			channel.queueDeclare(receiveQueue, durable, exclusive, autoDelete, null);
 		} catch (IOException e) {

@@ -9,24 +9,24 @@ import com.rabbitmq.client.AMQP.Queue.DeleteOk;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 
-import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
+import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.Exchange;
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
-public final class OperationalChannel extends BaseRabbitMqTransport {
+public final class OperationalChannel extends AbstractRabbitMqTransport {
 
 	public static OperationalChannel createChannel(String host, int port, String username, String password)
 			throws IOException, TimeoutException {
-		return createChannel(ConnectionConfigurator.configuration(host, port, username, password).build());
+		return createChannel(RmqConnection.configuration(host, port, username, password).build());
 	}
 
 	public static OperationalChannel createChannel(String host, int port, String username, String password,
 			String virtualHost) throws IOException, TimeoutException {
-		return createChannel(ConnectionConfigurator.configuration(host, port, username, password, virtualHost).build());
+		return createChannel(RmqConnection.configuration(host, port, username, password, virtualHost).build());
 	}
 
-	public static OperationalChannel createChannel(ConnectionConfigurator configurator)
+	public static OperationalChannel createChannel(RmqConnection configurator)
 			throws IOException, TimeoutException {
 		return new OperationalChannel("OperationalChannel", configurator);
 	}
@@ -35,7 +35,7 @@ public final class OperationalChannel extends BaseRabbitMqTransport {
 		return new OperationalChannel(channel);
 	}
 
-	private OperationalChannel(String tag, ConnectionConfigurator configurator) throws IOException, TimeoutException {
+	private OperationalChannel(String tag, RmqConnection configurator) throws IOException, TimeoutException {
 		super(tag, tag, configurator);
 		createConnection();
 	}

@@ -1,6 +1,6 @@
 package io.mercury.transport.rabbitmq;
 
-import static io.mercury.common.utils.StringUtil.bytesToStr;
+import static io.mercury.common.util.StringUtil.bytesToStr;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -13,12 +13,12 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import io.mercury.common.character.Charsets;
 import io.mercury.common.thread.ThreadUtil;
 import io.mercury.transport.core.api.Publisher;
-import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
-import io.mercury.transport.rabbitmq.config.RmqPublisherConfigurator;
+import io.mercury.transport.rabbitmq.configurator.RmqConnection;
+import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 import io.mercury.transport.rabbitmq.exception.NoConfirmException;
 
-public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publisher<byte[]> {
+public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publisher<byte[]> {
 
 	// 发布消息使用的ExchangeDeclare
 	private ExchangeDeclare exchangeDeclare;
@@ -66,7 +66,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 	 */
 	public RabbitMqPublisher(String tag, @Nonnull RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
 			Consumer<Long> noAckCallback) {
-		super(tag, "publisher", configurator.connectionConfigurator());
+		super(tag, "publisher", configurator.connection());
 		this.exchangeDeclare = configurator.exchangeDeclare();
 		this.defaultRoutingKey = configurator.defaultRoutingKey();
 		this.msgProperties = configurator.msgProperties();
@@ -85,12 +85,12 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 		} catch (Exception e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
 			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
-					connectionConfigurator.name(), e.getMessage(), e);
+					rmqConnection.name(), e.getMessage(), e);
 			destroy();
 			throw new RuntimeException(e);
 		}
 		this.exchangeName = exchangeDeclare.exchange().name();
-		this.publisherName = "Publisher->" + connectionConfigurator.name() + "$" + exchangeName;
+		this.publisherName = "Publisher->" + rmqConnection.name() + "$" + exchangeName;
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 		while (!isConnected()) {
 			logger.error("Detect connection isConnected() == false, retry {}", (++retry));
 			destroy();
-			ThreadUtil.sleep(connectionConfigurator.recoveryInterval());
+			ThreadUtil.sleep(rmqConnection.recoveryInterval());
 			createConnection();
 		}
 		if (confirm) {
@@ -198,7 +198,7 @@ public class RabbitMqPublisher extends BaseRabbitMqTransport implements Publishe
 
 	public static void main(String[] args) {
 
-		ConnectionConfigurator connectionConfigurator0 = ConnectionConfigurator.configuration("", 5672, "", "").build();
+		RmqConnection connectionConfigurator0 = RmqConnection.configuration("", 5672, "", "").build();
 
 		ExchangeDeclare fanoutExchange = ExchangeDeclare.fanout("");
 

@@ -1,6 +1,6 @@
 package io.mercury.transport.rabbitmq;
 
-import static io.mercury.common.utils.StringUtil.isNullOrEmpty;
+import static io.mercury.common.util.StringUtil.isNullOrEmpty;
 import static java.time.LocalDateTime.now;
 
 import java.io.IOException;
@@ -20,11 +20,12 @@ import com.rabbitmq.client.ShutdownSignalException;
 import io.mercury.common.functional.ShutdownEvent;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.common.thread.ThreadUtil;
-import io.mercury.common.utils.StringUtil;
+import io.mercury.common.util.Assertor;
+import io.mercury.common.util.StringUtil;
 import io.mercury.transport.core.TransportModule;
-import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
+import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 
-public abstract class BaseRabbitMqTransport implements TransportModule {
+abstract class AbstractRabbitMqTransport implements TransportModule {
 
 	// 连接RabbitMQ Server使用的组件
 	protected ConnectionFactory connectionFactory;
@@ -32,16 +33,17 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	protected volatile Channel channel;
 
 	// 存储配置信息对象
-	protected ConnectionConfigurator connectionConfigurator;
+	protected RmqConnection rmqConnection;
 
 	// 停机事件, 在监听到ShutdownSignalException时调用
 	protected ShutdownEvent<Exception> shutdownEvent;
 
+	// 子类共用Logger
 	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	protected String tag;
 
-	protected BaseRabbitMqTransport() {
+	AbstractRabbitMqTransport() {
 		// Generally not used
 	}
 
@@ -49,32 +51,29 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	 * @param tag
 	 * @param configurator
 	 */
-	protected BaseRabbitMqTransport(String tag, @Nonnull String moduleName,
-			@Nonnull ConnectionConfigurator connectionConfigurator) {
-		this.tag = isNullOrEmpty(tag) ? moduleName + "-" + now() : tag;
-		if (connectionConfigurator == null)
-			throw new NullPointerException(this.tag + " : configurator is null.");
-		this.connectionConfigurator = connectionConfigurator;
-		this.shutdownEvent = connectionConfigurator.shutdownEvent();
+	AbstractRabbitMqTransport(String tag, @Nonnull String moduleType, @Nonnull RmqConnection rmqConnection) {
+		this.tag = isNullOrEmpty(tag) ? moduleType + "-" + now() : tag;
+		this.rmqConnection = Assertor.nonNull(rmqConnection, "rmqConnection");
+		this.shutdownEvent = rmqConnection.shutdownEvent();
 	}
 
 	protected void createConnection() {
 		logger.info("Call method createConnection()");
 		if (connectionFactory == null) {
 			connectionFactory = new ConnectionFactory();
-			connectionFactory.setHost(connectionConfigurator.host());
-			connectionFactory.setPort(connectionConfigurator.port());
-			connectionFactory.setUsername(connectionConfigurator.username());
-			connectionFactory.setPassword(connectionConfigurator.password());
-			connectionFactory.setVirtualHost(connectionConfigurator.virtualHost());
-			connectionFactory.setAutomaticRecoveryEnabled(connectionConfigurator.automaticRecovery());
-			connectionFactory.setNetworkRecoveryInterval(connectionConfigurator.recoveryInterval());
-			connectionFactory.setHandshakeTimeout(connectionConfigurator.handshakeTimeout());
-			connectionFactory.setConnectionTimeout(connectionConfigurator.connectionTimeout());
-			connectionFactory.setShutdownTimeout(connectionConfigurator.shutdownTimeout());
-			connectionFactory.setRequestedHeartbeat(connectionConfigurator.requestedHeartbeat());
-			if (connectionConfigurator.sslContext() != null)
-				connectionFactory.useSslProtocol(connectionConfigurator.sslContext());
+			connectionFactory.setHost(rmqConnection.host());
+			connectionFactory.setPort(rmqConnection.port());
+			connectionFactory.setUsername(rmqConnection.username());
+			connectionFactory.setPassword(rmqConnection.password());
+			connectionFactory.setVirtualHost(rmqConnection.virtualHost());
+			connectionFactory.setAutomaticRecoveryEnabled(rmqConnection.automaticRecovery());
+			connectionFactory.setNetworkRecoveryInterval(rmqConnection.recoveryInterval());
+			connectionFactory.setHandshakeTimeout(rmqConnection.handshakeTimeout());
+			connectionFactory.setConnectionTimeout(rmqConnection.connectionTimeout());
+			connectionFactory.setShutdownTimeout(rmqConnection.shutdownTimeout());
+			connectionFactory.setRequestedHeartbeat(rmqConnection.requestedHeartbeat());
+			if (rmqConnection.sslContext() != null)
+				connectionFactory.useSslProtocol(rmqConnection.sslContext());
 		}
 		try {
 			connection = connectionFactory.newConnection();
@@ -111,9 +110,9 @@ public abstract class BaseRabbitMqTransport implements TransportModule {
 	protected boolean closeAndReconnection() {
 		logger.info("Call method closeAndReconnection()");
 		closeConnection();
-		ThreadUtil.sleep(connectionConfigurator.recoveryInterval() / 2);
+		ThreadUtil.sleep(rmqConnection.recoveryInterval() / 2);
 		createConnection();
-		ThreadUtil.sleep(connectionConfigurator.recoveryInterval() / 2);
+		ThreadUtil.sleep(rmqConnection.recoveryInterval() / 2);
 		return isConnected();
 	}
 

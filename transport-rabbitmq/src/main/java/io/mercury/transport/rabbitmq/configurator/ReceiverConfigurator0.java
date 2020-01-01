@@ -1,4 +1,4 @@
-package io.mercury.transport.rabbitmq.config;
+package io.mercury.transport.rabbitmq.configurator;
 
 import javax.annotation.Nonnull;
 
@@ -40,17 +40,17 @@ public final class ReceiverConfigurator0 {
 	private int qos = 256;
 
 	// 连接配置
-	private ConnectionConfigurator connectionConfigurator;
+	private RmqConnection connectionConfigurator;
 
-	private ReceiverConfigurator0(ConnectionConfigurator connectionConfigurator) {
+	private ReceiverConfigurator0(RmqConnection connectionConfigurator) {
 		this.connectionConfigurator = connectionConfigurator;
 	}
 
-	public static ReceiverConfigurator0 configuration(@Nonnull ConnectionConfigurator connectionConfigurator) {
+	public static ReceiverConfigurator0 configuration(@Nonnull RmqConnection connectionConfigurator) {
 		return new ReceiverConfigurator0(connectionConfigurator);
 	}
 
-	public ConnectionConfigurator getConnectionConfigurator() {
+	public RmqConnection getConnectionConfigurator() {
 		return connectionConfigurator;
 	}
 

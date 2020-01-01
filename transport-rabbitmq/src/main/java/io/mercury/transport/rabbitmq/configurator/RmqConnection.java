@@ -1,12 +1,14 @@
-package io.mercury.transport.rabbitmq.config;
+package io.mercury.transport.rabbitmq.configurator;
 
+import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
 
 import io.mercury.common.functional.ShutdownEvent;
-import io.mercury.common.utils.StringUtil;
+import io.mercury.common.util.Assertor;
+import io.mercury.common.util.StringUtil;
 import io.mercury.transport.core.config.TransportConfigurator;
 
-public final class ConnectionConfigurator implements TransportConfigurator {
+public final class RmqConnection implements TransportConfigurator {
 
 	/**
 	 * 连接参数
@@ -39,7 +41,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 	// 配置信息
 	private String connectionInfo;
 
-	private ConnectionConfigurator(Builder builder) {
+	private RmqConnection(Builder builder) {
 		this.host = builder.host;
 		this.port = builder.port;
 		this.username = builder.username;
@@ -65,11 +67,13 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		return username + "@" + connectionInfo;
 	}
 
-	public static Builder configuration(String host, int port, String username, String password) {
+	public static Builder configuration(@Nonnull String host, int port, @Nonnull String username,
+			@Nonnull String password) {
 		return new Builder(host, port, username, password);
 	}
 
-	public static Builder configuration(String host, int port, String username, String password, String virtualHost) {
+	public static Builder configuration(@Nonnull String host, int port, @Nonnull String username,
+			@Nonnull String password, String virtualHost) {
 		return new Builder(host, port, username, password, virtualHost);
 	}
 
@@ -212,23 +216,23 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 		private ShutdownEvent<Exception> shutdownEvent;
 
 		private Builder(String host, int port, String username, String password) {
-			this.host = host;
-			this.port = port;
-			this.username = username;
-			this.password = password;
+			this.host = Assertor.nonNull(host, "host");
+			this.port = Assertor.intGreaterThan(port, 0, "port");
+			this.username = Assertor.nonNull(username, "username");
+			this.password = Assertor.nonNull(password, "password");
 		}
 
 		private Builder(String host, int port, String username, String password, String virtualHost) {
-			this.host = host;
-			this.port = port;
-			this.username = username;
-			this.password = password;
+			this.host = Assertor.nonNull(host, "host");
+			this.port = Assertor.intGreaterThan(port, 0, "port");
+			this.username = Assertor.nonNull(username, "username");
+			this.password = Assertor.nonNull(password, "password");
 			if (virtualHost != null && !virtualHost.equals(""))
 				this.virtualHost = virtualHost;
 		}
 
-		public ConnectionConfigurator build() {
-			return new ConnectionConfigurator(this);
+		public RmqConnection build() {
+			return new RmqConnection(this);
 		}
 
 		/**
@@ -299,7 +303,7 @@ public final class ConnectionConfigurator implements TransportConfigurator {
 
 	public static void main(String[] args) {
 
-		ConnectionConfigurator configuration = configuration("localhost", 5672, "admin", "admin", "report").build();
+		RmqConnection configuration = configuration("localhost", 5672, "admin", "admin", "report").build();
 		System.out.println(configuration);
 		System.out.println(configuration.name());
 

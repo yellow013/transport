@@ -1,12 +1,12 @@
-package io.mercury.transport.rabbitmq.config;
+package io.mercury.transport.rabbitmq.configurator;
 
 import javax.annotation.Nonnull;
 
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.MessageProperties;
 
-import io.mercury.common.utils.StringUtil;
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
+import io.mercury.common.util.StringUtil;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 
 /**
@@ -30,7 +30,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	private int confirmRetry;
 
 	private RmqPublisherConfigurator(Builder builder) {
-		super(builder.connectionConfigurator);
+		super(builder.connection);
 		this.exchangeDeclare = builder.exchangeDeclare;
 		this.defaultRoutingKey = builder.defaultRoutingKey;
 		this.msgProperties = builder.msgProperties;
@@ -39,9 +39,9 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		this.confirmRetry = builder.confirmRetry;
 	}
 
-	public static Builder configuration(@Nonnull ConnectionConfigurator connectionConfigurator,
+	public static Builder configuration(@Nonnull RmqConnection connection,
 			@Nonnull ExchangeDeclare exchangeDeclare) {
-		return new Builder(connectionConfigurator, exchangeDeclare);
+		return new Builder(connection, exchangeDeclare);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	public static class Builder {
 
 		// 连接配置
-		private ConnectionConfigurator connectionConfigurator;
+		private RmqConnection connection;
 
 		private ExchangeDeclare exchangeDeclare;
 
@@ -109,8 +109,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		private long confirmTimeout = 5000;
 		private int confirmRetry = 3;
 
-		private Builder(ConnectionConfigurator connectionConfigurator, ExchangeDeclare exchangeDeclare) {
-			this.connectionConfigurator = connectionConfigurator;
+		private Builder(RmqConnection connection, ExchangeDeclare exchangeDeclare) {
+			this.connection = connection;
 			this.exchangeDeclare = exchangeDeclare;
 		}
 
@@ -163,7 +163,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	public static void main(String[] args) {
 
 		System.out.println(
-				configuration(ConnectionConfigurator.configuration("localhost", 5672, "user0", "userpass").build(),
+				configuration(RmqConnection.configuration("localhost", 5672, "user0", "userpass").build(),
 						ExchangeDeclare.direct("TEST").bindingQueue(Queue.named("TEST_0"))).build());
 
 	}

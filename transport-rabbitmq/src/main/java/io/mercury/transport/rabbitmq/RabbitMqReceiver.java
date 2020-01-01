@@ -1,6 +1,6 @@
 package io.mercury.transport.rabbitmq;
 
-import static io.mercury.common.utils.StringUtil.bytesToStr;
+import static io.mercury.common.util.StringUtil.bytesToStr;
 
 import java.io.IOException;
 import java.time.DateTimeException;
@@ -14,8 +14,8 @@ import com.rabbitmq.client.Envelope;
 
 import io.mercury.common.character.Charsets;
 import io.mercury.transport.core.api.Receiver;
-import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
-import io.mercury.transport.rabbitmq.config.RmqReceiverConfigurator;
+import io.mercury.transport.rabbitmq.configurator.RmqConnection;
+import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 import io.mercury.transport.rabbitmq.declare.QueueDeclare;
 
@@ -26,14 +26,14 @@ import io.mercury.transport.rabbitmq.declare.QueueDeclare;
  *         改造升级, 使用共同的创建者建立Exchange, RoutingKey, Queue的绑定关系
  *
  */
-public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver {
+public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Receiver {
 
 	// 接收消息时使用的回调函数
 	private volatile Consumer<byte[]> callback;
 
 	// 接受者QueueDeclare
 	private QueueDeclare queueDeclare;
-	// 接受者Queue
+	// 接受者QueueName
 	private String queueName;
 	// 消息无法处理时发送到的错误消息ExchangeDeclare
 	private ExchangeDeclare errorMsgExchange;
@@ -49,6 +49,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	private int maxAckTotal;
 	// Ack最大自动重连次数
 	private int maxAckReconnection;
+	// QOS预取
 	private int qos;
 
 	private String receiverName;
@@ -110,7 +111,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 	 */
 	private RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator,
 			@Nonnull Consumer<byte[]> callback) {
-		super(tag, "receiver", configurator.connectionConfigurator());
+		super(tag, "receiver", configurator.connection());
 		this.callback = callback;
 		this.queueDeclare = configurator.queueDeclare();
 		this.errorMsgExchange = configurator.errorMsgExchange();
@@ -129,7 +130,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 			this.queueDeclare.declare(operationalChannel);
 		} catch (Exception e) {
 			logger.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
-					connectionConfigurator.name(), e.getMessage(), e);
+					rmqConnection.name(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
 			throw new RuntimeException(e);
@@ -141,7 +142,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 			} catch (Exception e) {
 				logger.error(
 						"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
-						connectionConfigurator.name(), e.getMessage(), e);
+						rmqConnection.name(), e.getMessage(), e);
 				// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 				destroy();
 				throw new RuntimeException(e);
@@ -149,7 +150,7 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 			this.errorMsgExchangeName = errorMsgExchange.exchange().name();
 			this.hasErrorMsgExchange = true;
 		}
-		this.receiverName = "Receiver->" + connectionConfigurator.name() + "$" + queueName;
+		this.receiverName = "Receiver->" + rmqConnection.name() + "$" + queueName;
 	}
 
 	@Override
@@ -276,8 +277,8 @@ public class RabbitMqReceiver extends BaseRabbitMqTransport implements Receiver 
 
 	public static void main(String[] args) {
 		RabbitMqReceiver receiver = new RabbitMqReceiver("", RmqReceiverConfigurator
-				.configuration(ConnectionConfigurator.configuration("", 5672, "", "").build(), QueueDeclare.named(""))
-				.build(), msg -> System.out.println(new String(msg, Charsets.UTF8)));
+				.configuration(RmqConnection.configuration("", 5672, "", "").build(), QueueDeclare.named("")).build(),
+				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}
 

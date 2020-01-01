@@ -1,8 +1,8 @@
-package io.mercury.transport.rabbitmq.config;
+package io.mercury.transport.rabbitmq.configurator;
 
 import javax.annotation.Nonnull;
 
-import io.mercury.common.utils.StringUtil;
+import io.mercury.common.util.StringUtil;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 import io.mercury.transport.rabbitmq.declare.QueueDeclare;
 
@@ -34,8 +34,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		this.qos = builder.qos;
 	}
 
-	public static Builder configuration(@Nonnull ConnectionConfigurator connection,
-			@Nonnull QueueDeclare queueDeclare) {
+	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull QueueDeclare queueDeclare) {
 		return new Builder(connection, queueDeclare);
 	}
 
@@ -99,7 +98,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 
 	public static class Builder {
 		// 连接配置
-		private ConnectionConfigurator connection;
+		private RmqConnection connection;
 		// 接受者QueueDeclare
 		private QueueDeclare queueDeclare;
 		// 错误消息ExchangeDeclare
@@ -115,7 +114,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// QOS预取
 		private int qos = 256;
 
-		private Builder(ConnectionConfigurator connection, QueueDeclare queueDeclare) {
+		private Builder(RmqConnection connection, QueueDeclare queueDeclare) {
 			this.connection = connection;
 			this.queueDeclare = queueDeclare;
 		}

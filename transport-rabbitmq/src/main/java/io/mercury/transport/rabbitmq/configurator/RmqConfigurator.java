@@ -1,19 +1,19 @@
-package io.mercury.transport.rabbitmq.config;
+package io.mercury.transport.rabbitmq.configurator;
 
 abstract class RmqConfigurator {
 
 	// 连接配置
-	private ConnectionConfigurator connectionConfigurator;
+	private RmqConnection connection;
 
-	protected RmqConfigurator(ConnectionConfigurator connectionConfigurator) {
-		this.connectionConfigurator = connectionConfigurator;
+	protected RmqConfigurator(RmqConnection connection) {
+		this.connection = connection;
 	}
 
 	/**
 	 * @return the connectionConfigurator
 	 */
-	public ConnectionConfigurator connectionConfigurator() {
-		return connectionConfigurator;
+	public RmqConnection connection() {
+		return connection;
 	}
 
 }

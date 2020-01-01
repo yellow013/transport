@@ -1,4 +1,4 @@
-package io.mercury.transport.rabbitmq.config;
+package io.mercury.transport.rabbitmq.configurator;
 
 import javax.annotation.Nonnull;
 
@@ -6,7 +6,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.MessageProperties;
 
-import io.mercury.common.utils.StringUtil;
+import io.mercury.common.util.StringUtil;
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.ExchangeType;
 
 /**
@@ -41,17 +41,17 @@ public final class PublisherConfigurator0 {
 	private int confirmRetry = 3;
 
 	// 连接配置
-	private ConnectionConfigurator connectionConfigurator;
+	private RmqConnection connectionConfigurator;
 
-	private PublisherConfigurator0(ConnectionConfigurator connectionConfigurator) {
+	private PublisherConfigurator0(RmqConnection connectionConfigurator) {
 		this.connectionConfigurator = connectionConfigurator;
 	}
 
-	public static PublisherConfigurator0 configuration(@Nonnull ConnectionConfigurator connectionConfigurator) {
+	public static PublisherConfigurator0 configuration(@Nonnull RmqConnection connectionConfigurator) {
 		return new PublisherConfigurator0(connectionConfigurator);
 	}
 
-	public ConnectionConfigurator getConnectionConfigurator() {
+	public RmqConnection getConnectionConfigurator() {
 		return connectionConfigurator;
 	}
 

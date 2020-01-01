@@ -2,16 +2,16 @@ package io.mercury.transport.rabbitmq;
 
 import java.util.Arrays;
 
-import io.mercury.transport.rabbitmq.config.ConnectionConfigurator;
-import io.mercury.transport.rabbitmq.config.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
+import io.mercury.transport.rabbitmq.configurator.RmqConnection;
+import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 
 public class RabbitMqPublisherTest {
 
 	public static void main(String[] args) {
 
-		ConnectionConfigurator connectionConfigurator = ConnectionConfigurator
+		RmqConnection connectionConfigurator = RmqConnection
 				.configuration("10.0.64.201", 5672, "global", "global2018").build();
 
 		RmqPublisherConfigurator publisherConfigurator = RmqPublisherConfigurator
