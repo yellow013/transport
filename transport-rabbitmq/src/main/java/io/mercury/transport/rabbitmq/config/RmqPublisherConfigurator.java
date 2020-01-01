@@ -6,8 +6,8 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.MessageProperties;
 
 import io.mercury.common.utils.StringUtil;
+import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
-import io.mercury.transport.rabbitmq.declare.EntityDeclare.Queue;
 
 /**
  * 
@@ -164,7 +164,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 		System.out.println(
 				configuration(ConnectionConfigurator.configuration("localhost", 5672, "user0", "userpass").build(),
-						ExchangeDeclare.direct("TEST").bindingQueue(Queue.declare("TEST_0"))).build());
+						ExchangeDeclare.direct("TEST").bindingQueue(Queue.named("TEST_0"))).build());
 
 	}
 

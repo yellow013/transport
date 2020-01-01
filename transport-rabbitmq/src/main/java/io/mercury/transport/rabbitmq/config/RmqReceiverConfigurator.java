@@ -24,7 +24,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	private int qos;
 
 	private RmqReceiverConfigurator(Builder builder) {
-		super(builder.connectionConfigurator);
+		super(builder.connection);
 		this.queueDeclare = builder.queueDeclare;
 		this.errorMsgExchange = builder.errorMsgExchange;
 		this.autoAck = builder.autoAck;
@@ -34,9 +34,9 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		this.qos = builder.qos;
 	}
 
-	public static Builder configuration(@Nonnull ConnectionConfigurator connectionConfigurator,
+	public static Builder configuration(@Nonnull ConnectionConfigurator connection,
 			@Nonnull QueueDeclare queueDeclare) {
-		return new Builder(connectionConfigurator, queueDeclare);
+		return new Builder(connection, queueDeclare);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 
 	public static class Builder {
 		// 连接配置
-		private ConnectionConfigurator connectionConfigurator;
+		private ConnectionConfigurator connection;
 		// 接受者QueueDeclare
 		private QueueDeclare queueDeclare;
 		// 错误消息ExchangeDeclare
@@ -115,8 +115,8 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// QOS预取
 		private int qos = 256;
 
-		private Builder(ConnectionConfigurator connectionConfigurator, QueueDeclare queueDeclare) {
-			this.connectionConfigurator = connectionConfigurator;
+		private Builder(ConnectionConfigurator connection, QueueDeclare queueDeclare) {
+			this.connection = connection;
 			this.queueDeclare = queueDeclare;
 		}
 
