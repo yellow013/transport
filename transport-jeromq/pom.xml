@@ -18,7 +18,7 @@
 			<groupId>io.mercury</groupId>
 			<artifactId>transport-core</artifactId>
 		</dependency>
-		<!-- JeroMq API -->
+		<!-- JeroMq : Pure Java implementation of libzmq -->
 		<dependency>
 			<groupId>org.zeromq</groupId>
 			<artifactId>jeromq</artifactId>
