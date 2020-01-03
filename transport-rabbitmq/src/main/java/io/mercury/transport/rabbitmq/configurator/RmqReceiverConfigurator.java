@@ -2,6 +2,7 @@ package io.mercury.transport.rabbitmq.configurator;
 
 import javax.annotation.Nonnull;
 
+import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 import io.mercury.transport.rabbitmq.declare.QueueDeclare;
@@ -35,7 +36,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	}
 
 	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull QueueDeclare queueDeclare) {
-		return new Builder(connection, queueDeclare);
+		return new Builder(Assertor.nonNull(connection, "connection"), Assertor.nonNull(queueDeclare, "queueDeclare"));
 	}
 
 	/**

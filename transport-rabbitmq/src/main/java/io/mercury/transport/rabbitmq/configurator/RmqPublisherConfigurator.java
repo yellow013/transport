@@ -6,6 +6,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.MessageProperties;
 
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
+import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 
@@ -39,9 +40,9 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		this.confirmRetry = builder.confirmRetry;
 	}
 
-	public static Builder configuration(@Nonnull RmqConnection connection,
-			@Nonnull ExchangeDeclare exchangeDeclare) {
-		return new Builder(connection, exchangeDeclare);
+	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull ExchangeDeclare exchangeDeclare) {
+		return new Builder(Assertor.nonNull(connection, "connection"),
+				Assertor.nonNull(exchangeDeclare, "exchangeDeclare"));
 	}
 
 	/**
@@ -161,11 +162,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	}
 
 	public static void main(String[] args) {
-
-		System.out.println(
-				configuration(RmqConnection.configuration("localhost", 5672, "user0", "userpass").build(),
-						ExchangeDeclare.direct("TEST").bindingQueue(Queue.named("TEST_0"))).build());
-
+		System.out.println(configuration(RmqConnection.configuration("localhost", 5672, "user0", "userpass").build(),
+				ExchangeDeclare.direct("TEST").bindingQueue(Queue.named("TEST_0"))).build());
 	}
 
 }
