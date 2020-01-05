@@ -88,13 +88,13 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		return qos;
 	}
 
-	private String ToStringStr;
+	private transient String toStringCache;
 
 	@Override
 	public String toString() {
-		if (ToStringStr == null)
-			ToStringStr = StringUtil.reflectionToString(this);
-		return ToStringStr;
+		if (toStringCache == null)
+			toStringCache = StringUtil.reflectionToString(this);
+		return toStringCache;
 	}
 
 	public static class Builder {
