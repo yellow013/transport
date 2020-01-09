@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Random;
 
 import org.zeromq.SocketType;
+import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import io.mercury.common.thread.ThreadUtil;
@@ -13,8 +14,8 @@ import io.mercury.transport.jeromq.config.JeroMqConfigurator;
 
 public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 
-	private ZMQ.Context context;
-	private ZMQ.Socket publisher;
+	private ZContext zCtx;
+	private ZMQ.Socket zSocket;
 
 	private String topic;
 
@@ -30,9 +31,9 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 	}
 
 	private void init() {
-		this.context = ZMQ.context(configurator.ioThreads());
-		this.publisher = context.socket(SocketType.PUB);
-		this.publisher.bind(configurator.host());
+		this.zCtx = new ZContext(configurator.ioThreads());
+		this.zSocket = zCtx.createSocket(SocketType.PUB);
+		this.zSocket.bind(configurator.host());
 		this.topic = configurator.topic();
 		this.publisherName = "JeroMQ.Pub$" + configurator.host();
 	}
@@ -44,16 +45,15 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 
 	@Override
 	public void publish(String target, byte[] msg) {
-		publisher.sendMore(target);
-		publisher.send(msg, ZMQ.NOBLOCK);
+		zSocket.sendMore(target);
+		zSocket.send(msg, ZMQ.NOBLOCK);
 	}
 
 	@Override
 	public boolean destroy() {
-		publisher.close();
-		context.term();
-		context.close();
-		return context.isClosed();
+		zSocket.close();
+		zCtx.close();
+		return zCtx.isClosed();
 	}
 
 	@Override
@@ -64,9 +64,9 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 	public static void main(String[] args) {
 //		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
 //				.setTopic("").build();
-		
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().host("tcp://127.0.0.1:13001")
-				.topic("command").ioThreads(2).build();
+
+		JeroMqConfigurator configurator = JeroMqConfigurator.builder().host("tcp://127.0.0.1:13001").topic("command")
+				.ioThreads(2).build();
 
 		try (JeroMqPublisher publisher = new JeroMqPublisher(configurator)) {
 			Random random = new Random();
@@ -83,7 +83,7 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 
 	@Override
 	public boolean isConnected() {
-		return !context.isClosed();
+		return !zCtx.isClosed();
 	}
 
 	@Override

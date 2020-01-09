@@ -2,6 +2,7 @@ package io.mercury.transport.netty;
 
 import org.slf4j.Logger;
 
+import io.mercury.common.annotation.lang.ProtectedAbstractMethod;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.netty.config.NettyConfigurator;
 import io.netty.channel.ChannelHandler;
@@ -33,6 +34,7 @@ public abstract class NettyTransport {
 		init();
 	}
 
+	@ProtectedAbstractMethod
 	protected abstract void init();
 
 	public String name() {

@@ -1,19 +1,21 @@
 package io.mercury.transport.jeromq;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.function.Function;
 
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
-import org.zeromq.ZMQ.Socket;
+import org.zeromq.ZMQ;
 
 import io.mercury.common.thread.ThreadUtil;
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.jeromq.config.JeroMqConfigurator;
 
-public class JeroMqPipeline implements Receiver {
+public class JeroMqPipeline implements Receiver, Closeable {
 
-	private ZContext context;
-	private Socket socket;
+	private ZContext zCtx;
+	private ZMQ.Socket zSocket;
 
 	private String receiverName;
 
@@ -31,20 +33,19 @@ public class JeroMqPipeline implements Receiver {
 	}
 
 	private void init() {
-		this.context = new ZContext(configurator.ioThreads());
-		this.socket = context.createSocket(SocketType.REP);
-		this.socket.bind(configurator.host());
-		this.receiverName = "JeroMQ.REP$" + configurator.host();
+		this.zCtx = new ZContext(configurator.ioThreads());
+		this.zSocket = zCtx.createSocket(SocketType.REP);
+		this.zSocket.bind(configurator.host());
+		this.receiverName = "JeroMQ.REP:" + configurator.host();
 	}
 
 	@Override
 	public void receive() {
 		while (isRun) {
-			byte[] recvBytes = socket.recv();
-			byte[] bytes = pipeline.apply(recvBytes);
-			if (bytes == null)
-				bytes = new byte[0];
-			socket.send(bytes);
+			byte[] recvBytes = zSocket.recv();
+			byte[] sendBytes = pipeline.apply(recvBytes);
+			if (sendBytes != null)
+				zSocket.send(sendBytes);
 		}
 		return;
 	}
@@ -53,9 +54,9 @@ public class JeroMqPipeline implements Receiver {
 	public boolean destroy() {
 		this.isRun = false;
 		ThreadUtil.sleep(50);
-		socket.close();
-		context.close();
-		return true;
+		zSocket.close();
+		zCtx.close();
+		return zCtx.isClosed();
 	}
 
 	@Override
@@ -65,29 +66,33 @@ public class JeroMqPipeline implements Receiver {
 
 	public static void main(String[] args) {
 
-		JeroMqPipeline receiver = new JeroMqPipeline(
+		try (JeroMqPipeline receiver = new JeroMqPipeline(
 				JeroMqConfigurator.builder().ioThreads(10).host("tcp://*:5551").build(), (byte[] byteMsg) -> {
 					System.out.println(new String(byteMsg));
 					return null;
-				});
-
-		ThreadUtil.startNewThread(() -> receiver.receive());
-
-		ThreadUtil.sleep(15000);
-
-		receiver.destroy();
+				})) {
+			ThreadUtil.sleep(15000);
+			ThreadUtil.startNewThread(() -> receiver.receive());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
 	@Override
 	public boolean isConnected() {
-		return !context.isClosed();
+		return !zCtx.isClosed();
 	}
 
 	@Override
 	public void reconnect() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void close() throws IOException {
+		destroy();
 	}
 
 }

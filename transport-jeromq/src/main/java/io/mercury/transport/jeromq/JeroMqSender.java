@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.zeromq.SocketType;
+import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import io.mercury.transport.core.api.Sender;
@@ -14,8 +15,8 @@ import io.mercury.transport.jeromq.config.JeroMqConfigurator;
 @NotThreadSafe
 public class JeroMqSender implements Sender<byte[]>, Closeable {
 
-	private ZMQ.Context context;
-	private ZMQ.Socket socket;
+	private ZContext zCtx;
+	private ZMQ.Socket zSocket;
 
 	private String senderName;
 
@@ -29,23 +30,23 @@ public class JeroMqSender implements Sender<byte[]>, Closeable {
 	}
 
 	private void init() {
-		this.context = ZMQ.context(configurator.ioThreads());
-		this.socket = context.socket(SocketType.REQ);
-		this.socket.connect(configurator.host());
+		this.zCtx = new ZContext(configurator.ioThreads());
+		this.zSocket = zCtx.createSocket(SocketType.REQ);
+		this.zSocket.connect(configurator.host());
 		this.senderName = "JeroMQ.REQ$" + configurator.host();
 	}
 
 	@Override
 	public void send(byte[] msg) {
-		socket.send(msg);
-		socket.recv();
+		zSocket.send(msg);
+		zSocket.recv();
 	}
 
 	@Override
 	public boolean destroy() {
-		socket.close();
-		context.term();
-		return true;
+		zSocket.close();
+		zCtx.close();
+		return zCtx.isClosed();
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class JeroMqSender implements Sender<byte[]>, Closeable {
 
 	@Override
 	public boolean isConnected() {
-		return !context.isClosed();
+		return !zCtx.isClosed();
 	}
 
 	@Override

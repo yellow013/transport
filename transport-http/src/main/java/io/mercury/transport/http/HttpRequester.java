@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 
 import io.mercury.codec.json.JsonEncoder;
-import io.mercury.common.annotations.lang.MayThrowsRuntimeException;
+import io.mercury.common.annotation.lang.MayThrowsRuntimeException;
 import io.mercury.common.log.CommonLoggerFactory;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
