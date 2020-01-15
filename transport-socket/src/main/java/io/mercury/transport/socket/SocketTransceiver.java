@@ -14,7 +14,6 @@ import io.mercury.common.collections.queue.api.SCQueue;
 import io.mercury.common.concurrent.disruptor.BufferSize;
 import io.mercury.common.concurrent.disruptor.SpscQueue;
 import io.mercury.common.thread.ThreadUtil;
-import io.mercury.transport.core.base.BaseTransceiver;
 import io.mercury.transport.socket.config.SocketConfigurator;
 
 public class SocketTransceiver extends BaseTransceiver<String> {
@@ -53,12 +52,10 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 		}
 	}
 
-	@Override
 	public boolean isConnected() {
 		return false;
 	}
 
-	@Override
 	public boolean destroy() {
 		this.isReceiving.set(false);
 		try {
