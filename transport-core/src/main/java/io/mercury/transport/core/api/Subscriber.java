@@ -5,5 +5,7 @@ import io.mercury.transport.core.TransportModule;
 public interface Subscriber extends TransportModule{
 
 	void subscribe();
+	
+	void reconnect();
 
 }
