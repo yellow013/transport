@@ -1,6 +1,6 @@
 package io.mercury.transport.netty;
 
-import io.mercury.transport.core.api.TransportServer;
+import io.mercury.transport.api.TransportServer;
 import io.mercury.transport.netty.config.NettyConfigurator;
 import io.mercury.transport.netty.handler.GeneralNettyHandler;
 import io.netty.bootstrap.ServerBootstrap;
