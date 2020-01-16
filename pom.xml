@@ -15,10 +15,10 @@
 
 	<modules>
 		<module>transport-core</module>
-		<module>transport-rabbitmq</module>
-		<module>transport-netty</module>
-		<module>transport-socket</module>
 		<module>transport-http</module>
+		<module>transport-netty</module>
+		<module>transport-rabbitmq</module>
+		<module>transport-socket</module>
 		<module>transport-zmq</module>
 	</modules>
 
