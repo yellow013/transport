@@ -77,15 +77,15 @@ abstract class AbstractRabbitMqTransport implements TransportModule {
 		}
 		try {
 			connection = connectionFactory.newConnection();
-			logger.debug("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}.", tag,
+			logger.debug("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}", tag,
 					connection.getId());
 			connection.addShutdownListener(shutdownSignalException -> {
 				// 输出错误信息到控制台
 				logger.info("Call lambda shutdown listener message -> {}", shutdownSignalException.getMessage());
 				if (isNormalShutdown(shutdownSignalException))
-					logger.info("{} -> normal shutdown.", tag);
+					logger.info("{} -> is normal shutdown", tag);
 				else {
-					logger.info("{} -> is not normal shutdown.", tag);
+					logger.info("{} -> not normal shutdown", tag);
 					// 如果回调函数不为null, 则执行此函数
 					if (shutdownEvent != null)
 						shutdownEvent.accept(shutdownSignalException);

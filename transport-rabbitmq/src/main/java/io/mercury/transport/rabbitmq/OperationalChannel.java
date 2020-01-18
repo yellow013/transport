@@ -16,27 +16,62 @@ import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 public final class OperationalChannel extends AbstractRabbitMqTransport {
 
+	/**
+	 * Create OperationalChannel of host, port, username and password
+	 * 
+	 * @param host
+	 * @param port
+	 * @param username
+	 * @param password
+	 * @return
+	 * @throws IOException
+	 * @throws TimeoutException
+	 */
 	public static OperationalChannel createChannel(String host, int port, String username, String password)
 			throws IOException, TimeoutException {
 		return createChannel(RmqConnection.configuration(host, port, username, password).build());
 	}
 
+	/**
+	 * Create OperationalChannel of host, port, username, password and virtualHost
+	 * 
+	 * @param host
+	 * @param port
+	 * @param username
+	 * @param password
+	 * @param virtualHost
+	 * @return
+	 * @throws IOException
+	 * @throws TimeoutException
+	 */
 	public static OperationalChannel createChannel(String host, int port, String username, String password,
 			String virtualHost) throws IOException, TimeoutException {
 		return createChannel(RmqConnection.configuration(host, port, username, password, virtualHost).build());
 	}
 
-	public static OperationalChannel createChannel(RmqConnection configurator)
-			throws IOException, TimeoutException {
-		return new OperationalChannel("OperationalChannel", configurator);
+	/**
+	 * Create OperationalChannel of RmqConnection
+	 * 
+	 * @param configurator
+	 * @return
+	 * @throws IOException
+	 * @throws TimeoutException
+	 */
+	public static OperationalChannel createChannel(RmqConnection connection) throws IOException, TimeoutException {
+		return new OperationalChannel("OperationalChannel", connection);
 	}
 
+	/**
+	 * Create OperationalChannel of Channel
+	 * @param channel
+	 * @return
+	 */
 	public static OperationalChannel ofChannel(Channel channel) {
 		return new OperationalChannel(channel);
 	}
 
-	private OperationalChannel(String tag, RmqConnection configurator) throws IOException, TimeoutException {
-		super(tag, tag, configurator);
+	private OperationalChannel(String tag, RmqConnection connection) throws IOException, TimeoutException {
+		super(tag, "OperationalChannel", connection);
 		createConnection();
 	}
 

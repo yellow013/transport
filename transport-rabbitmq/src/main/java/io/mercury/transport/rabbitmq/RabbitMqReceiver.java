@@ -23,7 +23,7 @@ import io.mercury.transport.rabbitmq.declare.QueueDeclare;
  * 
  * @author yellow013<br>
  * 
- *         改造升级, 使用共同的创建者建立Exchange, RoutingKey, Queue的绑定关系
+ *         [已完成]改造升级, 使用共同的创建者建立Exchange, RoutingKey, Queue的绑定关系
  *
  */
 public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Receiver {

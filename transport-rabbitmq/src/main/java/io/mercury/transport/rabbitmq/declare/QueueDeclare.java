@@ -3,8 +3,6 @@ package io.mercury.transport.rabbitmq.declare;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import io.mercury.transport.rabbitmq.OperationalChannel;
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.Binding;
 import io.mercury.transport.rabbitmq.declare.AmqpEntity.Exchange;
@@ -69,7 +67,7 @@ public class QueueDeclare extends Relationship {
 		return binding(exchanges != null ? Arrays.asList(exchanges) : null, null);
 	}
 
-	public QueueDeclare binding(@Nonnull List<Exchange> exchanges, List<String> routingKeys) {
+	public QueueDeclare binding(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (routingKeys != null)
