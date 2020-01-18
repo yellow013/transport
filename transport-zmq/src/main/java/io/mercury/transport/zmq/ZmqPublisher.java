@@ -1,4 +1,4 @@
-package io.mercury.transport.jeromq;
+package io.mercury.transport.zmq;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,10 +9,11 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import io.mercury.common.thread.ThreadUtil;
+import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Publisher;
-import io.mercury.transport.jeromq.config.JeroMqConfigurator;
+import io.mercury.transport.zmq.configurator.ZmqConfigurator;
 
-public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
+public class ZmqPublisher implements Publisher<byte[]>, Closeable {
 
 	private ZContext zCtx;
 	private ZMQ.Socket zSocket;
@@ -21,12 +22,10 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 
 	private String publisherName;
 
-	private JeroMqConfigurator configurator;
+	private ZmqConfigurator configurator;
 
-	public JeroMqPublisher(JeroMqConfigurator configurator) {
-		if (configurator == null)
-			throw new IllegalArgumentException("configurator is null in JeroMQPublisher init method.");
-		this.configurator = configurator;
+	public ZmqPublisher(ZmqConfigurator configurator) {
+		this.configurator = Assertor.nonNull(configurator, "configurator");
 		init();
 	}
 
@@ -65,10 +64,10 @@ public class JeroMqPublisher implements Publisher<byte[]>, Closeable {
 //		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
 //				.setTopic("").build();
 
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().host("tcp://127.0.0.1:13001").topic("command")
+		ZmqConfigurator configurator = ZmqConfigurator.builder().host("tcp://127.0.0.1:13001").topic("command")
 				.ioThreads(2).build();
 
-		try (JeroMqPublisher publisher = new JeroMqPublisher(configurator)) {
+		try (ZmqPublisher publisher = new ZmqPublisher(configurator)) {
 			Random random = new Random();
 
 			for (;;) {

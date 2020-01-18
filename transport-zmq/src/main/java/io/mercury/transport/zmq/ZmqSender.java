@@ -1,4 +1,4 @@
-package io.mercury.transport.jeromq;
+package io.mercury.transport.zmq;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -10,19 +10,19 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 import io.mercury.transport.core.api.Sender;
-import io.mercury.transport.jeromq.config.JeroMqConfigurator;
+import io.mercury.transport.zmq.configurator.ZmqConfigurator;
 
 @NotThreadSafe
-public class JeroMqSender implements Sender<byte[]>, Closeable {
+public class ZmqSender implements Sender<byte[]>, Closeable {
 
 	private ZContext zCtx;
 	private ZMQ.Socket zSocket;
 
 	private String senderName;
 
-	private JeroMqConfigurator configurator;
+	private ZmqConfigurator configurator;
 
-	public JeroMqSender(JeroMqConfigurator configurator) {
+	public ZmqSender(ZmqConfigurator configurator) {
 		if (configurator == null)
 			throw new IllegalArgumentException("configurator is null in JeroMQPublisher init mothed !");
 		this.configurator = configurator;
@@ -56,10 +56,10 @@ public class JeroMqSender implements Sender<byte[]>, Closeable {
 
 	public static void main(String[] args) {
 
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().ioThreads(1).host("tcp://localhost:5551")
+		ZmqConfigurator configurator = ZmqConfigurator.builder().ioThreads(1).host("tcp://localhost:5551")
 				.build();
 
-		try (JeroMqSender sender = new JeroMqSender(configurator)) {
+		try (ZmqSender sender = new ZmqSender(configurator)) {
 
 			sender.send("TEST MSG".getBytes());
 

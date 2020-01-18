@@ -1,4 +1,4 @@
-package io.mercury.transport.jeromq;
+package io.mercury.transport.zmq;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -11,9 +11,9 @@ import org.zeromq.ZMQ;
 
 import io.mercury.common.character.Charsets;
 import io.mercury.transport.core.api.Subscriber;
-import io.mercury.transport.jeromq.config.JeroMqConfigurator;
+import io.mercury.transport.zmq.configurator.ZmqConfigurator;
 
-public class JeroMqSubscriber implements Subscriber, Closeable {
+public class ZmqSubscriber implements Subscriber, Closeable {
 
 	private ZContext zCtx;
 	private ZMQ.Socket zSocket;
@@ -21,11 +21,11 @@ public class JeroMqSubscriber implements Subscriber, Closeable {
 	private String subscriberName;
 
 	private Consumer<byte[]> callback;
-	private JeroMqConfigurator configurator;
+	private ZmqConfigurator configurator;
 
 	private AtomicBoolean isRun = new AtomicBoolean(true);
 
-	public JeroMqSubscriber(JeroMqConfigurator configurator, Consumer<byte[]> callback) {
+	public ZmqSubscriber(ZmqConfigurator configurator, Consumer<byte[]> callback) {
 		if (configurator == null || callback == null)
 			throw new IllegalArgumentException("configurator is null in JeroMQSubscriber init mothed !");
 		this.configurator = configurator;
@@ -72,10 +72,10 @@ public class JeroMqSubscriber implements Subscriber, Closeable {
 		// JeroMqConfigurator configurator =
 		// JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:10001").setIoThreads(2).setTopic("").build();
 
-		JeroMqConfigurator configurator = JeroMqConfigurator.builder().host("tcp://127.0.0.1:13001").topic("command")
+		ZmqConfigurator configurator = ZmqConfigurator.builder().host("tcp://127.0.0.1:13001").topic("command")
 				.ioThreads(2).build();
 
-		try (JeroMqSubscriber jeroMQSubscriber = new JeroMqSubscriber(configurator,
+		try (ZmqSubscriber jeroMQSubscriber = new ZmqSubscriber(configurator,
 				(byte[] byteMsg) -> System.out.println(new String(byteMsg, Charsets.UTF8)))) {
 			jeroMQSubscriber.subscribe();
 		} catch (IOException e) {

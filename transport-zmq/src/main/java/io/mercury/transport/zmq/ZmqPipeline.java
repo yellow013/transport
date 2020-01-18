@@ -1,4 +1,4 @@
-package io.mercury.transport.jeromq;
+package io.mercury.transport.zmq;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import org.zeromq.ZMQ;
 
 import io.mercury.common.thread.ThreadUtil;
 import io.mercury.transport.core.api.Receiver;
-import io.mercury.transport.jeromq.config.JeroMqConfigurator;
+import io.mercury.transport.zmq.configurator.ZmqConfigurator;
 
-public class JeroMqPipeline implements Receiver, Closeable {
+public class ZmqPipeline implements Receiver, Closeable {
 
 	private ZContext zCtx;
 	private ZMQ.Socket zSocket;
@@ -20,11 +20,11 @@ public class JeroMqPipeline implements Receiver, Closeable {
 	private String receiverName;
 
 	private Function<byte[], byte[]> pipeline;
-	private JeroMqConfigurator configurator;
+	private ZmqConfigurator configurator;
 
 	private volatile boolean isRun = true;
 
-	public JeroMqPipeline(JeroMqConfigurator configurator, Function<byte[], byte[]> pipeline) {
+	public ZmqPipeline(ZmqConfigurator configurator, Function<byte[], byte[]> pipeline) {
 		if (configurator == null || pipeline == null)
 			throw new IllegalArgumentException("configurator is null in JeroMQReceiver init mothed !");
 		this.configurator = configurator;
@@ -66,8 +66,8 @@ public class JeroMqPipeline implements Receiver, Closeable {
 
 	public static void main(String[] args) {
 
-		try (JeroMqPipeline receiver = new JeroMqPipeline(
-				JeroMqConfigurator.builder().ioThreads(10).host("tcp://*:5551").build(), (byte[] byteMsg) -> {
+		try (ZmqPipeline receiver = new ZmqPipeline(
+				ZmqConfigurator.builder().ioThreads(10).host("tcp://*:5551").build(), (byte[] byteMsg) -> {
 					System.out.println(new String(byteMsg));
 					return null;
 				})) {

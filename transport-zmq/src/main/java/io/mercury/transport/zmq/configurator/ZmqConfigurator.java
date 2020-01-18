@@ -1,8 +1,8 @@
-package io.mercury.transport.jeromq.config;
+package io.mercury.transport.zmq.configurator;
 
 import io.mercury.transport.core.config.TransportConfigurator;
 
-public class JeroMqConfigurator implements TransportConfigurator {
+public class ZmqConfigurator implements TransportConfigurator {
 
 	private String host;
 	private int port;
@@ -11,7 +11,7 @@ public class JeroMqConfigurator implements TransportConfigurator {
 
 	private final String configuratorName = "JeroMqConfigurator";
 
-	private JeroMqConfigurator(Builder builder) {
+	private ZmqConfigurator(Builder builder) {
 		this.host = builder.host;
 		this.port = builder.port;
 		this.topic = builder.topic;
@@ -75,8 +75,8 @@ public class JeroMqConfigurator implements TransportConfigurator {
 			return this;
 		}
 
-		public JeroMqConfigurator build() {
-			return new JeroMqConfigurator(this);
+		public ZmqConfigurator build() {
+			return new ZmqConfigurator(this);
 		}
 
 	}
