@@ -9,7 +9,8 @@ public class ZmqConfigurator implements TransportConfigurator {
 	private String topic;
 	private int ioThreads;
 
-	private final String configuratorName = "JeroMqConfigurator";
+	private final String fullInfo = "JeroMqConfigurator";
+	private final String connectionInfo = "";
 
 	private ZmqConfigurator(Builder builder) {
 		this.host = builder.host;
@@ -41,8 +42,13 @@ public class ZmqConfigurator implements TransportConfigurator {
 	}
 
 	@Override
-	public String name() {
-		return configuratorName;
+	public String fullInfo() {
+		return fullInfo;
+	}
+	
+	@Override
+	public String connectionInfo() {
+		return connectionInfo;
 	}
 
 	public static class Builder {

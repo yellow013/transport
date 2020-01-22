@@ -7,5 +7,7 @@ public interface TransportConfigurator extends Configurator {
 	public String host();
 
 	public int port();
+	
+	public String connectionInfo();
 
 }

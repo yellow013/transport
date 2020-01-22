@@ -19,7 +19,8 @@ public class NettyConfigurator implements TransportConfigurator {
 
 	private ShutdownEvent<Exception> shutdownEvent;
 
-	private String name = "NettyConfigurator";
+	private final String fullInfo = "NettyConfigurator";
+	private final String connectionInfo = "";
 
 	private NettyConfigurator(Builder builder) {
 		this.host = builder.host;
@@ -81,8 +82,13 @@ public class NettyConfigurator implements TransportConfigurator {
 	}
 
 	@Override
-	public String name() {
-		return name;
+	public String fullInfo() {
+		return fullInfo;
+	}
+
+	@Override
+	public String connectionInfo() {
+		return connectionInfo;
 	}
 
 	public static class Builder {
