@@ -85,12 +85,12 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		} catch (Exception e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
 			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
-					rmqConnection.name(), e.getMessage(), e);
+					rmqConnection.fullInfo(), e.getMessage(), e);
 			destroy();
 			throw new RuntimeException(e);
 		}
 		this.exchangeName = exchangeDeclare.exchange().name();
-		this.publisherName = "Publisher->" + rmqConnection.name() + "$" + exchangeName;
+		this.publisherName = "Publisher->" + rmqConnection.fullInfo() + "$" + exchangeName;
 	}
 
 	@Override

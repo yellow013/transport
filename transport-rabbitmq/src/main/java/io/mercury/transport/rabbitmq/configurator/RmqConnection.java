@@ -36,9 +36,9 @@ public final class RmqConnection implements TransportConfigurator {
 	// 停机处理回调函数
 	private ShutdownEvent<Exception> shutdownEvent;
 
-	// 配置器全名
-	private String name;
-	// 配置信息
+	// 配置器完整信息
+	private String fullInfo;
+	// 配置连接信息
 	private String connectionInfo;
 
 	private RmqConnection(Builder builder) {
@@ -56,14 +56,14 @@ public final class RmqConnection implements TransportConfigurator {
 		this.requestedHeartbeat = builder.requestedHeartbeat;
 		this.shutdownEvent = builder.shutdownEvent;
 		this.connectionInfo = newConnectionInfo();
-		this.name = newConfiguratorName();
+		this.fullInfo = newFullInfo();
 	}
 
 	private String newConnectionInfo() {
 		return host + ":" + port + (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
 	}
 
-	private String newConfiguratorName() {
+	private String newFullInfo() {
 		return username + "@" + connectionInfo;
 	}
 
@@ -81,8 +81,13 @@ public final class RmqConnection implements TransportConfigurator {
 	 * 
 	 */
 	@Override
-	public String name() {
-		return name;
+	public String fullInfo() {
+		return fullInfo;
+	}
+
+	@Override
+	public String connectionInfo() {
+		return connectionInfo;
 	}
 
 	@Override
@@ -170,13 +175,6 @@ public final class RmqConnection implements TransportConfigurator {
 	 */
 	public ShutdownEvent<Exception> shutdownEvent() {
 		return shutdownEvent;
-	}
-
-	/**
-	 * @return the connectionName
-	 */
-	public String connectionInfo() {
-		return connectionInfo;
 	}
 
 	private transient String toStringCache;
@@ -305,7 +303,7 @@ public final class RmqConnection implements TransportConfigurator {
 
 		RmqConnection configuration = configuration("localhost", 5672, "admin", "admin", "report").build();
 		System.out.println(configuration);
-		System.out.println(configuration.name());
+		System.out.println(configuration.fullInfo());
 
 	}
 

@@ -130,7 +130,7 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 			this.queueDeclare.declare(operationalChannel);
 		} catch (Exception e) {
 			logger.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
-					rmqConnection.name(), e.getMessage(), e);
+					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
 			throw new RuntimeException(e);
@@ -142,7 +142,7 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 			} catch (Exception e) {
 				logger.error(
 						"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
-						rmqConnection.name(), e.getMessage(), e);
+						rmqConnection.fullInfo(), e.getMessage(), e);
 				// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 				destroy();
 				throw new RuntimeException(e);
@@ -150,7 +150,7 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 			this.errorMsgExchangeName = errorMsgExchange.exchange().name();
 			this.hasErrorMsgExchange = true;
 		}
-		this.receiverName = "Receiver->" + rmqConnection.name() + "$" + queueName;
+		this.receiverName = "Receiver->" + rmqConnection.fullInfo() + "$" + queueName;
 	}
 
 	@Override
