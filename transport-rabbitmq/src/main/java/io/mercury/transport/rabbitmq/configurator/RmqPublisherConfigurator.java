@@ -40,6 +40,10 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		this.confirmRetry = builder.confirmRetry;
 	}
 
+	public static Builder configuration(@Nonnull RmqConnection connection) {
+		return configuration(connection, ExchangeDeclare.Anonymous);
+	}
+
 	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull ExchangeDeclare exchangeDeclare) {
 		return new Builder(Assertor.nonNull(connection, "connection"),
 				Assertor.nonNull(exchangeDeclare, "exchangeDeclare"));
@@ -109,6 +113,10 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		private boolean confirm = false;
 		private long confirmTimeout = 5000;
 		private int confirmRetry = 3;
+
+		private Builder(RmqConnection connection) {
+			this.connection = connection;
+		}
 
 		private Builder(RmqConnection connection, ExchangeDeclare exchangeDeclare) {
 			this.connection = connection;

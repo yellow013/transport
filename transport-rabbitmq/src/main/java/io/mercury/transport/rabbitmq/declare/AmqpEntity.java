@@ -29,6 +29,10 @@ public interface AmqpEntity {
 			return new Exchange(ExchangeType.Topic, name);
 		}
 
+		static Exchange anonymous() {
+			return new Exchange(ExchangeType.Anonymous, "");
+		}
+
 		private Exchange(ExchangeType type, String name) {
 			this.type = type;
 			this.name = name;
@@ -264,7 +268,7 @@ public interface AmqpEntity {
 	}
 
 	public static enum ExchangeType {
-		Direct, Fanout, Topic
+		Direct, Fanout, Topic, Anonymous
 	}
 
 	public static enum DestinationType {

@@ -81,7 +81,8 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 	private void init() {
 		try {
-			this.exchangeDeclare.declare(OperationalChannel.ofChannel(channel));
+			if (exchangeDeclare != ExchangeDeclare.Anonymous)
+				this.exchangeDeclare.declare(OperationalChannel.ofChannel(channel));
 		} catch (Exception e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
 			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",

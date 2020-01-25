@@ -19,6 +19,8 @@ import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
  */
 public class ExchangeDeclare extends Relationship {
 
+	public final static ExchangeDeclare Anonymous = new ExchangeDeclare(Exchange.anonymous());
+
 	private Exchange exchange;
 
 	public static ExchangeDeclare fanout(@Nonnull String exchangeName) {
