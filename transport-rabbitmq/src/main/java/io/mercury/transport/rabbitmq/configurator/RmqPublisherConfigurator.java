@@ -5,10 +5,10 @@ import javax.annotation.Nonnull;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.MessageProperties;
 
-import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
 import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
+import io.mercury.transport.rabbitmq.declare.entity.Queue;
 
 /**
  * 

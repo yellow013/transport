@@ -2,10 +2,10 @@ package io.mercury.transport.rabbitmq;
 
 import java.util.Arrays;
 
-import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
+import io.mercury.transport.rabbitmq.declare.entity.Queue;
 
 public class RabbitMqPublisherTest {
 

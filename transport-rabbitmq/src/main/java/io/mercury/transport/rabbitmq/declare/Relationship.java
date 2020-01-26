@@ -7,9 +7,9 @@ import io.mercury.common.annotation.lang.ProtectedAbstractMethod;
 import io.mercury.common.collections.MutableLists;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.OperationalChannel;
-import io.mercury.transport.rabbitmq.declare.AmqpEntity.Binding;
-import io.mercury.transport.rabbitmq.declare.AmqpEntity.Exchange;
-import io.mercury.transport.rabbitmq.declare.AmqpEntity.Queue;
+import io.mercury.transport.rabbitmq.declare.entity.Binding;
+import io.mercury.transport.rabbitmq.declare.entity.Exchange;
+import io.mercury.transport.rabbitmq.declare.entity.Queue;
 import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
 
 public abstract class Relationship {
@@ -61,7 +61,7 @@ public abstract class Relationship {
 			try {
 				channel.bindQueue(destQueue.name(), source.name(), routingKey);
 			} catch (RabbitMqDeclareException declareException) {
-				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue);
+				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue, source, routingKey);
 				throw declareException;
 			}
 			return;
