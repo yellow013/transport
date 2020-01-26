@@ -18,14 +18,14 @@
 			<groupId>io.mercury</groupId>
 			<artifactId>transport-core</artifactId>
 		</dependency>
+
 		<!-- JeroMq : Pure Java implementation of libzmq -->
 		<dependency>
 			<groupId>org.zeromq</groupId>
 			<artifactId>jeromq</artifactId>
 			<version>0.5.1</version>
 		</dependency>
+
 	</dependencies>
-
-
 
 </project>
