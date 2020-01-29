@@ -1,7 +1,7 @@
 package io.mercury.transport.netty;
 
-import io.mercury.transport.api.TransportClient;
-import io.mercury.transport.netty.config.NettyConfigurator;
+import io.mercury.transport.core.api.TransportClient;
+import io.mercury.transport.netty.configurator.NettyConfigurator;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;

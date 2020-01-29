@@ -1,9 +1,9 @@
-package io.mercury.transport.netty.config;
+package io.mercury.transport.netty.configurator;
 
 import java.util.concurrent.TimeUnit;
 
 import io.mercury.common.functional.ShutdownEvent;
-import io.mercury.transport.core.config.TransportConfigurator;
+import io.mercury.transport.core.configurator.TransportConfigurator;
 
 public class NettyConfigurator implements TransportConfigurator {
 

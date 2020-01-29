@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 
 import io.mercury.common.annotation.lang.ProtectedAbstractMethod;
 import io.mercury.common.log.CommonLoggerFactory;
-import io.mercury.transport.netty.config.NettyConfigurator;
+import io.mercury.transport.netty.configurator.NettyConfigurator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
