@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import io.mercury.transport.socket.config.SocketConfigurator;
+import io.mercury.transport.socket.configurator.SocketConfigurator;
 
 public class LocalSocketManager {
 

@@ -1,4 +1,4 @@
-package io.mercury.transport.utils;
+package io.mercury.transport.socket.util;
 
 import java.util.concurrent.ArrayBlockingQueue;
 

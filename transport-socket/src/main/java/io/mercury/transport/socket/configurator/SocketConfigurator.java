@@ -1,6 +1,6 @@
-package io.mercury.transport.socket.config;
+package io.mercury.transport.socket.configurator;
 
-import io.mercury.transport.core.config.TransportConfigurator;
+import io.mercury.transport.core.configurator.TransportConfigurator;
 
 public class SocketConfigurator implements TransportConfigurator {
 

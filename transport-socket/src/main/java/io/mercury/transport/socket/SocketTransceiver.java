@@ -14,7 +14,7 @@ import io.mercury.common.collections.queue.api.SCQueue;
 import io.mercury.common.concurrent.disruptor.BufferSize;
 import io.mercury.common.concurrent.disruptor.SpscQueue;
 import io.mercury.common.thread.ThreadUtil;
-import io.mercury.transport.socket.config.SocketConfigurator;
+import io.mercury.transport.socket.configurator.SocketConfigurator;
 
 public class SocketTransceiver extends BaseTransceiver<String> {
 

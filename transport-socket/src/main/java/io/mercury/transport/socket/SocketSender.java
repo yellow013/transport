@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import io.mercury.common.concurrent.queue.MpscArrayBlockingQueue;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.core.api.Sender;
-import io.mercury.transport.socket.config.SocketConfigurator;
+import io.mercury.transport.socket.configurator.SocketConfigurator;
 
 public class SocketSender implements Sender<byte[]> {
 
