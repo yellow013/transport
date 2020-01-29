@@ -7,7 +7,7 @@ import io.mercury.transport.rabbitmq.OperationalChannel;
 import io.mercury.transport.rabbitmq.declare.entity.Binding;
 import io.mercury.transport.rabbitmq.declare.entity.Exchange;
 import io.mercury.transport.rabbitmq.declare.entity.Queue;
-import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
+import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 /**
  * 定义Queue和其他实体绑定关系
@@ -35,7 +35,7 @@ public class QueueDeclare extends Relationship {
 	protected void declare0(OperationalChannel channel) {
 		try {
 			channel.declareQueue(queue);
-		} catch (RabbitMqDeclareException e) {
+		} catch (AmqpDeclareException e) {
 			logger.error("Declare Queue failure -> {}", queue);
 			throw new RuntimeException(e);
 		}

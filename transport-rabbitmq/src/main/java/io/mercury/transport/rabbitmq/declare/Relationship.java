@@ -10,7 +10,7 @@ import io.mercury.transport.rabbitmq.OperationalChannel;
 import io.mercury.transport.rabbitmq.declare.entity.Binding;
 import io.mercury.transport.rabbitmq.declare.entity.Exchange;
 import io.mercury.transport.rabbitmq.declare.entity.Queue;
-import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
+import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 public abstract class Relationship {
 
@@ -18,17 +18,17 @@ public abstract class Relationship {
 
 	protected MutableList<Binding> bindings = MutableLists.newFastList();
 
-	public void declare(OperationalChannel channel) throws RabbitMqDeclareException {
+	public void declare(OperationalChannel channel) throws AmqpDeclareException {
 		declare0(channel);
 		for (Binding binding : bindings)
 			handleBinding(channel, binding);
 	}
 
-	private void handleBinding(OperationalChannel channel, Binding binding) throws RabbitMqDeclareException {
+	private void handleBinding(OperationalChannel channel, Binding binding) throws AmqpDeclareException {
 		Exchange source = binding.source();
 		try {
 			channel.declareExchange(source);
-		} catch (RabbitMqDeclareException declareException) {
+		} catch (AmqpDeclareException declareException) {
 			logger.error("Declare source exchange failure -> {}", source);
 			throw declareException;
 		}
@@ -38,13 +38,13 @@ public abstract class Relationship {
 			Exchange destExchange = binding.destExchange();
 			try {
 				channel.declareExchange(destExchange);
-			} catch (RabbitMqDeclareException e) {
+			} catch (AmqpDeclareException e) {
 				logger.error("Declare dest exchange failure -> {}", destExchange);
 				throw e;
 			}
 			try {
 				channel.bindExchange(destExchange.name(), source.name(), routingKey);
-			} catch (RabbitMqDeclareException e) {
+			} catch (AmqpDeclareException e) {
 				logger.error("Declare bind exchange failure -> dest==[{}], source==[{}], routingKey==[{}]",
 						destExchange, source, routingKey);
 				throw e;
@@ -54,13 +54,13 @@ public abstract class Relationship {
 			Queue destQueue = binding.destQueue();
 			try {
 				channel.declareQueue(destQueue);
-			} catch (RabbitMqDeclareException e) {
+			} catch (AmqpDeclareException e) {
 				logger.error("Declare dest queue failure -> {}", destQueue);
 				throw e;
 			}
 			try {
 				channel.bindQueue(destQueue.name(), source.name(), routingKey);
-			} catch (RabbitMqDeclareException e) {
+			} catch (AmqpDeclareException e) {
 				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue,
 						source, routingKey);
 				throw e;
