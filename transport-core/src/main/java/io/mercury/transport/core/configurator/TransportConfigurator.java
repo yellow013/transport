@@ -1,4 +1,4 @@
-package io.mercury.transport.core.config;
+package io.mercury.transport.core.configurator;
 
 import io.mercury.common.config.Configurator;
 

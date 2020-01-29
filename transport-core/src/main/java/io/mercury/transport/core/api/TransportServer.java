@@ -1,4 +1,4 @@
-package io.mercury.transport.api;
+package io.mercury.transport.core.api;
 
 import io.mercury.transport.core.TransportModule;
 
