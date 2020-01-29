@@ -91,7 +91,7 @@ public final class Binding {
 	/**
 	 * @return the destinationType
 	 */
-	public DestType destinationType() {
+	public DestType destType() {
 		return destType;
 	}
 

@@ -33,44 +33,45 @@ public abstract class Relationship {
 			throw declareException;
 		}
 		String routingKey = binding.routingKey();
-		switch (binding.destinationType()) {
+		switch (binding.destType()) {
 		case Exchange:
 			Exchange destExchange = binding.destExchange();
 			try {
 				channel.declareExchange(destExchange);
-			} catch (RabbitMqDeclareException declareException) {
+			} catch (RabbitMqDeclareException e) {
 				logger.error("Declare dest exchange failure -> {}", destExchange);
-				throw declareException;
+				throw e;
 			}
 			try {
 				channel.bindExchange(destExchange.name(), source.name(), routingKey);
-			} catch (RabbitMqDeclareException declareException) {
+			} catch (RabbitMqDeclareException e) {
 				logger.error("Declare bind exchange failure -> dest==[{}], source==[{}], routingKey==[{}]",
 						destExchange, source, routingKey);
-				throw declareException;
+				throw e;
 			}
-			return;
+			break;
 		case Queue:
 			Queue destQueue = binding.destQueue();
 			try {
 				channel.declareQueue(destQueue);
-			} catch (RabbitMqDeclareException declareException) {
+			} catch (RabbitMqDeclareException e) {
 				logger.error("Declare dest queue failure -> {}", destQueue);
-				throw declareException;
+				throw e;
 			}
 			try {
 				channel.bindQueue(destQueue.name(), source.name(), routingKey);
-			} catch (RabbitMqDeclareException declareException) {
-				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue, source, routingKey);
-				throw declareException;
+			} catch (RabbitMqDeclareException e) {
+				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue,
+						source, routingKey);
+				throw e;
 			}
-			return;
+			break;
 		default:
-			return;
+			break;
 		}
 	}
 
 	@ProtectedAbstractMethod
-	protected abstract void declare0(OperationalChannel operationalChannel);
+	protected abstract void declare0(OperationalChannel opChannel);
 
 }

@@ -72,11 +72,11 @@ public final class Queue {
 		return this;
 	}
 
-	private final static String ToStringTemplate = "Queue([name==$name],[durable==$durable],[exclusive==$exclusive],[autoDelete==$autoDelete])";
+	private final static String Template = "Queue([name==$name],[durable==$durable],[exclusive==$exclusive],[autoDelete==$autoDelete])";
 
 	@Override
 	public String toString() {
-		return ToStringTemplate.replace("$name", name).replace("$durable", valueOf(durable))
+		return Template.replace("$name", name).replace("$durable", valueOf(durable))
 				.replace("$exclusive", valueOf(exclusive)).replace("$autoDelete", valueOf(autoDelete));
 	}
 

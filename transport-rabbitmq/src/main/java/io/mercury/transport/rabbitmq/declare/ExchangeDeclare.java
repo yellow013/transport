@@ -60,6 +60,15 @@ public class ExchangeDeclare extends Relationship {
 		return exchange;
 	}
 
+	/**
+	 * <b>exchange().name()<b><br>
+	 * 
+	 * @return the exchange name
+	 */
+	public String exchangeName() {
+		return exchange.name();
+	}
+
 	public ExchangeDeclare durable(boolean durable) {
 		exchange.durable(durable);
 		return this;

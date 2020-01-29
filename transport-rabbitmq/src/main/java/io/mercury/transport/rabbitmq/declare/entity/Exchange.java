@@ -99,11 +99,11 @@ public final class Exchange {
 		return this;
 	}
 
-	private final static String ToStringTemplate = "Exchange([name==$name],[type==$type],[durable==$durable],[autoDelete==$autoDelete],[internal==$internal])";
+	private final static String Template = "Exchange([name==$name],[type==$type],[durable==$durable],[autoDelete==$autoDelete],[internal==$internal])";
 
 	@Override
 	public String toString() {
-		return ToStringTemplate.replace("$name", name).replace("$type", valueOf(type))
+		return Template.replace("$name", name).replace("$type", valueOf(type))
 				.replace("$durable", valueOf(durable)).replace("$autoDelete", valueOf(autoDelete))
 				.replace("$internal", valueOf(internal));
 	}

@@ -48,6 +48,15 @@ public class QueueDeclare extends Relationship {
 		return queue;
 	}
 
+	/**
+	 * <b>queue().name()<b><br>
+	 * 
+	 * @return the queue name
+	 */
+	public String queueName() {
+		return queue.name();
+	}
+
 	public QueueDeclare durable(boolean durable) {
 		queue.durable(durable);
 		return this;
