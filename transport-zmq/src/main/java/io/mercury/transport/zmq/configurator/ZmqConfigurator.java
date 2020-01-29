@@ -1,6 +1,6 @@
 package io.mercury.transport.zmq.configurator;
 
-import io.mercury.transport.core.config.TransportConfigurator;
+import io.mercury.transport.core.configurator.TransportConfigurator;
 
 public class ZmqConfigurator implements TransportConfigurator {
 

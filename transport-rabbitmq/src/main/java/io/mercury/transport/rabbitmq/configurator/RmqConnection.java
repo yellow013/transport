@@ -6,7 +6,7 @@ import javax.net.ssl.SSLContext;
 import io.mercury.common.functional.ShutdownEvent;
 import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
-import io.mercury.transport.core.config.TransportConfigurator;
+import io.mercury.transport.core.configurator.TransportConfigurator;
 
 public final class RmqConnection implements TransportConfigurator {
 
