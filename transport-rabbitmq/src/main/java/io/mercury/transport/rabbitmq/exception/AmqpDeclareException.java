@@ -2,48 +2,48 @@ package io.mercury.transport.rabbitmq.exception;
 
 import com.rabbitmq.client.BuiltinExchangeType;
 
-public class RabbitMqDeclareException extends Exception {
+public final class AmqpDeclareException extends Exception {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7352101640279556300L;
 
-	private RabbitMqDeclareException(Throwable cause) {
+	private AmqpDeclareException(Throwable cause) {
 		super(cause);
 	}
 
-	private RabbitMqDeclareException(String message, Throwable cause) {
+	private AmqpDeclareException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public static RabbitMqDeclareException declareQueueError(String queue, boolean durable, boolean exclusive,
+	public static AmqpDeclareException declareQueueError(String queue, boolean durable, boolean exclusive,
 			boolean autoDelete, Throwable cause) {
-		return new RabbitMqDeclareException("Declare queue error -> queue==[" + queue + "], durable==[" + durable
+		return new AmqpDeclareException("Declare queue error -> queue==[" + queue + "], durable==[" + durable
 				+ "], exclusive==[" + exclusive + "], autoDelete==[" + autoDelete + "]", cause);
 	}
 
-	public static RabbitMqDeclareException declareExchangeError(String exchange, BuiltinExchangeType type,
+	public static AmqpDeclareException declareExchangeError(String exchange, BuiltinExchangeType type,
 			boolean durable, boolean autoDelete, boolean internal, Throwable cause) {
-		return new RabbitMqDeclareException("Declare exchange error -> exchange==[" + exchange + "], type==[" + type
+		return new AmqpDeclareException("Declare exchange error -> exchange==[" + exchange + "], type==[" + type
 				+ "], durable==[" + durable + "], autoDelete==[" + autoDelete + "], internal==[" + internal + "]",
 				cause);
 	}
 
-	public static RabbitMqDeclareException bindQueueError(String queue, String exchange, String routingKey,
+	public static AmqpDeclareException bindQueueError(String queue, String exchange, String routingKey,
 			Throwable cause) {
-		return new RabbitMqDeclareException("Declare bind queue error -> queue==[" + queue + "], exchange==[" + exchange
+		return new AmqpDeclareException("Declare bind queue error -> queue==[" + queue + "], exchange==[" + exchange
 				+ "], routingKey==[" + routingKey + "]", cause);
 	}
 
-	public static RabbitMqDeclareException bindExchangeError(String destExchange, String sourceExchange,
+	public static AmqpDeclareException bindExchangeError(String destExchange, String sourceExchange,
 			String routingKey, Throwable cause) {
-		return new RabbitMqDeclareException("Declare bind exchange error -> destExchange==[" + destExchange
+		return new AmqpDeclareException("Declare bind exchange error -> destExchange==[" + destExchange
 				+ "], sourceExchange==[" + sourceExchange + "], routingKey==[" + routingKey + "]", cause);
 	}
 
-	public static RabbitMqDeclareException ofException(Throwable cause) {
-		return new RabbitMqDeclareException(cause);
+	public static AmqpDeclareException with(Throwable cause) {
+		return new AmqpDeclareException(cause);
 	}
 
 }
