@@ -18,7 +18,7 @@ import io.mercury.transport.rabbitmq.declare.entity.Queue;
 public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 	// 发布者ExchangeDeclare
-	private ExchangeDeclare exchangeDeclare;
+	private ExchangeDeclare publishExchange;
 	// 默认RoutingKey
 	private String defaultRoutingKey;
 	// 默认消息发布参数
@@ -32,7 +32,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 	private RmqPublisherConfigurator(Builder builder) {
 		super(builder.connection);
-		this.exchangeDeclare = builder.exchangeDeclare;
+		this.publishExchange = builder.publishExchange;
 		this.defaultRoutingKey = builder.defaultRoutingKey;
 		this.msgProperties = builder.msgProperties;
 		this.confirm = builder.confirm;
@@ -52,8 +52,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	/**
 	 * @return the exchangeDeclare
 	 */
-	public ExchangeDeclare exchangeDeclare() {
-		return exchangeDeclare;
+	public ExchangeDeclare publishExchange() {
+		return publishExchange;
 	}
 
 	/**
@@ -105,7 +105,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		// 连接配置
 		private RmqConnection connection;
 
-		private ExchangeDeclare exchangeDeclare;
+		private ExchangeDeclare publishExchange;
 
 		private String defaultRoutingKey = "";
 		private BasicProperties msgProperties = MessageProperties.PERSISTENT_BASIC;
@@ -118,9 +118,9 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 			this.connection = connection;
 		}
 
-		private Builder(RmqConnection connection, ExchangeDeclare exchangeDeclare) {
+		private Builder(RmqConnection connection, ExchangeDeclare publishExchange) {
 			this.connection = connection;
-			this.exchangeDeclare = exchangeDeclare;
+			this.publishExchange = publishExchange;
 		}
 
 		public RmqPublisherConfigurator build() {

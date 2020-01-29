@@ -10,24 +10,38 @@ import io.mercury.transport.rabbitmq.declare.QueueDeclare;
 public final class RmqReceiverConfigurator extends RmqConfigurator {
 
 	// 接受者QueueDeclare
-	private QueueDeclare queueDeclare;
+	private QueueDeclare receiveQueue;
+
 	// 错误消息ExchangeDeclare
 	private ExchangeDeclare errorMsgExchange;
+
+	// 错误消息RoutingKey
+	private String errorMsgRoutingKey;
+
+	// 错误消息QueueDeclare
+	private QueueDeclare errorMsgQueue;
+
 	// 自动ACK
 	private boolean autoAck;
+
 	// 一次ACK多条
 	private boolean multipleAck;
+
 	// 最大重新ACK次数
 	private int maxAckTotal;
+
 	// 最大ACK重连次数
 	private int maxAckReconnection;
+
 	// QOS预取
 	private int qos;
 
 	private RmqReceiverConfigurator(Builder builder) {
 		super(builder.connection);
-		this.queueDeclare = builder.queueDeclare;
+		this.receiveQueue = builder.receiveQueue;
 		this.errorMsgExchange = builder.errorMsgExchange;
+		this.errorMsgRoutingKey = builder.errorMsgRoutingKey;
+		this.errorMsgQueue = builder.errorMsgQueue;
 		this.autoAck = builder.autoAck;
 		this.multipleAck = builder.multipleAck;
 		this.maxAckTotal = builder.maxAckTotal;
@@ -42,8 +56,8 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	/**
 	 * @return the queueDeclare
 	 */
-	public QueueDeclare queueDeclare() {
-		return queueDeclare;
+	public QueueDeclare receiveQueue() {
+		return receiveQueue;
 	}
 
 	/**
@@ -51,6 +65,23 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	 */
 	public ExchangeDeclare errorMsgExchange() {
 		return errorMsgExchange;
+	}
+
+	/**
+	 * 
+	 * @return the errorMsgRoutingKey
+	 */
+
+	public String errorMsgRoutingKey() {
+		return errorMsgRoutingKey;
+	}
+
+	/**
+	 * 
+	 * @return the errorMsgQueue
+	 */
+	public QueueDeclare errorMsgQueue() {
+		return errorMsgQueue;
 	}
 
 	/**
@@ -101,9 +132,13 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// 连接配置
 		private RmqConnection connection;
 		// 接受者QueueDeclare
-		private QueueDeclare queueDeclare;
+		private QueueDeclare receiveQueue;
 		// 错误消息ExchangeDeclare
 		private ExchangeDeclare errorMsgExchange;
+		// 错误消息RoutingKey
+		private String errorMsgRoutingKey = "";
+		// 错误消息QueueDeclare
+		private QueueDeclare errorMsgQueue;
 		// 自动ACK
 		private boolean autoAck = true;
 		// 一次ACK多条
@@ -115,9 +150,9 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// QOS预取
 		private int qos = 256;
 
-		private Builder(RmqConnection connection, QueueDeclare queueDeclare) {
+		private Builder(RmqConnection connection, QueueDeclare receiveQueue) {
 			this.connection = connection;
-			this.queueDeclare = queueDeclare;
+			this.receiveQueue = receiveQueue;
 		}
 
 		/**
@@ -125,6 +160,24 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		 */
 		public Builder errorMsgExchange(ExchangeDeclare errorMsgExchange) {
 			this.errorMsgExchange = errorMsgExchange;
+			return this;
+		}
+
+		/**
+		 * 
+		 * @param errorMsgRoutingKey
+		 */
+		public Builder errorMsgRoutingKey(String errorMsgRoutingKey) {
+			this.errorMsgRoutingKey = errorMsgRoutingKey;
+			return this;
+		}
+
+		/**
+		 * 
+		 * @param errorMsgQueue
+		 */
+		public Builder errorMsgQueue(QueueDeclare errorMsgQueue) {
+			this.errorMsgQueue = errorMsgQueue;
 			return this;
 		}
 
