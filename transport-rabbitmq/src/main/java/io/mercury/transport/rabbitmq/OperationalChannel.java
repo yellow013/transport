@@ -12,7 +12,7 @@ import com.rabbitmq.client.Channel;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.declare.entity.Exchange;
 import io.mercury.transport.rabbitmq.declare.entity.Queue;
-import io.mercury.transport.rabbitmq.exception.RabbitMqDeclareException;
+import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 public final class OperationalChannel extends AbstractRabbitMqTransport {
 
@@ -87,25 +87,25 @@ public final class OperationalChannel extends AbstractRabbitMqTransport {
 	 *                         false<br>
 	 * @throws QueueDeclareException
 	 */
-	public boolean declareQueueDefault(@Nonnull String queue) throws RabbitMqDeclareException {
+	public boolean declareQueueDefault(@Nonnull String queue) throws AmqpDeclareException {
 		if (queue == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param queue is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param queue is can't null."));
 		return declareQueue(queue, true, false, false);
 	}
 
-	public boolean declareQueue(@Nonnull Queue queue) throws RabbitMqDeclareException {
+	public boolean declareQueue(@Nonnull Queue queue) throws AmqpDeclareException {
 		if (queue == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param queue is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param queue is can't null."));
 		return declareQueue(queue.name(), queue.durable(), queue.exclusive(), queue.autoDelete());
 	}
 
 	public boolean declareQueue(@Nonnull String queue, boolean durable, boolean exclusive, boolean autoDelete)
-			throws RabbitMqDeclareException {
+			throws AmqpDeclareException {
 		try {
 			channel.queueDeclare(queue, durable, exclusive, autoDelete, null);
 			return true;
 		} catch (Exception e) {
-			throw RabbitMqDeclareException.declareQueueError(queue, durable, exclusive, autoDelete, e);
+			throw AmqpDeclareException.declareQueueError(queue, durable, exclusive, autoDelete, e);
 		}
 	}
 
@@ -117,9 +117,9 @@ public final class OperationalChannel extends AbstractRabbitMqTransport {
 	 * @return
 	 * @throws ExchangeDeclareException
 	 */
-	public boolean declareExchange(@Nonnull Exchange exchange) throws RabbitMqDeclareException {
+	public boolean declareExchange(@Nonnull Exchange exchange) throws AmqpDeclareException {
 		if (exchange == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param exchange is can't null."));
 		switch (exchange.type()) {
 		case Direct:
 			return declareDirectExchange(exchange.name(), exchange.durable(), exchange.autoDelete(),
@@ -135,79 +135,79 @@ public final class OperationalChannel extends AbstractRabbitMqTransport {
 		}
 	}
 
-	public boolean declareDirectExchangeDefault(@Nonnull String exchange) throws RabbitMqDeclareException {
+	public boolean declareDirectExchangeDefault(@Nonnull String exchange) throws AmqpDeclareException {
 		if (exchange == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param exchange is can't null."));
 		return declareDirectExchange(exchange, true, false, false);
 	}
 
 	public boolean declareDirectExchange(@Nonnull String exchange, boolean durable, boolean autoDelete,
-			boolean internal) throws RabbitMqDeclareException {
+			boolean internal) throws AmqpDeclareException {
 		if (exchange == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param exchange is can't null."));
 		return declareExchange(exchange, BuiltinExchangeType.DIRECT, durable, autoDelete, internal);
 	}
 
-	public boolean declareFanoutExchangeDefault(@Nonnull String exchange) throws RabbitMqDeclareException {
+	public boolean declareFanoutExchangeDefault(@Nonnull String exchange) throws AmqpDeclareException {
 		if (exchange == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param exchange is can't null."));
 		return declareFanoutExchange(exchange, true, false, false);
 	}
 
 	public boolean declareFanoutExchange(@Nonnull String exchange, boolean durable, boolean autoDelete,
-			boolean internal) throws RabbitMqDeclareException {
+			boolean internal) throws AmqpDeclareException {
 		if (exchange == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param exchange is can't null."));
 		return declareExchange(exchange, BuiltinExchangeType.FANOUT, durable, autoDelete, internal);
 	}
 
-	public boolean declareTopicExchangeDefault(@Nonnull String exchange) throws RabbitMqDeclareException {
+	public boolean declareTopicExchangeDefault(@Nonnull String exchange) throws AmqpDeclareException {
 		if (exchange == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param exchange is can't null."));
 		return declareTopicExchange(exchange, true, false, false);
 	}
 
 	public boolean declareTopicExchange(@Nonnull String exchange, boolean durable, boolean autoDelete, boolean internal)
-			throws RabbitMqDeclareException {
+			throws AmqpDeclareException {
 		if (exchange == null)
-			throw RabbitMqDeclareException.ofException(new NullPointerException("param exchange is can't null."));
+			throw AmqpDeclareException.with(new NullPointerException("param exchange is can't null."));
 		return declareExchange(exchange, BuiltinExchangeType.TOPIC, durable, autoDelete, internal);
 	}
 
 	private boolean declareExchange(String exchange, BuiltinExchangeType type, boolean durable, boolean autoDelete,
-			boolean internal) throws RabbitMqDeclareException {
+			boolean internal) throws AmqpDeclareException {
 		try {
 			channel.exchangeDeclare(exchange, type, durable, autoDelete, internal, null);
 			return true;
 		} catch (IOException e) {
-			throw RabbitMqDeclareException.declareExchangeError(exchange, type, durable, autoDelete, internal, e);
+			throw AmqpDeclareException.declareExchangeError(exchange, type, durable, autoDelete, internal, e);
 		}
 	}
 
-	public boolean bindQueue(String queue, String exchange) throws RabbitMqDeclareException {
+	public boolean bindQueue(String queue, String exchange) throws AmqpDeclareException {
 		return bindQueue(queue, exchange, "");
 	}
 
-	public boolean bindQueue(String queue, String exchange, String routingKey) throws RabbitMqDeclareException {
+	public boolean bindQueue(String queue, String exchange, String routingKey) throws AmqpDeclareException {
 		try {
 			channel.queueBind(queue, exchange, routingKey == null ? "" : routingKey);
 			return true;
 		} catch (IOException e) {
-			throw RabbitMqDeclareException.bindQueueError(queue, exchange, routingKey, e);
+			throw AmqpDeclareException.bindQueueError(queue, exchange, routingKey, e);
 		}
 	}
 
-	public boolean bindExchange(String destExchange, String sourceExchange) throws RabbitMqDeclareException {
+	public boolean bindExchange(String destExchange, String sourceExchange) throws AmqpDeclareException {
 		return bindExchange(destExchange, sourceExchange, "");
 	}
 
 	public boolean bindExchange(String destExchange, String sourceExchange, String routingKey)
-			throws RabbitMqDeclareException {
+			throws AmqpDeclareException {
 		try {
 			channel.exchangeBind(destExchange, sourceExchange, routingKey == null ? "" : routingKey);
 			return true;
 		} catch (IOException e) {
-			throw RabbitMqDeclareException.bindExchangeError(destExchange, sourceExchange, routingKey, e);
+			throw AmqpDeclareException.bindExchangeError(destExchange, sourceExchange, routingKey, e);
 		}
 	}
 
@@ -250,7 +250,7 @@ public final class OperationalChannel extends AbstractRabbitMqTransport {
 			System.out.println(manualCloseChannel.isOpen());
 			try {
 				manualCloseChannel.declareFanoutExchange("MarketData", true, false, false);
-			} catch (RabbitMqDeclareException e) {
+			} catch (AmqpDeclareException e) {
 				e.printStackTrace();
 			}
 			manualCloseChannel.close();

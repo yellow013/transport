@@ -17,6 +17,8 @@ import io.mercury.transport.core.api.Publisher;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
+import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
+import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
 import io.mercury.transport.rabbitmq.exception.NoConfirmException;
 
 public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publisher<byte[]> {
@@ -85,15 +87,14 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		try {
 			if (publishExchange != ExchangeDeclare.Anonymous)
 				this.publishExchange.declare(OperationalChannel.ofChannel(channel));
-		} catch (Exception e) {
+		} catch (AmqpDeclareException e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
 			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			destroy();
-			throw new RuntimeException(e);
+			throw new AmqpDeclareRuntimeException(e);
 		}
 		this.exchangeName = publishExchange.exchangeName();
-
 	}
 
 	@Override

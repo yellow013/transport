@@ -18,6 +18,8 @@ import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeDeclare;
 import io.mercury.transport.rabbitmq.declare.QueueDeclare;
+import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
+import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
 
 /**
  * 
@@ -174,13 +176,13 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 	private void declareErrorMsgExchange(OperationalChannel opChannel) {
 		try {
 			this.errorMsgExchange.declare(opChannel);
-		} catch (Exception e) {
+		} catch (AmqpDeclareException e) {
 			logger.error(
 					"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
-			throw new RuntimeException(e);
+			throw new AmqpDeclareRuntimeException(e);
 		}
 		this.errorMsgExchangeName = errorMsgExchange.exchangeName();
 		this.hasErrorMsgExchange = true;
@@ -189,13 +191,13 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 	private void declareErrorMsgQueueName(OperationalChannel opChannel) {
 		try {
 			this.errorMsgQueue.declare(opChannel);
-		} catch (Exception e) {
+		} catch (AmqpDeclareException e) {
 			logger.error(
 					"ErrorMsgQueue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
-			throw new RuntimeException(e);
+			throw new AmqpDeclareRuntimeException(e);
 		}
 		this.errorMsgQueueName = errorMsgQueue.queueName();
 		this.hasErrorMsgQueue = true;
