@@ -32,23 +32,44 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 	private volatile Consumer<byte[]> callback;
 
 	// 接受者QueueDeclare
-	private QueueDeclare queueDeclare;
+	private QueueDeclare receiveQueue;
+
 	// 接受者QueueName
 	private String queueName;
+
 	// 消息无法处理时发送到的错误消息ExchangeDeclare
 	private ExchangeDeclare errorMsgExchange;
+
+	// 消息无法处理时发送到的错误消息Exchange使用的RoutingKey
+	private String errorMsgRoutingKey;
+
+	// 消息无法处理时发送到的错误消息QueueDeclare
+	private QueueDeclare errorMsgQueue;
+
 	// 消息无法处理时发送到的错误消息Exchange
 	private String errorMsgExchangeName;
+
+	// 消息无法处理时发送到的错误消息Queue
+	private String errorMsgQueueName;
+
 	// 是否有错误消息Exchange
 	private boolean hasErrorMsgExchange;
+
+	// 是否有错误消息Queue
+	private boolean hasErrorMsgQueue;
+
 	// 自动ACK
 	private boolean autoAck;
+
 	// 一次ACK多条
 	private boolean multipleAck;
-	// Ack最大自动重试次数
+
+	// ACK最大自动重试次数
 	private int maxAckTotal;
-	// Ack最大自动重连次数
+
+	// ACK最大自动重连次数
 	private int maxAckReconnection;
+
 	// QOS预取
 	private int qos;
 
@@ -113,21 +134,24 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 			@Nonnull Consumer<byte[]> callback) {
 		super(tag, "receiver", configurator.connection());
 		this.callback = callback;
-		this.queueDeclare = configurator.queueDeclare();
+		this.receiveQueue = configurator.receiveQueue();
 		this.errorMsgExchange = configurator.errorMsgExchange();
+		this.errorMsgRoutingKey = configurator.errorMsgRoutingKey();
+		this.errorMsgQueue = configurator.errorMsgQueue();
 		this.autoAck = configurator.autoAck();
 		this.multipleAck = configurator.multipleAck();
 		this.maxAckTotal = configurator.maxAckTotal();
 		this.maxAckReconnection = configurator.maxAckReconnection();
 		this.qos = configurator.qos();
 		createConnection();
-		init();
+		declare();
+		this.receiverName = "Receiver::" + rmqConnection.fullInfo() + "$" + queueName;
 	}
 
-	private void init() {
-		OperationalChannel operationalChannel = OperationalChannel.ofChannel(channel);
+	private void declare() {
+		OperationalChannel opChannel = OperationalChannel.ofChannel(channel);
 		try {
-			this.queueDeclare.declare(operationalChannel);
+			this.receiveQueue.declare(opChannel);
 		} catch (Exception e) {
 			logger.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
@@ -135,22 +159,46 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 			destroy();
 			throw new RuntimeException(e);
 		}
-		this.queueName = queueDeclare.queue().name();
-		if (errorMsgExchange != null) {
-			try {
-				this.errorMsgExchange.declare(operationalChannel);
-			} catch (Exception e) {
-				logger.error(
-						"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
-						rmqConnection.fullInfo(), e.getMessage(), e);
-				// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
-				destroy();
-				throw new RuntimeException(e);
-			}
-			this.errorMsgExchangeName = errorMsgExchange.exchange().name();
-			this.hasErrorMsgExchange = true;
+		this.queueName = receiveQueue.queueName();
+		if (errorMsgExchange != null && errorMsgQueue != null) {
+			errorMsgExchange.bindingQueue(errorMsgQueue.queue());
+			declareErrorMsgExchange(opChannel);
+		} else if (errorMsgExchange != null) {
+			declareErrorMsgExchange(opChannel);
+		} else if (errorMsgQueue != null) {
+			declareErrorMsgQueueName(opChannel);
 		}
-		this.receiverName = "Receiver->" + rmqConnection.fullInfo() + "$" + queueName;
+		
+	}
+
+	private void declareErrorMsgExchange(OperationalChannel opChannel) {
+		try {
+			this.errorMsgExchange.declare(opChannel);
+		} catch (Exception e) {
+			logger.error(
+					"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
+					rmqConnection.fullInfo(), e.getMessage(), e);
+			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
+			destroy();
+			throw new RuntimeException(e);
+		}
+		this.errorMsgExchangeName = errorMsgExchange.exchangeName();
+		this.hasErrorMsgExchange = true;
+	}
+
+	private void declareErrorMsgQueueName(OperationalChannel opChannel) {
+		try {
+			this.errorMsgQueue.declare(opChannel);
+		} catch (Exception e) {
+			logger.error(
+					"ErrorMsgQueue declare throw exception -> connection configurator info : {}, error message : {}",
+					rmqConnection.fullInfo(), e.getMessage(), e);
+			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
+			destroy();
+			throw new RuntimeException(e);
+		}
+		this.errorMsgQueueName = errorMsgQueue.queueName();
+		this.hasErrorMsgQueue = true;
 	}
 
 	@Override
@@ -196,9 +244,15 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 										e.getMessage(), e);
 								if (hasErrorMsgExchange) {
 									// Sent message to error dump queue.
-									logger.error("Exception handling -> Msg [{}] sent to ErrorMsgExchange",
-											bytesToStr(body));
-									channel.basicPublish(errorMsgExchangeName, "", null, body);
+									logger.error("Exception handling -> Sent to ErrorMsgExchange [{}]",
+											errorMsgExchangeName);
+									channel.basicPublish(errorMsgExchangeName, errorMsgRoutingKey, null, body);
+									logger.error("Exception handling -> Sent to ErrorMsgExchange [{}] finished",
+											errorMsgExchangeName);
+								} else if (hasErrorMsgQueue) {
+									// Sent message to error dump queue.
+									logger.error("Exception handling -> Sent to ErrorMsgQueue [{}]", errorMsgQueueName);
+									channel.basicPublish("", errorMsgQueueName, null, body);
 									logger.error("Exception handling -> Sent to ErrorMsgExchange finished");
 								} else {
 									// Reject message and close connection.
@@ -210,17 +264,16 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 							}
 							if (!autoAck) {
 								if (ack(envelope.getDeliveryTag()))
-									logger.debug("Message handle end");
+									logger.debug("Message handle and ack finished");
 								else {
-									logger.info(
-											"Call method ack() envelope.getDeliveryTag()==[{}] failure, Reject message");
+									logger.info("Ack failure envelope.getDeliveryTag()==[{}], Reject message");
 									channel.basicReject(envelope.getDeliveryTag(), true);
 								}
 							}
 						}
 					});
 		} catch (IOException e) {
-			logger.error("Call method channel.basicConsume() IOException message -> {}", e.getMessage(), e);
+			logger.error("Method basicConsume() IOException message -> {}", e.getMessage(), e);
 		}
 	}
 

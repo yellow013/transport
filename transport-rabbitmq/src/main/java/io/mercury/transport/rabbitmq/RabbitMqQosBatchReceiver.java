@@ -36,7 +36,7 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
 		super(tag, "QosBatchReceiver", configurator.connection());
-		this.receiveQueue = configurator.queueDeclare().queue().name();
+		this.receiveQueue = configurator.receiveQueue().queue().name();
 		createConnection();
 		queueDeclare();
 		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, callBack,
@@ -47,7 +47,7 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent) {
 		super(tag, "QosBatchReceiver", configurator.connection());
-		this.receiveQueue = configurator.queueDeclare().queue().name();
+		this.receiveQueue = configurator.receiveQueue().queue().name();
 		createConnection();
 		queueDeclare();
 		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, callBack,

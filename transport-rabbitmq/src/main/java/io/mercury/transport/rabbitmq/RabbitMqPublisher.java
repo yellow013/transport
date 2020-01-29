@@ -12,6 +12,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 
 import io.mercury.common.character.Charsets;
 import io.mercury.common.thread.ThreadUtil;
+import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Publisher;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
@@ -21,7 +22,7 @@ import io.mercury.transport.rabbitmq.exception.NoConfirmException;
 public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publisher<byte[]> {
 
 	// 发布消息使用的ExchangeDeclare
-	private ExchangeDeclare exchangeDeclare;
+	private ExchangeDeclare publishExchange;
 	// 发布消息使用的Exchange
 	private String exchangeName;
 	// 发布消息使用的默认RoutingKey
@@ -67,7 +68,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 	public RabbitMqPublisher(String tag, @Nonnull RmqPublisherConfigurator configurator, Consumer<Long> ackCallback,
 			Consumer<Long> noAckCallback) {
 		super(tag, "publisher", configurator.connection());
-		this.exchangeDeclare = configurator.exchangeDeclare();
+		this.publishExchange = Assertor.nonNull(configurator.publishExchange(), "publishExchange");
 		this.defaultRoutingKey = configurator.defaultRoutingKey();
 		this.msgProperties = configurator.msgProperties();
 		this.confirm = configurator.confirm();
@@ -76,13 +77,14 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		this.ackCallback = ackCallback;
 		this.noAckCallback = noAckCallback;
 		createConnection();
-		init();
+		declare();
+		this.publisherName = "Publisher::" + rmqConnection.fullInfo() + "$" + exchangeName;
 	}
 
-	private void init() {
+	private void declare() {
 		try {
-			if (exchangeDeclare != ExchangeDeclare.Anonymous)
-				this.exchangeDeclare.declare(OperationalChannel.ofChannel(channel));
+			if (publishExchange != ExchangeDeclare.Anonymous)
+				this.publishExchange.declare(OperationalChannel.ofChannel(channel));
 		} catch (Exception e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
 			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
@@ -90,8 +92,8 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			destroy();
 			throw new RuntimeException(e);
 		}
-		this.exchangeName = exchangeDeclare.exchange().name();
-		this.publisherName = "Publisher->" + rmqConnection.fullInfo() + "$" + exchangeName;
+		this.exchangeName = publishExchange.exchangeName();
+
 	}
 
 	@Override

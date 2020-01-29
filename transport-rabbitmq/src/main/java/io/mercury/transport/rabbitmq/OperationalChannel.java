@@ -63,10 +63,11 @@ public final class OperationalChannel extends AbstractRabbitMqTransport {
 
 	/**
 	 * Create OperationalChannel of Channel
+	 * 
 	 * @param channel
 	 * @return
 	 */
-	public static OperationalChannel ofChannel(Channel channel) {
+	static OperationalChannel ofChannel(Channel channel) {
 		return new OperationalChannel(channel);
 	}
 
