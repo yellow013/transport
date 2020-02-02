@@ -5,7 +5,7 @@ abstract class RmqConfigurator {
 	// 连接配置
 	private RmqConnection connection;
 
-	protected RmqConfigurator(RmqConnection connection) {
+	RmqConfigurator(RmqConnection connection) {
 		this.connection = connection;
 	}
 

@@ -16,6 +16,9 @@ import io.mercury.transport.rabbitmq.consumer.RefreshNowEvent;
 /**
  * @author xuejian.sun
  * @date 2019/1/14 19:16
+ * 
+ * @updater yellow013
+ * @date 2019/2/20
  */
 public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport implements Receiver {
 
@@ -55,7 +58,7 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 	}
 
 	private void queueDeclare() {
-		this.receiverName = "Receiver->" + rmqConnection.fullInfo() + "$" + receiveQueue;
+		this.receiverName = "receiver::" + rmqConnection.fullInfo() + "$" + receiveQueue;
 		try {
 			channel.queueDeclare(receiveQueue, durable, exclusive, autoDelete, null);
 		} catch (IOException e) {
