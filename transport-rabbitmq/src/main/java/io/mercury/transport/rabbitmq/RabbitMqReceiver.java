@@ -147,7 +147,7 @@ public class RabbitMqReceiver extends AbstractRabbitMqTransport implements Recei
 		this.qos = configurator.qos();
 		createConnection();
 		declare();
-		this.receiverName = "Receiver::" + rmqConnection.fullInfo() + "$" + queueName;
+		this.receiverName = "receiver::" + rmqConnection.fullInfo() + "$" + queueName;
 	}
 
 	private void declare() {

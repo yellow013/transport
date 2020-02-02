@@ -80,7 +80,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		this.noAckCallback = noAckCallback;
 		createConnection();
 		declare();
-		this.publisherName = "Publisher::" + rmqConnection.fullInfo() + "$" + exchangeName;
+		this.publisherName = "publisher::" + rmqConnection.fullInfo() + "$" + exchangeName;
 	}
 
 	private void declare() {
