@@ -10,7 +10,7 @@ import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
 import io.mercury.transport.rabbitmq.consumer.QosBatchCallBack;
 import io.mercury.transport.rabbitmq.consumer.QosBatchProcessConsumer;
-import io.mercury.transport.rabbitmq.consumer.QueueMessageSerializable;
+import io.mercury.transport.rabbitmq.consumer.QueueMessageDeserializer;
 import io.mercury.transport.rabbitmq.consumer.RefreshNowEvent;
 
 /**
@@ -20,7 +20,7 @@ import io.mercury.transport.rabbitmq.consumer.RefreshNowEvent;
  * @updater yellow013
  * @date 2019/2/20
  */
-public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport implements Receiver {
+public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport implements Receiver, Runnable {
 
 	private String receiverName;
 
@@ -36,25 +36,25 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 	private QosBatchProcessConsumer<T> consumer;
 
 	public RabbitMqQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
-			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
+			QueueMessageDeserializer<T> deserializer, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
 		super(tag, "QosBatchReceiver", configurator.connection());
 		this.receiveQueue = configurator.receiveQueue().queue().name();
 		createConnection();
 		queueDeclare();
 		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, callBack,
-				serializable, refreshNowEvent, filter);
+				deserializer, refreshNowEvent, filter);
 	}
 
 	public RabbitMqQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
-			QueueMessageSerializable<T> serializable, QosBatchCallBack<List<T>> callBack,
+			QueueMessageDeserializer<T> deserializer, QosBatchCallBack<List<T>> callBack,
 			RefreshNowEvent<T> refreshNowEvent) {
 		super(tag, "QosBatchReceiver", configurator.connection());
 		this.receiveQueue = configurator.receiveQueue().queue().name();
 		createConnection();
 		queueDeclare();
-		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, callBack,
-				serializable, refreshNowEvent, null);
+		consumer = new QosBatchProcessConsumer<T>(channel, configurator.qos(), autoFlushInterval, callBack,
+				deserializer, refreshNowEvent, null);
 	}
 
 	private void queueDeclare() {
@@ -67,6 +67,11 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 					receiveQueue, durable, exclusive, autoDelete, e.getMessage(), e);
 			destroy();
 		}
+	}
+
+	@Override
+	public void run() {
+		receive();
 	}
 
 	@Override

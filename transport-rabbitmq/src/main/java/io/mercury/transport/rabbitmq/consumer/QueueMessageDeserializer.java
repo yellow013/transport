@@ -7,7 +7,7 @@ import java.util.function.Function;
  * @date 2018/11/20 14:44
  */
 @FunctionalInterface
-public interface QueueMessageSerializable<R> extends Function<byte[], R> {
+public interface QueueMessageDeserializer<R> extends Function<byte[], R> {
 
 	/**
 	 * convert byte[] to R
@@ -15,7 +15,7 @@ public interface QueueMessageSerializable<R> extends Function<byte[], R> {
 	 * @param bytes bytes
 	 * @return R
 	 */
-	default R serialize(byte[] bytes) {
+	default R deserialization(byte[] bytes) {
 		return apply(bytes);
 	}
 	

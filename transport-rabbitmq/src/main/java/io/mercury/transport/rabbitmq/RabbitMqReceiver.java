@@ -29,7 +29,7 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
  *         [已完成]改造升级, 使用共同的创建者建立Exchange, RoutingKey, Queue的绑定关系
  *
  */
-public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Receiver {
+public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Receiver, Runnable {
 
 	// 接收消息使用的反序列化器
 	private Function<byte[], T> deserializer;
@@ -240,6 +240,11 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		}
 		this.errorMsgQueueName = errorMsgQueue.queueName();
 		this.hasErrorMsgQueue = true;
+	}
+
+	@Override
+	public void run() {
+		receive();
 	}
 
 	@Override

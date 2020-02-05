@@ -22,6 +22,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import io.mercury.common.util.Assertor;
+
 /**
  * @author xuejian.sun
  * @date 2018/11/17 13:14
@@ -34,7 +36,7 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 
 	private QosBatchCallBack<List<T>> qosBatchCallBack;
 
-	private QueueMessageSerializable<T> serializable;
+	private QueueMessageDeserializer<T> deserializer;
 
 	/**
 	 * prefetchCount : rabbit consumer最多接受的数量
@@ -74,14 +76,14 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 	 * @param qosBatchCallBack 当达到prefetchCount值或自动flush触发此回调
 	 */
 	public QosBatchProcessConsumer(Channel channel, int prefetchCount, long millisSecond,
-			QosBatchCallBack<List<T>> qosBatchCallBack, QueueMessageSerializable<T> serializable,
+			QosBatchCallBack<List<T>> qosBatchCallBack, QueueMessageDeserializer<T> deserializer,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
 		super(channel);
 		this.channel = channel;
 		this.refreshNowEvent = refreshNowEvent;
 		this.filter = filter;
-		this.qosBatchCallBack = Objects.requireNonNull(qosBatchCallBack, "QosBatchCallBack can not be null");
-		this.serializable = Objects.requireNonNull(serializable, "QueueMessageSerializable can not be null");
+		this.qosBatchCallBack = Assertor.nonNull(qosBatchCallBack, "qosBatchCallBack");
+		this.deserializer = Assertor.nonNull(deserializer, "deserializer");
 		this.prefetchCount = prefetchCount;
 		if (millisSecond > 0) {
 			this.millisSecond = millisSecond;
@@ -91,12 +93,12 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 		init();
 	}
 
-	public QosBatchProcessConsumer(Channel channel, QueueMessageSerializable<T> serializable,
+	public QosBatchProcessConsumer(Channel channel, QueueMessageDeserializer<T> serializable,
 			QosBatchCallBack<List<T>> qosBatchCallBack) {
 		super(channel);
 		this.channel = channel;
-		this.qosBatchCallBack = Objects.requireNonNull(qosBatchCallBack, "QosBatchCallBack can not be null");
-		this.serializable = Objects.requireNonNull(serializable, "QueueMessageSerializable can not be null");
+		this.qosBatchCallBack = Assertor.nonNull(qosBatchCallBack, "qosBatchCallBack");
+		this.deserializer = Assertor.nonNull(serializable, "deserializer");
 		init();
 	}
 
@@ -119,7 +121,7 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
 		// 序列化
-		T t = serializable.serialize(body);
+		T t = deserializer.deserialization(body);
 		// 过滤器
 		if (filter != null && !filter.test(t)) {
 			return;
@@ -205,7 +207,6 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 			schedule.shutdown();
 			schedule = null;
 		}
-
 		if (channel.isOpen()) {
 			try {
 				channel.close();
