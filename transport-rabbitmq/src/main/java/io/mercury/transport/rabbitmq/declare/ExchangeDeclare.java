@@ -19,7 +19,7 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
  */
 public class ExchangeDeclare extends Relationship {
 
-	public final static ExchangeDeclare Anonymous = new ExchangeDeclare(Exchange.anonymous());
+	public final static ExchangeDeclare Anonymous = new ExchangeDeclare(Exchange.Anonymous);
 
 	private Exchange exchange;
 

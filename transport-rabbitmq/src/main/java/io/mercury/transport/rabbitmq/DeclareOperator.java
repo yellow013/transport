@@ -44,8 +44,7 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static DeclareOperator createChannel(String host, int port, String username, String password,
-			String virtualHost) {
+	public static DeclareOperator create(String host, int port, String username, String password, String virtualHost) {
 		return create(RmqConnection.configuration(host, port, username, password, virtualHost).build());
 	}
 
@@ -67,7 +66,7 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	 * @param channel
 	 * @return
 	 */
-	static DeclareOperator ofChannel(Channel channel) {
+	public static DeclareOperator ofChannel(Channel channel) {
 		return new DeclareOperator(channel);
 	}
 

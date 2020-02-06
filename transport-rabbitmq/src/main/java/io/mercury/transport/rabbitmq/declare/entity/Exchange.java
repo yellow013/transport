@@ -31,9 +31,7 @@ public final class Exchange {
 		return new Exchange(ExchangeType.Topic, name);
 	}
 
-	public static Exchange anonymous() {
-		return new Exchange(ExchangeType.Anonymous, "");
-	}
+	public static final Exchange Anonymous = new Exchange(ExchangeType.Anonymous, "");
 
 	private Exchange(ExchangeType type, String name) {
 		this.type = type;
@@ -103,9 +101,8 @@ public final class Exchange {
 
 	@Override
 	public String toString() {
-		return Template.replace("$name", name).replace("$type", valueOf(type))
-				.replace("$durable", valueOf(durable)).replace("$autoDelete", valueOf(autoDelete))
-				.replace("$internal", valueOf(internal));
+		return Template.replace("$name", name).replace("$type", valueOf(type)).replace("$durable", valueOf(durable))
+				.replace("$autoDelete", valueOf(autoDelete)).replace("$internal", valueOf(internal));
 	}
 
 	public boolean idempotent(Exchange another) {
