@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import io.mercury.transport.rabbitmq.OperationalChannel;
+import io.mercury.transport.rabbitmq.DeclareOperator;
 import io.mercury.transport.rabbitmq.declare.entity.Binding;
 import io.mercury.transport.rabbitmq.declare.entity.Exchange;
 import io.mercury.transport.rabbitmq.declare.entity.Queue;
@@ -44,9 +44,9 @@ public class ExchangeDeclare extends Relationship {
 	}
 
 	@Override
-	protected void declare0(OperationalChannel channel) {
+	protected void declare0(DeclareOperator operator) {
 		try {
-			channel.declareExchange(exchange);
+			operator.declareExchange(exchange);
 		} catch (AmqpDeclareException e) {
 			logger.error("Declare Exchange failure -> {}", exchange);
 			throw new RuntimeException(e);
