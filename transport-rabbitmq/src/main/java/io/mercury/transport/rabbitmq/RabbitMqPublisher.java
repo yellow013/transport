@@ -86,7 +86,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 	private void declare() {
 		try {
 			if (publishExchange != ExchangeDeclare.Anonymous)
-				this.publishExchange.declare(OperationalChannel.ofChannel(channel));
+				this.publishExchange.declare(DeclareOperator.ofChannel(channel));
 		} catch (AmqpDeclareException e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
 			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
@@ -186,9 +186,8 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 	@Override
 	public boolean destroy() {
-		logger.info("Call method destroy() for Publisher tag==[{}]", tag);
-		closeConnection();
-		return true;
+		logger.info("Call method destroy() from Publisher name==[{}]", publisherName);
+		return super.destroy();
 	}
 
 	@Override
@@ -206,17 +205,19 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 		ExchangeDeclare fanoutExchange = ExchangeDeclare.fanout("");
 
-		RabbitMqPublisher publisher = new RabbitMqPublisher("",
-				RmqPublisherConfigurator.configuration(connectionConfigurator0, fanoutExchange).build());
-
-		ThreadUtil.startNewThread(() -> {
-			int count = 0;
-			while (true) {
-				ThreadUtil.sleep(5000);
-				publisher.publish(String.valueOf(++count).getBytes(Charsets.UTF8));
-				System.out.println(count);
-			}
-		});
+		try (RabbitMqPublisher publisher = new RabbitMqPublisher("",
+				RmqPublisherConfigurator.configuration(connectionConfigurator0, fanoutExchange).build())) {
+			ThreadUtil.startNewThread(() -> {
+				int count = 0;
+				while (true) {
+					ThreadUtil.sleep(5000);
+					publisher.publish(String.valueOf(++count).getBytes(Charsets.UTF8));
+					System.out.println(count);
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 

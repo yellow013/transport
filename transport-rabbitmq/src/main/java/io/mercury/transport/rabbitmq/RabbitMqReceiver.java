@@ -190,9 +190,9 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	}
 
 	private void declare() {
-		OperationalChannel opChannel = OperationalChannel.ofChannel(channel);
+		DeclareOperator operator = DeclareOperator.ofChannel(channel);
 		try {
-			this.receiveQueue.declare(opChannel);
+			this.receiveQueue.declare(operator);
 		} catch (Exception e) {
 			logger.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
@@ -203,16 +203,16 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		this.queueName = receiveQueue.queueName();
 		if (errorMsgExchange != null && errorMsgQueue != null) {
 			errorMsgExchange.bindingQueue(errorMsgQueue.queue());
-			declareErrorMsgExchange(opChannel);
+			declareErrorMsgExchange(operator);
 		} else if (errorMsgExchange != null) {
-			declareErrorMsgExchange(opChannel);
+			declareErrorMsgExchange(operator);
 		} else if (errorMsgQueue != null) {
-			declareErrorMsgQueueName(opChannel);
+			declareErrorMsgQueueName(operator);
 		}
 
 	}
 
-	private void declareErrorMsgExchange(OperationalChannel opChannel) {
+	private void declareErrorMsgExchange(DeclareOperator opChannel) {
 		try {
 			this.errorMsgExchange.declare(opChannel);
 		} catch (AmqpDeclareException e) {
@@ -227,9 +227,9 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		this.hasErrorMsgExchange = true;
 	}
 
-	private void declareErrorMsgQueueName(OperationalChannel opChannel) {
+	private void declareErrorMsgQueueName(DeclareOperator operator) {
 		try {
-			this.errorMsgQueue.declare(opChannel);
+			this.errorMsgQueue.declare(operator);
 		} catch (AmqpDeclareException e) {
 			logger.error(
 					"ErrorMsgQueue declare throw exception -> connection configurator info : {}, error message : {}",
@@ -362,9 +362,8 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 
 	@Override
 	public boolean destroy() {
-		logger.info("Call method destroy() for Receiver tag==[{}]", tag);
-		closeConnection();
-		return true;
+		logger.info("Call method destroy() from Receiver name==[{}]", receiverName);
+		return super.destroy();
 	}
 
 	@Override
@@ -372,17 +371,17 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		return receiverName;
 	}
 
+	@Override
+	public void reconnect() {
+		closeAndReconnection();
+		receive();
+	}
+
 	public static void main(String[] args) {
 		RabbitMqReceiver<byte[]> receiver = RabbitMqReceiver.create("test", RmqReceiverConfigurator
 				.configuration(RmqConnection.configuration("", 5672, "", "").build(), QueueDeclare.named("")).build(),
 				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
-	}
-
-	@Override
-	public void reconnect() {
-		closeAndReconnection();
-		receive();
 	}
 
 }

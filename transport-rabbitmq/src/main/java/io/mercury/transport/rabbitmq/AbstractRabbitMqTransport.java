@@ -1,9 +1,10 @@
 package io.mercury.transport.rabbitmq;
 
 import static io.mercury.common.util.StringUtil.isNullOrEmpty;
-import static java.time.LocalDateTime.now;
 
+import java.io.Closeable;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Nonnull;
@@ -25,7 +26,7 @@ import io.mercury.common.util.StringUtil;
 import io.mercury.transport.core.TransportModule;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 
-abstract class AbstractRabbitMqTransport implements TransportModule {
+public abstract class AbstractRabbitMqTransport implements TransportModule, Closeable {
 
 	// 连接RabbitMQ Server使用的组件
 	protected ConnectionFactory connectionFactory;
@@ -43,7 +44,7 @@ abstract class AbstractRabbitMqTransport implements TransportModule {
 
 	protected String tag;
 
-	AbstractRabbitMqTransport() {
+	protected AbstractRabbitMqTransport() {
 		// Generally not used
 	}
 
@@ -51,8 +52,8 @@ abstract class AbstractRabbitMqTransport implements TransportModule {
 	 * @param tag
 	 * @param configurator
 	 */
-	AbstractRabbitMqTransport(String tag, @Nonnull String moduleType, @Nonnull RmqConnection rmqConnection) {
-		this.tag = isNullOrEmpty(tag) ? moduleType + "-" + now() : tag;
+	protected AbstractRabbitMqTransport(String tag, @Nonnull String moduleType, @Nonnull RmqConnection rmqConnection) {
+		this.tag = isNullOrEmpty(tag) ? moduleType + "-" + Instant.now() : tag;
 		this.rmqConnection = Assertor.nonNull(rmqConnection, "rmqConnection");
 		this.shutdownEvent = rmqConnection.shutdownEvent();
 	}
@@ -146,6 +147,23 @@ abstract class AbstractRabbitMqTransport implements TransportModule {
 		} catch (TimeoutException e) {
 			logger.error("Method closeConnection() throw TimeoutException -> {}", e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public boolean destroy() {
+		logger.info("Call method destroy() from AbstractRabbitMqTransport tag==[{}]", tag);
+		closeConnection();
+		return true;
+	}
+
+	@Override
+	public void close() throws IOException {
+		destroy();
+	}
+
+	@Override
+	public String name() {
+		return tag;
 	}
 
 }
