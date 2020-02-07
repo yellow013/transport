@@ -3,6 +3,8 @@ package io.mercury.transport.rabbitmq;
 import java.io.IOException;
 import java.util.function.Function;
 
+import com.rabbitmq.client.GetResponse;
+
 import io.mercury.codec.json.JsonEncoder;
 import io.mercury.common.character.Charsets;
 import io.mercury.common.collections.queue.api.Queue;
@@ -51,12 +53,27 @@ public class RabbitQueue<E> implements Queue<E> {
 	@Override
 	public boolean enqueue(E e) {
 		try {
-			byte[] apply = serializer.apply(e);
-			generalChannel.getChannel().basicPublish("", queueName, null, apply);
+			byte[] msg = serializer.apply(e);
+			generalChannel.getChannel().basicPublish("", queueName, null, msg);
 			return true;
 		} catch (IOException e1) {
 			return false;
 		}
+	}
+
+	@Override
+	public E poll() {
+		GetResponse basicGet;
+		try {
+			basicGet = generalChannel.getChannel().basicGet(queueName, false);
+			byte[] body = basicGet.getBody();
+			generalChannel.getChannel().basicAck(basicGet.getEnvelope().getDeliveryTag(), true);
+			// TODO
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override
