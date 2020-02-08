@@ -1,8 +1,6 @@
 package io.mercury.transport.rabbitmq.consumer;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -14,6 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.eclipse.collections.api.list.MutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +21,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import io.mercury.common.collections.MutableLists;
 import io.mercury.common.util.Assertor;
 
 /**
@@ -34,7 +34,7 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 
 	private Channel channel;
 
-	private QosBatchCallBack<List<T>> qosBatchCallBack;
+	private QosBatchHandler<T> qosBatchHandler;
 
 	private QueueMessageDeserializer<T> deserializer;
 
@@ -47,7 +47,7 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 	 */
 	private long millisSecond = 500L;
 	/**
-	 * 上一次的cache -> (linkedList) 大小
+	 * 上一次的buffer -> (bufferList) 大小
 	 */
 	private long lastSize;
 
@@ -59,7 +59,7 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 
 	private ReentrantLock lock;
 
-	private List<T> linkedList;
+	private MutableList<T> bufferList;
 
 	private Predicate<T> filter;
 
@@ -76,13 +76,13 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 	 * @param qosBatchCallBack 当达到prefetchCount值或自动flush触发此回调
 	 */
 	public QosBatchProcessConsumer(Channel channel, int prefetchCount, long millisSecond,
-			QosBatchCallBack<List<T>> qosBatchCallBack, QueueMessageDeserializer<T> deserializer,
+			QosBatchHandler<T> qosBatchHandler, QueueMessageDeserializer<T> deserializer,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
 		super(channel);
 		this.channel = channel;
 		this.refreshNowEvent = refreshNowEvent;
 		this.filter = filter;
-		this.qosBatchCallBack = Assertor.nonNull(qosBatchCallBack, "qosBatchCallBack");
+		this.qosBatchHandler = Assertor.nonNull(qosBatchHandler, "qosBatchHandler");
 		this.deserializer = Assertor.nonNull(deserializer, "deserializer");
 		this.prefetchCount = prefetchCount;
 		if (millisSecond > 0) {
@@ -94,10 +94,10 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 	}
 
 	public QosBatchProcessConsumer(Channel channel, QueueMessageDeserializer<T> serializable,
-			QosBatchCallBack<List<T>> qosBatchCallBack) {
+			QosBatchHandler<T> qosBatchHandler) {
 		super(channel);
 		this.channel = channel;
-		this.qosBatchCallBack = Assertor.nonNull(qosBatchCallBack, "qosBatchCallBack");
+		this.qosBatchHandler = Assertor.nonNull(qosBatchHandler, "qosBatchHandler");
 		this.deserializer = Assertor.nonNull(serializable, "deserializer");
 		init();
 	}
@@ -110,7 +110,8 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 			return;
 		}
 		this.cacheSize = new LongAdder();
-		linkedList = new LinkedList<>();
+		bufferList = MutableLists.newFastList();
+
 		lock = new ReentrantLock();
 		ThreadFactory namedThreadFactory = new BasicThreadFactory.Builder()
 				.namingPattern("BatchHandlerAutoFlush-pool-%d").build();
@@ -138,7 +139,7 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 		this.lastDeliveryTag = lastDeliveryTag;
 		if (Objects.nonNull(t)) {
 			cacheSize.increment();
-			linkedList.add(t);
+			bufferList.add(t);
 		}
 		if (cacheSize.longValue() >= prefetchCount) {
 			log.info("The message to be stored reaches the threshold[{}] -> {} , local deliveryTag[{}] ",
@@ -158,13 +159,12 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 		lock.lock();
 		try {
 			if (cacheSize.longValue() != 0) {
-				Boolean batchResult = qosBatchCallBack.apply(linkedList);
-				if (batchResult != null && batchResult) {
+				if (qosBatchHandler.handle(bufferList)) {
 					channel.basicAck(lastDeliveryTag, true);
 					log.info("ack tag -> {}", lastDeliveryTag);
-					linkedList.clear();
+					bufferList.clear();
 					cacheSize.reset();
-					log.info("cache clear, current size -> {}, cache -> {} , local tag -> {}", linkedList.size(),
+					log.info("cache clear, current size -> {}, cache -> {} , local tag -> {}", bufferList.size(),
 							cacheSize.longValue(), lastDeliveryTag);
 				}
 			}
@@ -182,7 +182,7 @@ public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 	 * schedule task : 如果缓存中的数据长期没有变动,触发flush动作 1.
 	 * 当缓存队列中的值等于上一次定时任务触发的值,并且该值大于0,不等于rmq预取值,则认为该缓存数据长期没有变动,立即触发回调.
 	 * <p>
-	 * 缓存值达到预取值得大小交给主线程去触发刷新.减少锁的竞争.
+	 * 缓存值达到预取值的大小交给主线程去触发刷新.减少锁的竞争.
 	 */
 	private void automaticFlush() {
 		schedule.scheduleWithFixedDelay(() -> {

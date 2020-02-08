@@ -9,8 +9,11 @@ import java.util.function.Predicate;
 @FunctionalInterface
 public interface RefreshNowEvent<T> extends Predicate<T> {
 
-	default boolean flushNow(T obj) {
-		return test(obj);
+	boolean flushNow(T obj);
+
+	@Override
+	default boolean test(T t) {
+		return flushNow(t);
 	}
 
 }
