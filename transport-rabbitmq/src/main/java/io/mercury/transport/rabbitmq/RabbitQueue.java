@@ -1,49 +1,52 @@
 package io.mercury.transport.rabbitmq;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.function.Function;
+
+import org.slf4j.Logger;
 
 import com.rabbitmq.client.GetResponse;
 
 import io.mercury.codec.json.JsonEncoder;
 import io.mercury.common.character.Charsets;
 import io.mercury.common.collections.queue.api.Queue;
+import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
-public class RabbitQueue<E> implements Queue<E> {
+public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	private RmqConnection connection;
-
-	private io.mercury.transport.rabbitmq.declare.entity.Queue queue;
-
+	private RabbitMqGeneralChannel generalChannel;
 	private String queueName;
 
-	private RabbitMqGeneralChannel generalChannel;
-
 	private Function<E, byte[]> serializer;
+	private Function<byte[], E> deserializer;
 
 	private String name;
 
-	public RabbitQueue(RmqConnection connection, io.mercury.transport.rabbitmq.declare.entity.Queue queue)
-			throws AmqpDeclareException {
-		this(connection, queue, e -> JsonEncoder.toJson(e).getBytes(Charsets.UTF8));
+	private Logger logger = CommonLoggerFactory.getLogger(getClass());
+
+	@SuppressWarnings("unchecked")
+	public RabbitQueue(RmqConnection connection, String queueName) throws AmqpDeclareException {
+		this(connection, queueName, e -> JsonEncoder.toJson(e).getBytes(Charsets.UTF8),
+				bytes -> (E) new String(bytes, Charsets.UTF8));
 	}
 
-	public RabbitQueue(RmqConnection connection, io.mercury.transport.rabbitmq.declare.entity.Queue queue,
-			Function<E, byte[]> serializer) throws AmqpDeclareException {
-		super();
+	public RabbitQueue(RmqConnection connection, String queueName, Function<E, byte[]> serializer,
+			Function<byte[], E> deserializer) throws AmqpDeclareException {
 		this.connection = connection;
-		this.queue = queue;
+		this.queueName = queueName;
 		this.serializer = serializer;
-		this.queueName = queue.name();
 		this.generalChannel = RabbitMqGeneralChannel.create(connection);
 		declareQueue();
 		buildName();
 	}
 
 	private void declareQueue() throws AmqpDeclareException {
-		DeclareOperator.ofChannel(generalChannel.getChannel()).declareQueue(queue);
+		DeclareOperator.ofChannel(generalChannel.getChannel())
+				.declareQueue(io.mercury.transport.rabbitmq.declare.entity.Queue.named(queueName));
 	}
 
 	private void buildName() {
@@ -52,33 +55,75 @@ public class RabbitQueue<E> implements Queue<E> {
 
 	@Override
 	public boolean enqueue(E e) {
+		byte[] msg = serializer.apply(e);
 		try {
-			byte[] msg = serializer.apply(e);
 			generalChannel.getChannel().basicPublish("", queueName, null, msg);
 			return true;
-		} catch (IOException e1) {
+		} catch (IOException ioe) {
+			logger.error("enqueue basicPublish throw -> {}", ioe.getMessage(), ioe);
 			return false;
 		}
 	}
 
 	@Override
 	public E poll() {
-		GetResponse basicGet;
+		GetResponse response = null;
 		try {
-			basicGet = generalChannel.getChannel().basicGet(queueName, false);
-			byte[] body = basicGet.getBody();
-			generalChannel.getChannel().basicAck(basicGet.getEnvelope().getDeliveryTag(), true);
-			// TODO
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response = generalChannel.getChannel().basicGet(queueName, false);
+		} catch (IOException ioe) {
+			logger.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
+			return null;
 		}
-		return null;
+		byte[] body = response.getBody();
+		if (body != null) {
+			try {
+				generalChannel.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), true);
+			} catch (IOException ioe) {
+				logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
+				return null;
+			}
+			return deserializer.apply(body);
+		} else
+			return null;
+	}
+
+	@Override
+	public boolean pollAndApply(PollFunction<E> function) {
+		GetResponse response = null;
+		try {
+			response = generalChannel.getChannel().basicGet(queueName, false);
+		} catch (IOException ioe) {
+			logger.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
+			return false;
+		}
+		byte[] body = response.getBody();
+		if (body != null) {
+			E e = deserializer.apply(body);
+			boolean apply = function.apply(e);
+			if (apply) {
+				try {
+					generalChannel.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), true);
+					return true;
+				} catch (IOException ioe) {
+					logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
+					return false;
+				}
+			} else {
+				logger.error("PollFunction failure, no ack");
+				return false;
+			}
+		} else
+			return false;
 	}
 
 	@Override
 	public String name() {
 		return name;
+	}
+
+	@Override
+	public void close() throws IOException {
+		generalChannel.close();
 	}
 
 }

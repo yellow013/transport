@@ -1,14 +1,13 @@
 package io.mercury.transport.rabbitmq;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
-import io.mercury.transport.rabbitmq.consumer.QosBatchCallBack;
+import io.mercury.transport.rabbitmq.consumer.QosBatchHandler;
 import io.mercury.transport.rabbitmq.consumer.QosBatchProcessConsumer;
 import io.mercury.transport.rabbitmq.consumer.QueueMessageDeserializer;
 import io.mercury.transport.rabbitmq.consumer.RefreshNowEvent;
@@ -36,24 +35,24 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 	private QosBatchProcessConsumer<T> consumer;
 
 	public RabbitMqQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
-			QueueMessageDeserializer<T> deserializer, QosBatchCallBack<List<T>> callBack,
+			QueueMessageDeserializer<T> deserializer, QosBatchHandler<T> qosBatchHandler,
 			RefreshNowEvent<T> refreshNowEvent, Predicate<T> filter) {
 		super(tag, "QosBatchReceiver", configurator.connection());
 		this.receiveQueue = configurator.receiveQueue().queue().name();
 		createConnection();
 		queueDeclare();
-		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, callBack,
+		consumer = new QosBatchProcessConsumer<T>(super.channel, configurator.qos(), autoFlushInterval, qosBatchHandler,
 				deserializer, refreshNowEvent, filter);
 	}
 
 	public RabbitMqQosBatchReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator, long autoFlushInterval,
-			QueueMessageDeserializer<T> deserializer, QosBatchCallBack<List<T>> callBack,
+			QueueMessageDeserializer<T> deserializer, QosBatchHandler<T> qosBatchHandler,
 			RefreshNowEvent<T> refreshNowEvent) {
 		super(tag, "QosBatchReceiver", configurator.connection());
 		this.receiveQueue = configurator.receiveQueue().queue().name();
 		createConnection();
 		queueDeclare();
-		consumer = new QosBatchProcessConsumer<T>(channel, configurator.qos(), autoFlushInterval, callBack,
+		consumer = new QosBatchProcessConsumer<T>(channel, configurator.qos(), autoFlushInterval, qosBatchHandler,
 				deserializer, refreshNowEvent, null);
 	}
 
