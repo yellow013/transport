@@ -39,6 +39,7 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 		this.connection = connection;
 		this.queueName = queueName;
 		this.serializer = serializer;
+		this.deserializer = deserializer;
 		this.generalChannel = RabbitMqGeneralChannel.create(connection);
 		declareQueue();
 		buildName();
@@ -96,24 +97,26 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 			logger.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
 			return false;
 		}
+		if (response == null)
+			return false;
 		byte[] body = response.getBody();
-		if (body != null) {
-			E e = deserializer.apply(body);
-			boolean apply = function.apply(e);
-			if (apply) {
-				try {
-					generalChannel.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), true);
-					return true;
-				} catch (IOException ioe) {
-					logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
-					return false;
-				}
-			} else {
-				logger.error("PollFunction failure, no ack");
+		if (body == null) {
+			return false;
+		}
+		E e = deserializer.apply(body);
+		boolean apply = function.apply(e);
+		if (apply) {
+			try {
+				generalChannel.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), true);
+				return true;
+			} catch (IOException ioe) {
+				logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
 				return false;
 			}
-		} else
+		} else {
+			logger.error("PollFunction failure, no ack");
 			return false;
+		}
 	}
 
 	@Override
