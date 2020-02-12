@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 
-import io.mercury.codec.json.JsonEncoder;
+import io.mercury.codec.json.JsonUtil;
 import io.mercury.common.annotation.lang.MayThrowsRuntimeException;
 import io.mercury.common.log.CommonLoggerFactory;
 import okhttp3.MediaType;
@@ -48,7 +48,7 @@ public class HttpRequester {
 
 	@MayThrowsRuntimeException
 	public String post(String url, Object obj) throws IOException {
-		RequestBody body = RequestBody.create(JsonEncoder.toJson(obj), APPLICATION_JSON);
+		RequestBody body = RequestBody.create(JsonUtil.toJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
 		try (Response response = client.newCall(request).execute()) {
 			if (response == null)

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 
 import com.rabbitmq.client.GetResponse;
 
-import io.mercury.codec.json.JsonEncoder;
+import io.mercury.codec.json.JsonUtil;
 import io.mercury.common.character.Charsets;
 import io.mercury.common.collections.queue.api.Queue;
 import io.mercury.common.log.CommonLoggerFactory;
@@ -30,7 +30,7 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	@SuppressWarnings("unchecked")
 	public RabbitQueue(RmqConnection connection, String queueName) throws AmqpDeclareException {
-		this(connection, queueName, e -> JsonEncoder.toJson(e).getBytes(Charsets.UTF8),
+		this(connection, queueName, e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8),
 				bytes -> (E) new String(bytes, Charsets.UTF8));
 	}
 
