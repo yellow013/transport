@@ -7,24 +7,24 @@ import io.mercury.common.annotation.lang.ProtectedAbstractMethod;
 import io.mercury.common.collections.MutableLists;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.DeclareOperator;
-import io.mercury.transport.rabbitmq.declare.entity.Binding;
-import io.mercury.transport.rabbitmq.declare.entity.Exchange;
-import io.mercury.transport.rabbitmq.declare.entity.Queue;
+import io.mercury.transport.rabbitmq.declare.Binding;
+import io.mercury.transport.rabbitmq.declare.Exchange;
+import io.mercury.transport.rabbitmq.declare.Queue;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
-public abstract class Relationship {
+public abstract class Relation {
 
 	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
 
 	protected MutableList<Binding> bindings = MutableLists.newFastList();
 
-	public void declare(DeclareOperator channel) throws AmqpDeclareException {
-		declare0(channel);
+	public void declare(DeclareOperator operator) throws AmqpDeclareException {
+		declare0(operator);
 		for (Binding binding : bindings)
-			handleBinding(channel, binding);
+			declareBinding(operator, binding);
 	}
 
-	private void handleBinding(DeclareOperator operator, Binding binding) throws AmqpDeclareException {
+	private void declareBinding(DeclareOperator operator, Binding binding) throws AmqpDeclareException {
 		Exchange source = binding.source();
 		try {
 			operator.declareExchange(source);
@@ -38,32 +38,32 @@ public abstract class Relationship {
 			Exchange destExchange = binding.destExchange();
 			try {
 				operator.declareExchange(destExchange);
-			} catch (AmqpDeclareException e) {
+			} catch (AmqpDeclareException exception) {
 				logger.error("Declare dest exchange failure -> {}", destExchange);
-				throw e;
+				throw exception;
 			}
 			try {
 				operator.bindExchange(destExchange.name(), source.name(), routingKey);
-			} catch (AmqpDeclareException e) {
+			} catch (AmqpDeclareException exception) {
 				logger.error("Declare bind exchange failure -> dest==[{}], source==[{}], routingKey==[{}]",
 						destExchange, source, routingKey);
-				throw e;
+				throw exception;
 			}
 			break;
 		case Queue:
 			Queue destQueue = binding.destQueue();
 			try {
 				operator.declareQueue(destQueue);
-			} catch (AmqpDeclareException e) {
+			} catch (AmqpDeclareException exception) {
 				logger.error("Declare dest queue failure -> {}", destQueue);
-				throw e;
+				throw exception;
 			}
 			try {
 				operator.bindQueue(destQueue.name(), source.name(), routingKey);
-			} catch (AmqpDeclareException e) {
+			} catch (AmqpDeclareException exception) {
 				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue,
 						source, routingKey);
-				throw e;
+				throw exception;
 			}
 			break;
 		default:

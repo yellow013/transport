@@ -6,9 +6,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import io.mercury.transport.rabbitmq.DeclareOperator;
-import io.mercury.transport.rabbitmq.declare.entity.Binding;
-import io.mercury.transport.rabbitmq.declare.entity.Exchange;
-import io.mercury.transport.rabbitmq.declare.entity.Queue;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 /**
@@ -17,29 +14,29 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
  * @author yellow013
  *
  */
-public class ExchangeDeclare extends Relationship {
+public class ExchangeRelation extends Relation {
 
-	public final static ExchangeDeclare Anonymous = new ExchangeDeclare(Exchange.Anonymous);
+	public final static ExchangeRelation Anonymous = new ExchangeRelation(Exchange.Anonymous);
 
 	private Exchange exchange;
 
-	public static ExchangeDeclare fanout(@Nonnull String exchangeName) {
-		return new ExchangeDeclare(Exchange.fanout(exchangeName));
+	public static ExchangeRelation fanout(@Nonnull String exchangeName) {
+		return new ExchangeRelation(Exchange.fanout(exchangeName));
 	}
 
-	public static ExchangeDeclare direct(@Nonnull String exchangeName) {
-		return new ExchangeDeclare(Exchange.direct(exchangeName));
+	public static ExchangeRelation direct(@Nonnull String exchangeName) {
+		return new ExchangeRelation(Exchange.direct(exchangeName));
 	}
 
-	public static ExchangeDeclare topic(@Nonnull String exchangeName) {
-		return new ExchangeDeclare(Exchange.topic(exchangeName));
+	public static ExchangeRelation topic(@Nonnull String exchangeName) {
+		return new ExchangeRelation(Exchange.topic(exchangeName));
 	}
 
-	public static ExchangeDeclare ofExchange(@Nonnull Exchange exchange) {
-		return new ExchangeDeclare(exchange);
+	public static ExchangeRelation withExchange(@Nonnull Exchange exchange) {
+		return new ExchangeRelation(exchange);
 	}
 
-	private ExchangeDeclare(Exchange exchange) {
+	private ExchangeRelation(Exchange exchange) {
 		this.exchange = exchange;
 	}
 
@@ -69,26 +66,26 @@ public class ExchangeDeclare extends Relationship {
 		return exchange.name();
 	}
 
-	public ExchangeDeclare durable(boolean durable) {
+	public ExchangeRelation durable(boolean durable) {
 		exchange.durable(durable);
 		return this;
 	}
 
-	public ExchangeDeclare autoDelete(boolean autoDelete) {
+	public ExchangeRelation autoDelete(boolean autoDelete) {
 		exchange.autoDelete(autoDelete);
 		return this;
 	}
 
-	public ExchangeDeclare internal(boolean internal) {
+	public ExchangeRelation internal(boolean internal) {
 		exchange.internal(internal);
 		return this;
 	}
 
-	public ExchangeDeclare bindingExchange(Exchange... exchanges) {
+	public ExchangeRelation bindingExchange(Exchange... exchanges) {
 		return bindingExchange(exchanges != null ? Arrays.asList(exchanges) : null, null);
 	}
 
-	public ExchangeDeclare bindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
+	public ExchangeRelation bindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (routingKeys != null)
@@ -100,11 +97,11 @@ public class ExchangeDeclare extends Relationship {
 		return this;
 	}
 
-	public ExchangeDeclare bindingQueue(Queue... queues) {
+	public ExchangeRelation bindingQueue(Queue... queues) {
 		return bindingQueue(queues != null ? Arrays.asList(queues) : null, null);
 	}
 
-	public ExchangeDeclare bindingQueue(List<Queue> queues, List<String> routingKeys) {
+	public ExchangeRelation bindingQueue(List<Queue> queues, List<String> routingKeys) {
 		if (queues != null) {
 			queues.forEach(queue -> {
 				if (routingKeys != null)
@@ -118,7 +115,7 @@ public class ExchangeDeclare extends Relationship {
 
 	public static void main(String[] args) {
 
-		ExchangeDeclare.direct("TEST_DIRECT").autoDelete(true).internal(true);
+		ExchangeRelation.direct("TEST_DIRECT").autoDelete(true).internal(true);
 
 	}
 

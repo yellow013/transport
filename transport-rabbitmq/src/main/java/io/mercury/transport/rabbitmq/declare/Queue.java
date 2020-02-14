@@ -1,4 +1,4 @@
-package io.mercury.transport.rabbitmq.declare.entity;
+package io.mercury.transport.rabbitmq.declare;
 
 import static java.lang.String.valueOf;
 

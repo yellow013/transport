@@ -1,4 +1,4 @@
-package io.mercury.transport.rabbitmq.declare.entity;
+package io.mercury.transport.rabbitmq.declare;
 
 import static java.lang.String.valueOf;
 
@@ -31,6 +31,9 @@ public final class Exchange {
 		return new Exchange(ExchangeType.Topic, name);
 	}
 
+	/**
+	 * The Anonymous Exchange
+	 */
 	public static final Exchange Anonymous = new Exchange(ExchangeType.Anonymous, "");
 
 	private Exchange(ExchangeType type, String name) {

@@ -4,9 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.mercury.transport.rabbitmq.DeclareOperator;
-import io.mercury.transport.rabbitmq.declare.entity.Binding;
-import io.mercury.transport.rabbitmq.declare.entity.Exchange;
-import io.mercury.transport.rabbitmq.declare.entity.Queue;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 /**
@@ -15,19 +12,19 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
  * @author yellow013
  *
  */
-public class QueueDeclare extends Relationship {
+public class QueueRelation extends Relation {
 
 	private Queue queue;
 
-	public static QueueDeclare named(String queueName) {
-		return new QueueDeclare(Queue.named(queueName));
+	public static QueueRelation named(String queueName) {
+		return new QueueRelation(Queue.named(queueName));
 	}
 
-	public static QueueDeclare with(Queue queue) {
-		return new QueueDeclare(queue);
+	public static QueueRelation with(Queue queue) {
+		return new QueueRelation(queue);
 	}
 
-	private QueueDeclare(Queue queue) {
+	private QueueRelation(Queue queue) {
 		this.queue = queue;
 	}
 
@@ -57,26 +54,26 @@ public class QueueDeclare extends Relationship {
 		return queue.name();
 	}
 
-	public QueueDeclare durable(boolean durable) {
+	public QueueRelation durable(boolean durable) {
 		queue.durable(durable);
 		return this;
 	}
 
-	public QueueDeclare autoDelete(boolean autoDelete) {
+	public QueueRelation autoDelete(boolean autoDelete) {
 		queue.autoDelete(autoDelete);
 		return this;
 	}
 
-	public QueueDeclare exclusive(boolean exclusive) {
+	public QueueRelation exclusive(boolean exclusive) {
 		queue.exclusive(exclusive);
 		return this;
 	}
 
-	public QueueDeclare binding(Exchange... exchanges) {
+	public QueueRelation binding(Exchange... exchanges) {
 		return binding(exchanges != null ? Arrays.asList(exchanges) : null, null);
 	}
 
-	public QueueDeclare binding(List<Exchange> exchanges, List<String> routingKeys) {
+	public QueueRelation binding(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (routingKeys != null)
