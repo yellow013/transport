@@ -28,13 +28,18 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	private Logger logger = CommonLoggerFactory.getLogger(getClass());
 
-	@SuppressWarnings("unchecked")
-	public RabbitQueue(RmqConnection connection, String queueName) throws AmqpDeclareException {
-		this(connection, queueName, e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8),
-				bytes -> (E) new String(bytes, Charsets.UTF8));
+	public static final RabbitQueue<String> newQueue(RmqConnection connection, String queueName)
+			throws AmqpDeclareException {
+		return new RabbitQueue<>(connection, queueName, e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8),
+				bytes -> new String(bytes, Charsets.UTF8));
 	}
 
-	public RabbitQueue(RmqConnection connection, String queueName, Function<E, byte[]> serializer,
+	public static final <E> RabbitQueue<E> newQueue(RmqConnection connection, String queueName,
+			Function<E, byte[]> serializer, Function<byte[], E> deserializer) throws AmqpDeclareException {
+		return new RabbitQueue<>(connection, queueName, serializer, deserializer);
+	}
+
+	private RabbitQueue(RmqConnection connection, String queueName, Function<E, byte[]> serializer,
 			Function<byte[], E> deserializer) throws AmqpDeclareException {
 		this.connection = connection;
 		this.queueName = queueName;
@@ -47,7 +52,7 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	private void declareQueue() throws AmqpDeclareException {
 		DeclareOperator.ofChannel(generalChannel.getChannel())
-				.declareQueue(io.mercury.transport.rabbitmq.declare.entity.Queue.named(queueName));
+				.declareQueue(io.mercury.transport.rabbitmq.declare.Queue.named(queueName));
 	}
 
 	private void buildName() {

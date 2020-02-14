@@ -59,7 +59,7 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	}
 
 	protected void createConnection() {
-		logger.info("Call method createConnection()");
+		logger.info("Create connection started");
 		if (connectionFactory == null) {
 			connectionFactory = new ConnectionFactory();
 			connectionFactory.setHost(rmqConnection.host());
@@ -78,24 +78,25 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 		}
 		try {
 			connection = connectionFactory.newConnection();
-			logger.debug("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}", tag,
+			connection.setId(tag + "-" + System.nanoTime());
+			logger.info("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}", tag,
 					connection.getId());
-			connection.addShutdownListener(shutdownSignalException -> {
-				// 输出错误信息到控制台
-				logger.info("Call lambda shutdown listener message -> {}", shutdownSignalException.getMessage());
-				if (isNormalShutdown(shutdownSignalException))
-					logger.info("{} -> is normal shutdown", tag);
+			connection.addShutdownListener(shutdownSignal -> {
+				// 输出信号到控制台
+				logger.info("Shutdown listener message -> {}", shutdownSignal.getMessage());
+				if (isNormalShutdown(shutdownSignal))
+					logger.info("connection id -> {}, is normal shutdown", connection.getId());
 				else {
-					logger.info("{} -> not normal shutdown", tag);
+					logger.error("connection id -> {}, not normal shutdown", connection.getId());
 					// 如果回调函数不为null, 则执行此函数
 					if (shutdownEvent != null)
-						shutdownEvent.accept(shutdownSignalException);
+						shutdownEvent.accept(shutdownSignal);
 				}
 			});
 			channel = connection.createChannel();
-			logger.debug("Call method connection.createChannel() finished, tag -> {}, channel number -> {}", tag,
-					channel.getChannelNumber());
-			logger.debug("All connection call method successful...");
+			logger.info("Call method connection.createChannel() finished, connection id -> {}, channel number -> {}",
+					connection.getId(), channel.getChannelNumber());
+			logger.info("Create connection finished");
 		} catch (IOException e) {
 			logger.error("Method createConnection() throw IOException -> {}", e.getMessage(), e);
 		} catch (TimeoutException e) {

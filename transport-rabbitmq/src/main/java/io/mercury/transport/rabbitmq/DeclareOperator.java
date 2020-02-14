@@ -11,8 +11,8 @@ import com.rabbitmq.client.Channel;
 
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
-import io.mercury.transport.rabbitmq.declare.entity.Exchange;
-import io.mercury.transport.rabbitmq.declare.entity.Queue;
+import io.mercury.transport.rabbitmq.declare.Exchange;
+import io.mercury.transport.rabbitmq.declare.Queue;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 public final class DeclareOperator extends AbstractRabbitMqTransport {
