@@ -2,6 +2,8 @@ package io.mercury.transport.rabbitmq.declare;
 
 import static java.lang.String.valueOf;
 
+import io.mercury.common.util.Assertor;
+
 public final class Exchange {
 
 	public static enum ExchangeType {
@@ -20,15 +22,15 @@ public final class Exchange {
 	private boolean internal = false;
 
 	public static Exchange fanout(String name) {
-		return new Exchange(ExchangeType.Fanout, name);
+		return new Exchange(ExchangeType.Fanout, Assertor.nonNullAndEmpty(name, "name"));
 	}
 
 	public static Exchange direct(String name) {
-		return new Exchange(ExchangeType.Direct, name);
+		return new Exchange(ExchangeType.Direct, Assertor.nonNullAndEmpty(name, "name"));
 	}
 
 	public static Exchange topic(String name) {
-		return new Exchange(ExchangeType.Topic, name);
+		return new Exchange(ExchangeType.Topic, Assertor.nonNullAndEmpty(name, "name"));
 	}
 
 	/**

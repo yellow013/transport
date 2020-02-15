@@ -2,6 +2,8 @@ package io.mercury.transport.rabbitmq.declare;
 
 import static java.lang.String.valueOf;
 
+import io.mercury.common.util.Assertor;
+
 public final class Queue {
 
 	private String name;
@@ -13,7 +15,7 @@ public final class Queue {
 	private boolean autoDelete = false;
 
 	public static Queue named(String name) {
-		return new Queue(name);
+		return new Queue(Assertor.nonNullAndEmpty(name, "name"));
 	}
 
 	private Queue(String name) {
