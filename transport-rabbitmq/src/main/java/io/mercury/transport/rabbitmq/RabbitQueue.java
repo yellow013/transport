@@ -2,24 +2,32 @@ package io.mercury.transport.rabbitmq;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
+import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.GetResponse;
 
 import io.mercury.codec.json.JsonUtil;
 import io.mercury.common.character.Charsets;
+import io.mercury.common.collections.MutableLists;
 import io.mercury.common.collections.queue.api.Queue;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
+import io.mercury.transport.rabbitmq.declare.Exchange;
+import io.mercury.transport.rabbitmq.declare.QueueRelation;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	private RmqConnection connection;
-	private RabbitMqGeneralChannel generalChannel;
+	private RabbitMqChannel rabbitMqChannel;
 	private String queueName;
+	private List<String> exchangeNames;
+	private List<String> routingKeys;
 
 	private Function<E, byte[]> serializer;
 	private Function<byte[], E> deserializer;
@@ -30,29 +38,56 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	public static final RabbitQueue<String> newQueue(RmqConnection connection, String queueName)
 			throws AmqpDeclareException {
-		return new RabbitQueue<>(connection, queueName, e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8),
-				bytes -> new String(bytes, Charsets.UTF8));
+		return new RabbitQueue<>(connection, queueName, MutableLists.emptyFastList(), MutableLists.emptyFastList(),
+				e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8), bytes -> new String(bytes, Charsets.UTF8));
+	}
+
+	public static final RabbitQueue<String> newQueue(RmqConnection connection, String queueName,
+			List<String> exchangeNames) throws AmqpDeclareException {
+		return new RabbitQueue<>(connection, queueName, exchangeNames, MutableLists.emptyFastList(),
+				e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8), bytes -> new String(bytes, Charsets.UTF8));
+	}
+
+	public static final RabbitQueue<String> newQueue(RmqConnection connection, String queueName,
+			List<String> exchangeNames, List<String> routingKeys) throws AmqpDeclareException {
+		return new RabbitQueue<>(connection, queueName, exchangeNames, routingKeys,
+				e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8), bytes -> new String(bytes, Charsets.UTF8));
 	}
 
 	public static final <E> RabbitQueue<E> newQueue(RmqConnection connection, String queueName,
 			Function<E, byte[]> serializer, Function<byte[], E> deserializer) throws AmqpDeclareException {
-		return new RabbitQueue<>(connection, queueName, serializer, deserializer);
+		return new RabbitQueue<>(connection, queueName, MutableLists.emptyFastList(), MutableLists.emptyFastList(),
+				serializer, deserializer);
 	}
 
-	private RabbitQueue(RmqConnection connection, String queueName, Function<E, byte[]> serializer,
+	public static final <E> RabbitQueue<E> newQueue(RmqConnection connection, String queueName,
+			List<String> exchangeNames, List<String> routingKeys, Function<E, byte[]> serializer,
 			Function<byte[], E> deserializer) throws AmqpDeclareException {
+		return new RabbitQueue<>(connection, queueName, exchangeNames, routingKeys, serializer, deserializer);
+	}
+
+	private RabbitQueue(RmqConnection connection, String queueName, List<String> exchangeNames,
+			List<String> routingKeys, Function<E, byte[]> serializer, Function<byte[], E> deserializer)
+			throws AmqpDeclareException {
 		this.connection = connection;
 		this.queueName = queueName;
+		this.exchangeNames = exchangeNames;
+		this.routingKeys = routingKeys;
 		this.serializer = serializer;
 		this.deserializer = deserializer;
-		this.generalChannel = RabbitMqGeneralChannel.create(connection);
+		this.rabbitMqChannel = RabbitMqChannel.create(connection);
 		declareQueue();
 		buildName();
 	}
 
 	private void declareQueue() throws AmqpDeclareException {
-		DeclareOperator.ofChannel(generalChannel.getChannel())
-				.declareQueue(io.mercury.transport.rabbitmq.declare.Queue.named(queueName));
+		QueueRelation queueRelation = QueueRelation.with(io.mercury.transport.rabbitmq.declare.Queue.named(queueName))
+				.binding(
+						// 如果routingKeys为空集合, 则创建fanout交换器, 否则创建直接交换器
+						exchangeNames.stream().map(exchangeName -> routingKeys.isEmpty() ? Exchange.fanout(exchangeName)
+								: Exchange.direct(exchangeName)).collect(Collectors.toList()),
+						routingKeys);
+		queueRelation.declare(DeclareOperator.ofChannel(rabbitMqChannel.internalChannel()));
 	}
 
 	private void buildName() {
@@ -63,7 +98,7 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 	public boolean enqueue(E e) {
 		byte[] msg = serializer.apply(e);
 		try {
-			generalChannel.getChannel().basicPublish("", queueName, null, msg);
+			rabbitMqChannel.internalChannel().basicPublish("", queueName, null, msg);
 			return true;
 		} catch (IOException ioe) {
 			logger.error("enqueue basicPublish throw -> {}", ioe.getMessage(), ioe);
@@ -73,53 +108,46 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	@Override
 	public E poll() {
-		GetResponse response = null;
-		try {
-			response = generalChannel.getChannel().basicGet(queueName, false);
-		} catch (IOException ioe) {
-			logger.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
+		GetResponse response = basicGet();
+		if (response == null)
 			return null;
-		}
 		byte[] body = response.getBody();
-		if (body != null) {
-			try {
-				generalChannel.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), true);
-			} catch (IOException ioe) {
-				logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
-				return null;
-			}
-			return deserializer.apply(body);
-		} else
+		if (body == null)
 			return null;
+		basicAck(response.getEnvelope());
+		return deserializer.apply(body);
 	}
 
 	@Override
 	public boolean pollAndApply(PollFunction<E> function) {
-		GetResponse response = null;
-		try {
-			response = generalChannel.getChannel().basicGet(queueName, false);
-		} catch (IOException ioe) {
-			logger.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
-			return false;
-		}
+		GetResponse response = basicGet();
 		if (response == null)
 			return false;
 		byte[] body = response.getBody();
-		if (body == null) {
+		if (body == null)
+			return false;
+		if (!function.apply(deserializer.apply(body))) {
+			logger.error("PollFunction failure, no ack");
 			return false;
 		}
-		E e = deserializer.apply(body);
-		boolean apply = function.apply(e);
-		if (apply) {
-			try {
-				generalChannel.getChannel().basicAck(response.getEnvelope().getDeliveryTag(), true);
-				return true;
-			} catch (IOException ioe) {
-				logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
-				return false;
-			}
-		} else {
-			logger.error("PollFunction failure, no ack");
+		return basicAck(response.getEnvelope());
+	}
+
+	private GetResponse basicGet() {
+		try {
+			return rabbitMqChannel.internalChannel().basicGet(queueName, false);
+		} catch (IOException ioe) {
+			logger.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
+			return null;
+		}
+	}
+
+	private boolean basicAck(Envelope envelope) {
+		try {
+			rabbitMqChannel.internalChannel().basicAck(envelope.getDeliveryTag(), false);
+			return true;
+		} catch (IOException ioe) {
+			logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
 			return false;
 		}
 	}
@@ -131,7 +159,7 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 
 	@Override
 	public void close() throws IOException {
-		generalChannel.close();
+		rabbitMqChannel.close();
 	}
 
 }

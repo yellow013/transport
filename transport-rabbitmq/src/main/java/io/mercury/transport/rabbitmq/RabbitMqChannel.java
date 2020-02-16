@@ -7,7 +7,7 @@ import com.rabbitmq.client.Channel;
 
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 
-public class RabbitMqGeneralChannel extends AbstractRabbitMqTransport {
+public class RabbitMqChannel extends AbstractRabbitMqTransport {
 
 	/**
 	 * Create GeneralChannel of host, port, username and password
@@ -20,7 +20,7 @@ public class RabbitMqGeneralChannel extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static RabbitMqGeneralChannel create(String host, int port, String username, String password) {
+	public static RabbitMqChannel create(String host, int port, String username, String password) {
 		return create(RmqConnection.configuration(host, port, username, password).build());
 	}
 
@@ -36,7 +36,7 @@ public class RabbitMqGeneralChannel extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static RabbitMqGeneralChannel create(String host, int port, String username, String password,
+	public static RabbitMqChannel create(String host, int port, String username, String password,
 			String virtualHost) {
 		return create(RmqConnection.configuration(host, port, username, password, virtualHost).build());
 	}
@@ -49,8 +49,8 @@ public class RabbitMqGeneralChannel extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static RabbitMqGeneralChannel create(RmqConnection connection) {
-		return new RabbitMqGeneralChannel("", connection);
+	public static RabbitMqChannel create(RmqConnection connection) {
+		return new RabbitMqChannel("", connection);
 	}
 
 	/**
@@ -59,20 +59,20 @@ public class RabbitMqGeneralChannel extends AbstractRabbitMqTransport {
 	 * @param channel
 	 * @return
 	 */
-	static RabbitMqGeneralChannel ofChannel(Channel channel) {
-		return new RabbitMqGeneralChannel(channel);
+	static RabbitMqChannel ofChannel(Channel channel) {
+		return new RabbitMqChannel(channel);
 	}
 
-	private RabbitMqGeneralChannel(String tag, RmqConnection connection) {
+	private RabbitMqChannel(String tag, RmqConnection connection) {
 		super(tag, "GeneralChannel", connection);
 		createConnection();
 	}
 
-	private RabbitMqGeneralChannel(Channel channel) {
+	private RabbitMqChannel(Channel channel) {
 		this.channel = channel;
 	}
 
-	public Channel getChannel() {
+	public Channel internalChannel() {
 		return channel;
 	}
 
