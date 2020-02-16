@@ -1,10 +1,12 @@
 package io.mercury.transport.rabbitmq.declare;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import io.mercury.common.collections.MutableLists;
 import io.mercury.transport.rabbitmq.DeclareOperator;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
@@ -82,13 +84,13 @@ public class ExchangeRelation extends Relation {
 	}
 
 	public ExchangeRelation bindingExchange(Exchange... exchanges) {
-		return bindingExchange(exchanges != null ? Arrays.asList(exchanges) : null, null);
+		return bindingExchange(exchanges != null ? MutableLists.newFastList(exchanges) : null, null);
 	}
 
 	public ExchangeRelation bindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
-				if (routingKeys != null)
+				if (CollectionUtils.isNotEmpty(routingKeys))
 					routingKeys.forEach(routingKey -> bindings.add(new Binding(this.exchange, exchange, routingKey)));
 				else
 					bindings.add(new Binding(this.exchange, exchange));
@@ -98,16 +100,18 @@ public class ExchangeRelation extends Relation {
 	}
 
 	public ExchangeRelation bindingQueue(Queue... queues) {
-		return bindingQueue(queues != null ? Arrays.asList(queues) : null, null);
+		return bindingQueue(
+				
+				queues != null ? MutableLists.newFastList(queues) : null, null);
 	}
 
 	public ExchangeRelation bindingQueue(List<Queue> queues, List<String> routingKeys) {
 		if (queues != null) {
 			queues.forEach(queue -> {
-				if (routingKeys != null)
-					routingKeys.forEach(routingKey -> bindings.add(new Binding(this.exchange, queue, routingKey)));
+				if (CollectionUtils.isNotEmpty(routingKeys))
+					routingKeys.forEach(routingKey -> bindings.add(new Binding(exchange, queue, routingKey)));
 				else
-					bindings.add(new Binding(this.exchange, queue));
+					bindings.add(new Binding(exchange, queue));
 			});
 		}
 		return this;

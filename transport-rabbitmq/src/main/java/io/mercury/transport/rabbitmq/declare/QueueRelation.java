@@ -1,8 +1,10 @@
 package io.mercury.transport.rabbitmq.declare;
 
-import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import io.mercury.common.collections.MutableLists;
 import io.mercury.transport.rabbitmq.DeclareOperator;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
@@ -70,16 +72,16 @@ public class QueueRelation extends Relation {
 	}
 
 	public QueueRelation binding(Exchange... exchanges) {
-		return binding(exchanges != null ? Arrays.asList(exchanges) : null, null);
+		return binding(exchanges != null ? MutableLists.newFastList(exchanges) : null, null);
 	}
 
 	public QueueRelation binding(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
-				if (routingKeys != null)
-					routingKeys.forEach(routingKey -> bindings.add(new Binding(exchange, this.queue, routingKey)));
+				if (CollectionUtils.isNotEmpty(routingKeys))
+					routingKeys.forEach(routingKey -> bindings.add(new Binding(exchange, queue, routingKey)));
 				else
-					bindings.add(new Binding(exchange, this.queue));
+					bindings.add(new Binding(exchange, queue));
 			});
 		}
 		return this;
