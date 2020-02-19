@@ -34,7 +34,7 @@ public final class RmqConnection implements TransportConfigurator {
 	// 请求心跳超时时间
 	private int requestedHeartbeat;
 	// 停机处理回调函数
-	private ShutdownEvent<Exception> shutdownEvent;
+	private transient ShutdownEvent<Exception> shutdownEvent;
 
 	// 配置器完整信息
 	private String fullInfo;

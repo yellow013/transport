@@ -87,7 +87,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		try {
 			if (publishExchange == ExchangeRelation.Anonymous)
 				logger.warn(
-						"Publisher-> {} use anonymous exchange, Please specify [queue name] as the [routing key] when sending",
+						"Publisher-> {} use anonymous exchange, Please specify [queue name] as the [routing key] when publish",
 						tag);
 			else
 				this.publishExchange.declare(DeclareOperator.ofChannel(channel));

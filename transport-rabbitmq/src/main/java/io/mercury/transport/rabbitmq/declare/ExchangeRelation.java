@@ -101,7 +101,6 @@ public class ExchangeRelation extends Relation {
 
 	public ExchangeRelation bindingQueue(Queue... queues) {
 		return bindingQueue(
-				
 				queues != null ? MutableLists.newFastList(queues) : null, null);
 	}
 
@@ -118,9 +117,7 @@ public class ExchangeRelation extends Relation {
 	}
 
 	public static void main(String[] args) {
-
 		ExchangeRelation.direct("TEST_DIRECT").autoDelete(true).internal(true);
-
 	}
 
 }
