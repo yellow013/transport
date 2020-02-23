@@ -1,5 +1,7 @@
 package io.mercury.transport.netty;
 
+import static io.mercury.common.sys.CurrentRuntime.availableCores;
+
 import org.slf4j.Logger;
 
 import io.mercury.common.annotation.lang.ProtectedAbstractMethod;
@@ -30,7 +32,7 @@ public abstract class NettyTransport {
 		this.tag = tag;
 		this.configurator = configurator;
 		this.channelHandlers = channelHandlers;
-		this.workerGroup = new NioEventLoopGroup();
+		this.workerGroup = new NioEventLoopGroup(availableCores() * 2 - availableCores());
 		init();
 	}
 
