@@ -4,22 +4,22 @@ import javax.annotation.Nonnull;
 
 import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
-import io.mercury.transport.rabbitmq.declare.ExchangeRelation;
-import io.mercury.transport.rabbitmq.declare.QueueRelation;
+import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
+import io.mercury.transport.rabbitmq.declare.QueueAndBinding;
 
 public final class RmqReceiverConfigurator extends RmqConfigurator {
 
 	// 接受者QueueDeclare
-	private QueueRelation receiveQueue;
+	private QueueAndBinding receiveQueue;
 
 	// 错误消息ExchangeDeclare
-	private ExchangeRelation errorMsgExchange;
+	private ExchangeAndBinding errorMsgExchange;
 
 	// 错误消息RoutingKey
 	private String errorMsgRoutingKey;
 
 	// 错误消息QueueDeclare
-	private QueueRelation errorMsgQueue;
+	private QueueAndBinding errorMsgQueue;
 
 	// 自动ACK
 	private boolean autoAck;
@@ -49,21 +49,21 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		this.qos = builder.qos;
 	}
 
-	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull QueueRelation queueDeclare) {
-		return new Builder(Assertor.nonNull(connection, "connection"), Assertor.nonNull(queueDeclare, "queueDeclare"));
+	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull QueueAndBinding receiveQueue) {
+		return new Builder(Assertor.nonNull(connection, "connection"), Assertor.nonNull(receiveQueue, "receiveQueue"));
 	}
 
 	/**
 	 * @return the queueDeclare
 	 */
-	public QueueRelation receiveQueue() {
+	public QueueAndBinding receiveQueue() {
 		return receiveQueue;
 	}
 
 	/**
 	 * @return the errorMsgExchange
 	 */
-	public ExchangeRelation errorMsgExchange() {
+	public ExchangeAndBinding errorMsgExchange() {
 		return errorMsgExchange;
 	}
 
@@ -80,7 +80,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	 * 
 	 * @return the errorMsgQueue
 	 */
-	public QueueRelation errorMsgQueue() {
+	public QueueAndBinding errorMsgQueue() {
 		return errorMsgQueue;
 	}
 
@@ -132,13 +132,13 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// 连接配置
 		private RmqConnection connection;
 		// 接受者QueueDeclare
-		private QueueRelation receiveQueue;
+		private QueueAndBinding receiveQueue;
 		// 错误消息ExchangeDeclare
-		private ExchangeRelation errorMsgExchange;
+		private ExchangeAndBinding errorMsgExchange;
 		// 错误消息RoutingKey
 		private String errorMsgRoutingKey = "";
 		// 错误消息QueueDeclare
-		private QueueRelation errorMsgQueue;
+		private QueueAndBinding errorMsgQueue;
 		// 自动ACK
 		private boolean autoAck = true;
 		// 一次ACK多条
@@ -150,7 +150,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// QOS预取
 		private int qos = 256;
 
-		private Builder(RmqConnection connection, QueueRelation receiveQueue) {
+		private Builder(RmqConnection connection, QueueAndBinding receiveQueue) {
 			this.connection = connection;
 			this.receiveQueue = receiveQueue;
 		}
@@ -158,7 +158,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param errorMsgExchange the errorMsgExchange to set
 		 */
-		public Builder errorMsgExchange(ExchangeRelation errorMsgExchange) {
+		public Builder errorMsgExchange(ExchangeAndBinding errorMsgExchange) {
 			this.errorMsgExchange = errorMsgExchange;
 			return this;
 		}
@@ -176,7 +176,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		 * 
 		 * @param errorMsgQueue
 		 */
-		public Builder errorMsgQueue(QueueRelation errorMsgQueue) {
+		public Builder errorMsgQueue(QueueAndBinding errorMsgQueue) {
 			this.errorMsgQueue = errorMsgQueue;
 			return this;
 		}
