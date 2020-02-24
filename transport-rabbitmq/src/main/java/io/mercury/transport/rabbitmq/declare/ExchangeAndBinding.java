@@ -16,29 +16,29 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
  * @author yellow013
  *
  */
-public class ExchangeRelation extends Relation {
+public class ExchangeAndBinding extends Relation {
 
-	public final static ExchangeRelation Anonymous = new ExchangeRelation(Exchange.Anonymous);
+	public final static ExchangeAndBinding Anonymous = new ExchangeAndBinding(Exchange.Anonymous);
 
 	private Exchange exchange;
 
-	public static ExchangeRelation fanout(@Nonnull String exchangeName) {
-		return new ExchangeRelation(Exchange.fanout(exchangeName));
+	public static ExchangeAndBinding fanout(@Nonnull String exchangeName) {
+		return new ExchangeAndBinding(Exchange.fanout(exchangeName));
 	}
 
-	public static ExchangeRelation direct(@Nonnull String exchangeName) {
-		return new ExchangeRelation(Exchange.direct(exchangeName));
+	public static ExchangeAndBinding direct(@Nonnull String exchangeName) {
+		return new ExchangeAndBinding(Exchange.direct(exchangeName));
 	}
 
-	public static ExchangeRelation topic(@Nonnull String exchangeName) {
-		return new ExchangeRelation(Exchange.topic(exchangeName));
+	public static ExchangeAndBinding topic(@Nonnull String exchangeName) {
+		return new ExchangeAndBinding(Exchange.topic(exchangeName));
 	}
 
-	public static ExchangeRelation withExchange(@Nonnull Exchange exchange) {
-		return new ExchangeRelation(exchange);
+	public static ExchangeAndBinding withExchange(@Nonnull Exchange exchange) {
+		return new ExchangeAndBinding(exchange);
 	}
 
-	private ExchangeRelation(Exchange exchange) {
+	private ExchangeAndBinding(Exchange exchange) {
 		this.exchange = exchange;
 	}
 
@@ -68,26 +68,26 @@ public class ExchangeRelation extends Relation {
 		return exchange.name();
 	}
 
-	public ExchangeRelation durable(boolean durable) {
+	public ExchangeAndBinding exchangeDurable(boolean durable) {
 		exchange.durable(durable);
 		return this;
 	}
 
-	public ExchangeRelation autoDelete(boolean autoDelete) {
+	public ExchangeAndBinding exchangeAutoDelete(boolean autoDelete) {
 		exchange.autoDelete(autoDelete);
 		return this;
 	}
 
-	public ExchangeRelation internal(boolean internal) {
+	public ExchangeAndBinding exchangeInternal(boolean internal) {
 		exchange.internal(internal);
 		return this;
 	}
 
-	public ExchangeRelation bindingExchange(Exchange... exchanges) {
+	public ExchangeAndBinding bindingExchange(Exchange... exchanges) {
 		return bindingExchange(exchanges != null ? MutableLists.newFastList(exchanges) : null, null);
 	}
 
-	public ExchangeRelation bindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
+	public ExchangeAndBinding bindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (CollectionUtils.isNotEmpty(routingKeys))
@@ -99,12 +99,12 @@ public class ExchangeRelation extends Relation {
 		return this;
 	}
 
-	public ExchangeRelation bindingQueue(Queue... queues) {
+	public ExchangeAndBinding bindingQueue(Queue... queues) {
 		return bindingQueue(
 				queues != null ? MutableLists.newFastList(queues) : null, null);
 	}
 
-	public ExchangeRelation bindingQueue(List<Queue> queues, List<String> routingKeys) {
+	public ExchangeAndBinding bindingQueue(List<Queue> queues, List<String> routingKeys) {
 		if (queues != null) {
 			queues.forEach(queue -> {
 				if (CollectionUtils.isNotEmpty(routingKeys))
@@ -117,7 +117,7 @@ public class ExchangeRelation extends Relation {
 	}
 
 	public static void main(String[] args) {
-		ExchangeRelation.direct("TEST_DIRECT").autoDelete(true).internal(true);
+		ExchangeAndBinding.direct("TEST_DIRECT").exchangeAutoDelete(true).exchangeInternal(true);
 	}
 
 }

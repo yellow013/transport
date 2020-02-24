@@ -14,19 +14,19 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
  * @author yellow013
  *
  */
-public class QueueRelation extends Relation {
+public class QueueAndBinding extends Relation {
 
 	private Queue queue;
 
-	public static QueueRelation named(String queueName) {
-		return new QueueRelation(Queue.named(queueName));
+	public static QueueAndBinding named(String queueName) {
+		return new QueueAndBinding(Queue.named(queueName));
 	}
 
-	public static QueueRelation with(Queue queue) {
-		return new QueueRelation(queue);
+	public static QueueAndBinding with(Queue queue) {
+		return new QueueAndBinding(queue);
 	}
 
-	private QueueRelation(Queue queue) {
+	private QueueAndBinding(Queue queue) {
 		this.queue = queue;
 	}
 
@@ -56,26 +56,26 @@ public class QueueRelation extends Relation {
 		return queue.name();
 	}
 
-	public QueueRelation durable(boolean durable) {
+	public QueueAndBinding queueDurable(boolean durable) {
 		queue.durable(durable);
 		return this;
 	}
 
-	public QueueRelation autoDelete(boolean autoDelete) {
+	public QueueAndBinding queueAutoDelete(boolean autoDelete) {
 		queue.autoDelete(autoDelete);
 		return this;
 	}
 
-	public QueueRelation exclusive(boolean exclusive) {
+	public QueueAndBinding queueExclusive(boolean exclusive) {
 		queue.exclusive(exclusive);
 		return this;
 	}
 
-	public QueueRelation binding(Exchange... exchanges) {
+	public QueueAndBinding binding(Exchange... exchanges) {
 		return binding(exchanges != null ? MutableLists.newFastList(exchanges) : null, null);
 	}
 
-	public QueueRelation binding(List<Exchange> exchanges, List<String> routingKeys) {
+	public QueueAndBinding binding(List<Exchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (CollectionUtils.isNotEmpty(routingKeys))
