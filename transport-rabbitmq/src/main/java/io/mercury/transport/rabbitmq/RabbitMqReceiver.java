@@ -17,8 +17,8 @@ import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
-import io.mercury.transport.rabbitmq.declare.ExchangeRelation;
-import io.mercury.transport.rabbitmq.declare.QueueRelation;
+import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
+import io.mercury.transport.rabbitmq.declare.QueueAndBinding;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
 
@@ -38,19 +38,19 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	private volatile Consumer<T> handler;
 
 	// 接受者QueueDeclare
-	private QueueRelation receiveQueue;
+	private QueueAndBinding receiveQueue;
 
 	// 接受者QueueName
 	private String queueName;
 
 	// 消息无法处理时发送到的错误消息ExchangeDeclare
-	private ExchangeRelation errorMsgExchange;
+	private ExchangeAndBinding errorMsgExchange;
 
 	// 消息无法处理时发送到的错误消息Exchange使用的RoutingKey
 	private String errorMsgRoutingKey;
 
 	// 消息无法处理时发送到的错误消息QueueDeclare
-	private QueueRelation errorMsgQueue;
+	private QueueAndBinding errorMsgQueue;
 
 	// 消息无法处理时发送到的错误消息Exchange
 	private String errorMsgExchangeName;
@@ -378,8 +378,10 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	}
 
 	public static void main(String[] args) {
-		RabbitMqReceiver<byte[]> receiver = RabbitMqReceiver.create("test", RmqReceiverConfigurator
-				.configuration(RmqConnection.configuration("", 5672, "", "").build(), QueueRelation.named("")).build(),
+		RabbitMqReceiver<byte[]> receiver = RabbitMqReceiver.create("test",
+				RmqReceiverConfigurator
+						.configuration(RmqConnection.configuration("", 5672, "", "").build(), QueueAndBinding.named(""))
+						.build(),
 				msg -> System.out.println(new String(msg, Charsets.UTF8)));
 		receiver.receive();
 	}

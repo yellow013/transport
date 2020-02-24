@@ -18,7 +18,7 @@ import io.mercury.common.collections.queue.api.Queue;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.declare.Exchange;
-import io.mercury.transport.rabbitmq.declare.QueueRelation;
+import io.mercury.transport.rabbitmq.declare.QueueAndBinding;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 public class RabbitQueue<E> implements Queue<E>, Closeable {
@@ -35,24 +35,6 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 	private String name;
 
 	private Logger logger = CommonLoggerFactory.getLogger(getClass());
-
-	public static final RabbitQueue<String> newQueue(RmqConnection connection, String queueName)
-			throws AmqpDeclareException {
-		return new RabbitQueue<>(connection, queueName, MutableLists.emptyFastList(), MutableLists.emptyFastList(),
-				e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8), bytes -> new String(bytes, Charsets.UTF8));
-	}
-
-	public static final RabbitQueue<String> newQueue(RmqConnection connection, String queueName,
-			List<String> exchangeNames) throws AmqpDeclareException {
-		return new RabbitQueue<>(connection, queueName, exchangeNames, MutableLists.emptyFastList(),
-				e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8), bytes -> new String(bytes, Charsets.UTF8));
-	}
-
-	public static final RabbitQueue<String> newQueue(RmqConnection connection, String queueName,
-			List<String> exchangeNames, List<String> routingKeys) throws AmqpDeclareException {
-		return new RabbitQueue<>(connection, queueName, exchangeNames, routingKeys,
-				e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8), bytes -> new String(bytes, Charsets.UTF8));
-	}
 
 	public static final <E> RabbitQueue<E> newQueue(RmqConnection connection, String queueName,
 			Function<E, byte[]> serializer, Function<byte[], E> deserializer) throws AmqpDeclareException {
@@ -81,7 +63,7 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 	}
 
 	private void declareQueue() throws AmqpDeclareException {
-		QueueRelation queueRelation = QueueRelation.with(io.mercury.transport.rabbitmq.declare.Queue.named(queueName))
+		QueueAndBinding queueRelation = QueueAndBinding.with(io.mercury.transport.rabbitmq.declare.Queue.named(queueName))
 				.binding(
 						// 如果routingKeys为空集合, 则创建fanout交换器, 否则创建直接交换器
 						exchangeNames.stream().map(exchangeName -> routingKeys.isEmpty() ? Exchange.fanout(exchangeName)
@@ -160,6 +142,24 @@ public class RabbitQueue<E> implements Queue<E>, Closeable {
 	@Override
 	public void close() throws IOException {
 		rabbitMqChannel.close();
+	}
+
+	public static void main(String[] args) {
+
+		RmqConnection connection = RmqConnection.configuration("203.60.1.26", 5672, "global", "global2018", "report")
+				.build();
+		try {
+			RabbitQueue<String> testQueue = newQueue(connection, "rmq_test",
+					e -> JsonUtil.toJson(e).getBytes(Charsets.UTF8), bytes -> new String(bytes, Charsets.UTF8));
+
+			testQueue.pollAndApply(str -> {
+				System.out.println(str);
+				return true;
+			});
+		} catch (AmqpDeclareException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }
