@@ -13,6 +13,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import io.mercury.common.character.Charsets;
+import io.mercury.common.codec.DecodeException;
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
@@ -44,25 +45,25 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	private String queueName;
 
 	// 消息无法处理时发送到的错误消息ExchangeDeclare
-	private ExchangeAndBinding errorMsgExchange;
+	private ExchangeAndBinding errMsgExchange;
 
 	// 消息无法处理时发送到的错误消息Exchange使用的RoutingKey
-	private String errorMsgRoutingKey;
+	private String errMsgRoutingKey;
 
 	// 消息无法处理时发送到的错误消息QueueDeclare
-	private QueueAndBinding errorMsgQueue;
+	private QueueAndBinding errMsgQueue;
 
 	// 消息无法处理时发送到的错误消息Exchange
-	private String errorMsgExchangeName;
+	private String errMsgExchangeName;
 
 	// 消息无法处理时发送到的错误消息Queue
-	private String errorMsgQueueName;
+	private String errMsgQueueName;
 
 	// 是否有错误消息Exchange
-	private boolean hasErrorMsgExchange;
+	private boolean hasErrMsgExchange;
 
 	// 是否有错误消息Queue
-	private boolean hasErrorMsgQueue;
+	private boolean hasErrMsgQueue;
 
 	// 自动ACK
 	private boolean autoAck;
@@ -176,9 +177,9 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		this.deserializer = deserializer;
 		this.handler = handler;
 		this.receiveQueue = configurator.receiveQueue();
-		this.errorMsgExchange = configurator.errorMsgExchange();
-		this.errorMsgRoutingKey = configurator.errorMsgRoutingKey();
-		this.errorMsgQueue = configurator.errorMsgQueue();
+		this.errMsgExchange = configurator.errMsgExchange();
+		this.errMsgRoutingKey = configurator.errMsgRoutingKey();
+		this.errMsgQueue = configurator.errMsgQueue();
 		this.autoAck = configurator.autoAck();
 		this.multipleAck = configurator.multipleAck();
 		this.maxAckTotal = configurator.maxAckTotal();
@@ -201,12 +202,12 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 			throw new RuntimeException(e);
 		}
 		this.queueName = receiveQueue.queueName();
-		if (errorMsgExchange != null && errorMsgQueue != null) {
-			errorMsgExchange.bindingQueue(errorMsgQueue.queue());
+		if (errMsgExchange != null && errMsgQueue != null) {
+			errMsgExchange.bindingQueue(errMsgQueue.queue());
 			declareErrorMsgExchange(operator);
-		} else if (errorMsgExchange != null) {
+		} else if (errMsgExchange != null) {
 			declareErrorMsgExchange(operator);
-		} else if (errorMsgQueue != null) {
+		} else if (errMsgQueue != null) {
 			declareErrorMsgQueueName(operator);
 		}
 
@@ -214,7 +215,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 
 	private void declareErrorMsgExchange(DeclareOperator opChannel) {
 		try {
-			this.errorMsgExchange.declare(opChannel);
+			this.errMsgExchange.declare(opChannel);
 		} catch (AmqpDeclareException e) {
 			logger.error(
 					"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
@@ -223,13 +224,13 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
-		this.errorMsgExchangeName = errorMsgExchange.exchangeName();
-		this.hasErrorMsgExchange = true;
+		this.errMsgExchangeName = errMsgExchange.exchangeName();
+		this.hasErrMsgExchange = true;
 	}
 
 	private void declareErrorMsgQueueName(DeclareOperator operator) {
 		try {
-			this.errorMsgQueue.declare(operator);
+			this.errMsgQueue.declare(operator);
 		} catch (AmqpDeclareException e) {
 			logger.error(
 					"ErrorMsgQueue declare throw exception -> connection configurator info : {}, error message : {}",
@@ -238,8 +239,8 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
-		this.errorMsgQueueName = errorMsgQueue.queueName();
-		this.hasErrorMsgQueue = true;
+		this.errMsgQueueName = errMsgQueue.queueName();
+		this.hasErrMsgQueue = true;
 	}
 
 	@Override
@@ -276,12 +277,18 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 								logger.debug(
 										"Callback handleDelivery() consumerTag==[{}], deliveryTag==[{}] body.length==[{}]",
 										consumerTag, envelope.getDeliveryTag(), body.length);
-								handler.accept(deserializer.apply(body));
+								T apply = null;
+								try {
+									apply = deserializer.apply(body);
+								} catch (Exception e) {
+									throw new DecodeException(e);
+								}
+								handler.accept(apply);
 								logger.debug("Callback handleDelivery() end");
 							} catch (Exception e) {
 								logger.error("Consumer accept msg==[{}] throw Exception -> {}", bytesToStr(body),
 										e.getMessage(), e);
-								errorDump(consumerTag, envelope, properties, body);
+								dumpError(e, consumerTag, envelope, properties, body);
 							}
 							if (!autoAck) {
 								if (ack(envelope.getDeliveryTag()))
@@ -298,18 +305,18 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		}
 	}
 
-	private void errorDump(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
-			throws IOException {
-		if (hasErrorMsgExchange) {
+	private void dumpError(Throwable cause, String consumerTag, Envelope envelope, BasicProperties properties,
+			byte[] body) throws IOException {
+		if (hasErrMsgExchange) {
 			// Sent message to error dump exchange.
-			logger.error("Exception handling -> Sent to ErrorMsgExchange [{}]", errorMsgExchangeName);
-			channel.basicPublish(errorMsgExchangeName, errorMsgRoutingKey, null, body);
-			logger.error("Exception handling -> Sent to ErrorMsgExchange [{}] finished", errorMsgExchangeName);
-		} else if (hasErrorMsgQueue) {
+			logger.error("Exception handling -> Sent to ErrMsgExchange [{}]", errMsgExchangeName);
+			channel.basicPublish(errMsgExchangeName, errMsgRoutingKey, null, body);
+			logger.error("Exception handling -> Sent to ErrMsgExchange [{}] finished", errMsgExchangeName);
+		} else if (hasErrMsgQueue) {
 			// Sent message to error dump queue.
-			logger.error("Exception handling -> Sent to ErrorMsgQueue [{}]", errorMsgQueueName);
-			channel.basicPublish("", errorMsgQueueName, null, body);
-			logger.error("Exception handling -> Sent to ErrorMsgQueue finished");
+			logger.error("Exception handling -> Sent to ErrMsgQueue [{}]", errMsgQueueName);
+			channel.basicPublish("", errMsgQueueName, null, body);
+			logger.error("Exception handling -> Sent to ErrMsgQueue finished");
 		} else {
 			// Reject message and close connection.
 			logger.error("Exception handling -> Reject Msg [{}]", bytesToStr(body));
@@ -318,7 +325,8 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 			destroy();
 			throw new RuntimeException(
 					"The message could not handle, and could not delivered to the error dump address. "
-							+ "\n The connection was closed.");
+							+ "\n The connection was closed.",
+					cause);
 		}
 	}
 
