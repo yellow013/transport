@@ -10,30 +10,22 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>transport-rabbitmq</artifactId>
-	<name>transport-rabbitmq</name>
+	<artifactId>transport-zmq</artifactId>
+	<name>transport-zmq</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>io.mercury</groupId>
 			<artifactId>transport-core</artifactId>
 		</dependency>
+
+		<!-- JeroMq : Pure Java implementation of libzmq -->
 		<dependency>
-			<groupId>io.mercury</groupId>
-			<artifactId>codec-json</artifactId>
+			<groupId>org.zeromq</groupId>
+			<artifactId>jeromq</artifactId>
+			<version>0.5.2</version>
 		</dependency>
-		<!-- rabbitmq amqp-client -->
-		<dependency>
-			<groupId>com.rabbitmq</groupId>
-			<artifactId>amqp-client</artifactId>
-			<version>5.8.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+
 	</dependencies>
 
 </project>
