@@ -13,13 +13,13 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	private QueueAndBinding receiveQueue;
 
 	// 错误消息ExchangeDeclare
-	private ExchangeAndBinding errorMsgExchange;
+	private ExchangeAndBinding errMsgExchange;
 
 	// 错误消息RoutingKey
-	private String errorMsgRoutingKey;
+	private String errMsgRoutingKey;
 
 	// 错误消息QueueDeclare
-	private QueueAndBinding errorMsgQueue;
+	private QueueAndBinding errMsgQueue;
 
 	// 自动ACK
 	private boolean autoAck;
@@ -39,9 +39,9 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	private RmqReceiverConfigurator(Builder builder) {
 		super(builder.connection);
 		this.receiveQueue = builder.receiveQueue;
-		this.errorMsgExchange = builder.errorMsgExchange;
-		this.errorMsgRoutingKey = builder.errorMsgRoutingKey;
-		this.errorMsgQueue = builder.errorMsgQueue;
+		this.errMsgExchange = builder.errMsgExchange;
+		this.errMsgRoutingKey = builder.errMsgRoutingKey;
+		this.errMsgQueue = builder.errMsgQueue;
 		this.autoAck = builder.autoAck;
 		this.multipleAck = builder.multipleAck;
 		this.maxAckTotal = builder.maxAckTotal;
@@ -63,8 +63,8 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	/**
 	 * @return the errorMsgExchange
 	 */
-	public ExchangeAndBinding errorMsgExchange() {
-		return errorMsgExchange;
+	public ExchangeAndBinding errMsgExchange() {
+		return errMsgExchange;
 	}
 
 	/**
@@ -72,16 +72,16 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	 * @return the errorMsgRoutingKey
 	 */
 
-	public String errorMsgRoutingKey() {
-		return errorMsgRoutingKey;
+	public String errMsgRoutingKey() {
+		return errMsgRoutingKey;
 	}
 
 	/**
 	 * 
 	 * @return the errorMsgQueue
 	 */
-	public QueueAndBinding errorMsgQueue() {
-		return errorMsgQueue;
+	public QueueAndBinding errMsgQueue() {
+		return errMsgQueue;
 	}
 
 	/**
@@ -134,11 +134,11 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		// 接受者QueueDeclare
 		private QueueAndBinding receiveQueue;
 		// 错误消息ExchangeDeclare
-		private ExchangeAndBinding errorMsgExchange;
+		private ExchangeAndBinding errMsgExchange;
 		// 错误消息RoutingKey
-		private String errorMsgRoutingKey = "";
+		private String errMsgRoutingKey = "";
 		// 错误消息QueueDeclare
-		private QueueAndBinding errorMsgQueue;
+		private QueueAndBinding errMsgQueue;
 		// 自动ACK
 		private boolean autoAck = true;
 		// 一次ACK多条
@@ -158,8 +158,8 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param errorMsgExchange the errorMsgExchange to set
 		 */
-		public Builder errorMsgExchange(ExchangeAndBinding errorMsgExchange) {
-			this.errorMsgExchange = errorMsgExchange;
+		public Builder errMsgExchange(ExchangeAndBinding errMsgExchange) {
+			this.errMsgExchange = errMsgExchange;
 			return this;
 		}
 
@@ -167,8 +167,8 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		 * 
 		 * @param errorMsgRoutingKey
 		 */
-		public Builder errorMsgRoutingKey(String errorMsgRoutingKey) {
-			this.errorMsgRoutingKey = errorMsgRoutingKey;
+		public Builder errMsgRoutingKey(String errMsgRoutingKey) {
+			this.errMsgRoutingKey = errMsgRoutingKey;
 			return this;
 		}
 
@@ -176,8 +176,8 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		 * 
 		 * @param errorMsgQueue
 		 */
-		public Builder errorMsgQueue(QueueAndBinding errorMsgQueue) {
-			this.errorMsgQueue = errorMsgQueue;
+		public Builder errMsgQueue(QueueAndBinding errMsgQueue) {
+			this.errMsgQueue = errMsgQueue;
 			return this;
 		}
 
