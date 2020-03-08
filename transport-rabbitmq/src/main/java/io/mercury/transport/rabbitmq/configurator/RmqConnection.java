@@ -38,8 +38,6 @@ public final class RmqConnection implements TransportConfigurator {
 	// 停机处理回调函数
 	private transient ShutdownEvent<Exception> shutdownEvent;
 
-	// 配置器完整信息
-	private String fullInfo;
 	// 配置连接信息
 	private String connectionInfo;
 
@@ -58,15 +56,10 @@ public final class RmqConnection implements TransportConfigurator {
 		this.requestedHeartbeat = builder.requestedHeartbeat;
 		this.shutdownEvent = builder.shutdownEvent;
 		this.connectionInfo = newConnectionInfo();
-		this.fullInfo = newFullInfo();
 	}
 
 	private String newConnectionInfo() {
-		return host + ":" + port + (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
-	}
-
-	private String newFullInfo() {
-		return username + "@" + connectionInfo;
+		return username + "@" + host + ":" + port + (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
 	}
 
 	public static Builder configuration(@Nonnull String host, int port, @Nonnull String username,
@@ -84,7 +77,7 @@ public final class RmqConnection implements TransportConfigurator {
 	 */
 	@Override
 	public String fullInfo() {
-		return fullInfo;
+		return toString();
 	}
 
 	@Override
