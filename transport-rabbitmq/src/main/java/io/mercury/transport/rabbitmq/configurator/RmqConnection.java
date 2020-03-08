@@ -3,6 +3,8 @@ package io.mercury.transport.rabbitmq.configurator;
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
 
+import com.rabbitmq.client.ConnectionFactory;
+
 import io.mercury.common.functional.ShutdownEvent;
 import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
@@ -184,6 +186,24 @@ public final class RmqConnection implements TransportConfigurator {
 		if (toStringCache == null)
 			toStringCache = StringUtil.reflectionToString(this);
 		return toStringCache;
+	}
+
+	public ConnectionFactory createConnectionFactory() {
+		ConnectionFactory factory = new ConnectionFactory();
+		factory.setHost(host());
+		factory.setPort(port());
+		factory.setUsername(username());
+		factory.setPassword(password());
+		factory.setVirtualHost(virtualHost());
+		factory.setAutomaticRecoveryEnabled(automaticRecovery());
+		factory.setNetworkRecoveryInterval(recoveryInterval());
+		factory.setHandshakeTimeout(handshakeTimeout());
+		factory.setConnectionTimeout(connectionTimeout());
+		factory.setShutdownTimeout(shutdownTimeout());
+		factory.setRequestedHeartbeat(requestedHeartbeat());
+		if (sslContext() != null)
+			factory.useSslProtocol(sslContext());
+		return factory;
 	}
 
 	public static class Builder {

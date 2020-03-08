@@ -1,6 +1,6 @@
 package io.mercury.transport.rabbitmq.configurator;
 
-abstract class RmqConfigurator {
+public abstract class RmqConfigurator {
 
 	// 连接配置
 	private RmqConnection connection;
