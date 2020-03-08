@@ -2,9 +2,9 @@ package io.mercury.transport.rabbitmq.declare;
 
 import io.mercury.common.util.Assertor;
 
-public final class Binding {
+final class Binding {
 
-	public static enum DestType {
+	static enum DestType {
 		Exchange, Queue
 	}
 
@@ -19,7 +19,7 @@ public final class Binding {
 	 * @param source
 	 * @param destExchange
 	 */
-	public Binding(Exchange source, Exchange destExchange) {
+	Binding(Exchange source, Exchange destExchange) {
 		this(source, destExchange, null, null, DestType.Exchange);
 	}
 
@@ -28,7 +28,7 @@ public final class Binding {
 	 * @param source
 	 * @param destQueue
 	 */
-	public Binding(Exchange source, Queue destQueue) {
+	Binding(Exchange source, Queue destQueue) {
 		this(source, null, destQueue, null, DestType.Queue);
 	}
 
@@ -38,7 +38,7 @@ public final class Binding {
 	 * @param destExchange
 	 * @param routingKey
 	 */
-	public Binding(Exchange source, Exchange destExchange, String routingKey) {
+	Binding(Exchange source, Exchange destExchange, String routingKey) {
 		this(source, destExchange, null, routingKey, DestType.Exchange);
 	}
 
@@ -48,11 +48,11 @@ public final class Binding {
 	 * @param destQueue
 	 * @param routingKey
 	 */
-	public Binding(Exchange source, Queue destQueue, String routingKey) {
+	Binding(Exchange source, Queue destQueue, String routingKey) {
 		this(source, null, destQueue, routingKey, DestType.Queue);
 	}
 
-	private Binding(Exchange source, Exchange destExchange, Queue destQueue, String routingKey, DestType destType) {
+	Binding(Exchange source, Exchange destExchange, Queue destQueue, String routingKey, DestType destType) {
 		this.source = Assertor.nonNull(source, "source");
 		this.destExchange = destExchange;
 		this.destQueue = destQueue;
@@ -63,39 +63,38 @@ public final class Binding {
 	/**
 	 * @return the source
 	 */
-	public Exchange source() {
+	Exchange source() {
 		return source;
 	}
 
 	/**
 	 * @return the routingKey
 	 */
-	public String routingKey() {
+	String routingKey() {
 		return routingKey;
 	}
 
 	/**
 	 * @return the destExchange
 	 */
-	public Exchange destExchange() {
+	Exchange destExchange() {
 		return destExchange;
 	}
 
 	/**
 	 * @return the destQueue
 	 */
-	public Queue destQueue() {
+	Queue destQueue() {
 		return destQueue;
 	}
 
 	/**
 	 * @return the destinationType
 	 */
-	public DestType destType() {
+	DestType destType() {
 		return destType;
 	}
 
-	
 	public static void main(String[] args) {
 
 		Exchange exchange0 = Exchange.direct("ABC");

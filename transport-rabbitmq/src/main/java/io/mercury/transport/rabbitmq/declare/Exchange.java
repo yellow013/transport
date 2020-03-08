@@ -22,15 +22,15 @@ public final class Exchange {
 	private boolean internal = false;
 
 	public static Exchange fanout(String name) {
-		return new Exchange(ExchangeType.Fanout, Assertor.nonNullAndEmpty(name, "name"));
+		return new Exchange(ExchangeType.Fanout, Assertor.nonEmpty(name, "name"));
 	}
 
 	public static Exchange direct(String name) {
-		return new Exchange(ExchangeType.Direct, Assertor.nonNullAndEmpty(name, "name"));
+		return new Exchange(ExchangeType.Direct, Assertor.nonEmpty(name, "name"));
 	}
 
 	public static Exchange topic(String name) {
-		return new Exchange(ExchangeType.Topic, Assertor.nonNullAndEmpty(name, "name"));
+		return new Exchange(ExchangeType.Topic, Assertor.nonEmpty(name, "name"));
 	}
 
 	/**

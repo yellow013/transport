@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 
 import io.mercury.common.collections.MutableLists;
-import io.mercury.transport.rabbitmq.DeclareOperator;
+import io.mercury.transport.rabbitmq.RabbitMqDeclarant;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 /**
@@ -31,9 +31,9 @@ public class QueueAndBinding extends Relation {
 	}
 
 	@Override
-	protected void declare0(DeclareOperator operator) {
+	protected void declare0(RabbitMqDeclarant declarant) {
 		try {
-			operator.declareQueue(queue);
+			declarant.declareQueue(queue);
 		} catch (AmqpDeclareException e) {
 			logger.error("Declare Queue failure -> {}", queue);
 			throw new RuntimeException(e);

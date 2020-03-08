@@ -15,7 +15,7 @@ public final class Queue {
 	private boolean autoDelete = false;
 
 	public static Queue named(String name) {
-		return new Queue(Assertor.nonNullAndEmpty(name, "name"));
+		return new Queue(Assertor.nonEmpty(name, "name"));
 	}
 
 	private Queue(String name) {

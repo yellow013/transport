@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.collections4.CollectionUtils;
 
 import io.mercury.common.collections.MutableLists;
-import io.mercury.transport.rabbitmq.DeclareOperator;
+import io.mercury.transport.rabbitmq.RabbitMqDeclarant;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 /**
@@ -43,9 +43,9 @@ public class ExchangeAndBinding extends Relation {
 	}
 
 	@Override
-	protected void declare0(DeclareOperator operator) {
+	protected void declare0(RabbitMqDeclarant declarant) {
 		try {
-			operator.declareExchange(exchange);
+			declarant.declareExchange(exchange);
 		} catch (AmqpDeclareException e) {
 			logger.error("Declare Exchange failure -> {}", exchange);
 			throw new RuntimeException(e);
