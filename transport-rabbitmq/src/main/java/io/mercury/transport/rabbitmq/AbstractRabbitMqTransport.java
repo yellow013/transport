@@ -49,8 +49,10 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	}
 
 	/**
+	 * 
 	 * @param tag
-	 * @param configurator
+	 * @param moduleType
+	 * @param rmqConnection
 	 */
 	protected AbstractRabbitMqTransport(String tag, @Nonnull String moduleType, @Nonnull RmqConnection rmqConnection) {
 		this.tag = isNullOrEmpty(tag) ? moduleType + "-" + Instant.now() : tag;
@@ -61,36 +63,23 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	protected void createConnection() {
 		logger.info("Create connection started");
 		if (connectionFactory == null) {
-			connectionFactory = new ConnectionFactory();
-			connectionFactory.setHost(rmqConnection.host());
-			connectionFactory.setPort(rmqConnection.port());
-			connectionFactory.setUsername(rmqConnection.username());
-			connectionFactory.setPassword(rmqConnection.password());
-			connectionFactory.setVirtualHost(rmqConnection.virtualHost());
-			connectionFactory.setAutomaticRecoveryEnabled(rmqConnection.automaticRecovery());
-			connectionFactory.setNetworkRecoveryInterval(rmqConnection.recoveryInterval());
-			connectionFactory.setHandshakeTimeout(rmqConnection.handshakeTimeout());
-			connectionFactory.setConnectionTimeout(rmqConnection.connectionTimeout());
-			connectionFactory.setShutdownTimeout(rmqConnection.shutdownTimeout());
-			connectionFactory.setRequestedHeartbeat(rmqConnection.requestedHeartbeat());
-			if (rmqConnection.sslContext() != null)
-				connectionFactory.useSslProtocol(rmqConnection.sslContext());
+			connectionFactory = rmqConnection.createConnectionFactory();
 		}
 		try {
 			connection = connectionFactory.newConnection();
 			connection.setId(tag + "-" + System.nanoTime());
 			logger.info("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}", tag,
 					connection.getId());
-			connection.addShutdownListener(shutdownSignal -> {
+			connection.addShutdownListener(signal -> {
 				// 输出信号到控制台
-				logger.info("Shutdown listener message -> {}", shutdownSignal.getMessage());
-				if (isNormalShutdown(shutdownSignal))
+				logger.info("Shutdown listener message -> {}", signal.getMessage());
+				if (isNormalShutdown(signal))
 					logger.info("connection id -> {}, is normal shutdown", connection.getId());
 				else {
 					logger.error("connection id -> {}, not normal shutdown", connection.getId());
 					// 如果回调函数不为null, 则执行此函数
 					if (shutdownEvent != null)
-						shutdownEvent.accept(shutdownSignal);
+						shutdownEvent.accept(signal);
 				}
 			});
 			channel = connection.createChannel();

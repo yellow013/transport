@@ -90,7 +90,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 						"Publisher-> {} use anonymous exchange, Please specify [queue name] as the [routing key] when publish",
 						tag);
 			else
-				this.publishExchange.declare(DeclareOperator.ofChannel(channel));
+				this.publishExchange.declare(RabbitMqDeclarant.withChannel(channel));
 		} catch (AmqpDeclareException e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
 			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",

@@ -36,7 +36,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	private Function<byte[], T> deserializer;
 
 	// 接收消息时使用的回调函数
-	private volatile Consumer<T> handler;
+	private volatile Consumer<T> consumer;
 
 	// 接受者QueueDeclare
 	private QueueAndBinding receiveQueue;
@@ -88,9 +88,9 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	 * @return
 	 */
 	@Deprecated
-	public void initHandler(Consumer<T> callback) {
-		if (this.handler == null)
-			this.handler = callback;
+	public void setConsumer(Consumer<T> consumer) {
+		if (this.consumer == null)
+			this.consumer = consumer;
 	}
 
 	/**
@@ -172,10 +172,10 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	 * @param callback
 	 */
 	private RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator,
-			@Nonnull Function<byte[], T> deserializer, @Nonnull Consumer<T> handler) {
+			@Nonnull Function<byte[], T> deserializer, @Nonnull Consumer<T> consumer) {
 		super(tag, "receiver", configurator.connection());
 		this.deserializer = deserializer;
-		this.handler = handler;
+		this.consumer = consumer;
 		this.receiveQueue = configurator.receiveQueue();
 		this.errMsgExchange = configurator.errMsgExchange();
 		this.errMsgRoutingKey = configurator.errMsgRoutingKey();
@@ -191,9 +191,9 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	}
 
 	private void declare() {
-		DeclareOperator operator = DeclareOperator.ofChannel(channel);
+		RabbitMqDeclarant declarant = RabbitMqDeclarant.withChannel(channel);
 		try {
-			this.receiveQueue.declare(operator);
+			this.receiveQueue.declare(declarant);
 		} catch (Exception e) {
 			logger.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
@@ -204,16 +204,16 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		this.queueName = receiveQueue.queueName();
 		if (errMsgExchange != null && errMsgQueue != null) {
 			errMsgExchange.bindingQueue(errMsgQueue.queue());
-			declareErrorMsgExchange(operator);
+			declareErrorMsgExchange(declarant);
 		} else if (errMsgExchange != null) {
-			declareErrorMsgExchange(operator);
+			declareErrorMsgExchange(declarant);
 		} else if (errMsgQueue != null) {
-			declareErrorMsgQueueName(operator);
+			declareErrorMsgQueueName(declarant);
 		}
 
 	}
 
-	private void declareErrorMsgExchange(DeclareOperator opChannel) {
+	private void declareErrorMsgExchange(RabbitMqDeclarant opChannel) {
 		try {
 			this.errMsgExchange.declare(opChannel);
 		} catch (AmqpDeclareException e) {
@@ -228,7 +228,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		this.hasErrMsgExchange = true;
 	}
 
-	private void declareErrorMsgQueueName(DeclareOperator operator) {
+	private void declareErrorMsgQueueName(RabbitMqDeclarant operator) {
 		try {
 			this.errMsgQueue.declare(operator);
 		} catch (AmqpDeclareException e) {
@@ -251,7 +251,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 	@Override
 	public void receive() {
 		Assertor.nonNull(deserializer, "deserializer");
-		Assertor.nonNull(handler, "handler");
+		Assertor.nonNull(consumer, "consumer");
 		try {
 			// channel.basicConsume(receiveQueue, isAutoAck, tag, (consumerTag, msg) -> {
 			// Envelope envelope = msg.getEnvelope();
@@ -283,7 +283,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 								} catch (Exception e) {
 									throw new DecodeException(e);
 								}
-								handler.accept(apply);
+								consumer.accept(apply);
 								logger.debug("Callback handleDelivery() end");
 							} catch (Exception e) {
 								logger.error("Consumer accept msg==[{}] throw Exception -> {}", bytesToStr(body),

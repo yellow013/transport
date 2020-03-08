@@ -15,7 +15,7 @@ import io.mercury.transport.rabbitmq.declare.Exchange;
 import io.mercury.transport.rabbitmq.declare.Queue;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
-public final class DeclareOperator extends AbstractRabbitMqTransport {
+public final class RabbitMqDeclarant extends AbstractRabbitMqTransport {
 
 	/**
 	 * Create OperationalChannel of host, port, username and password
@@ -28,7 +28,7 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static DeclareOperator create(String host, int port, String username, String password) {
+	public static RabbitMqDeclarant create(String host, int port, String username, String password) {
 		return create(RmqConnection.configuration(host, port, username, password).build());
 	}
 
@@ -44,7 +44,7 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static DeclareOperator create(String host, int port, String username, String password, String virtualHost) {
+	public static RabbitMqDeclarant create(String host, int port, String username, String password, String virtualHost) {
 		return create(RmqConnection.configuration(host, port, username, password, virtualHost).build());
 	}
 
@@ -56,8 +56,8 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static DeclareOperator create(RmqConnection connection) {
-		return new DeclareOperator(connection);
+	public static RabbitMqDeclarant create(RmqConnection connection) {
+		return new RabbitMqDeclarant(connection);
 	}
 
 	/**
@@ -66,16 +66,16 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	 * @param channel
 	 * @return
 	 */
-	public static DeclareOperator ofChannel(Channel channel) {
-		return new DeclareOperator(channel);
+	public static RabbitMqDeclarant withChannel(Channel channel) {
+		return new RabbitMqDeclarant(channel);
 	}
 
-	private DeclareOperator(RmqConnection connection) {
-		super("", "DeclareOperator", connection);
+	private RabbitMqDeclarant(RmqConnection connection) {
+		super(null, "DeclareOperator", connection);
 		createConnection();
 	}
 
-	private DeclareOperator(Channel channel) {
+	private RabbitMqDeclarant(Channel channel) {
 		this.channel = channel;
 	}
 
@@ -113,7 +113,7 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	public boolean declareQueue(@Nonnull String queue, boolean durable, boolean exclusive, boolean autoDelete)
 			throws AmqpDeclareException {
 		try {
-			Assertor.nonNullAndEmpty(queue, "queue");
+			Assertor.nonEmpty(queue, "queue");
 		} catch (Exception e) {
 			throw AmqpDeclareException.with(e);
 		}
@@ -181,7 +181,7 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	private boolean declareExchange(String exchange, BuiltinExchangeType type, boolean durable, boolean autoDelete,
 			boolean internal) throws AmqpDeclareException {
 		try {
-			Assertor.nonNullAndEmpty(exchange, "exchange");
+			Assertor.nonEmpty(exchange, "exchange");
 		} catch (Exception e) {
 			throw AmqpDeclareException.with(e);
 		}
@@ -199,8 +199,8 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 
 	public boolean bindQueue(String queue, String exchange, String routingKey) throws AmqpDeclareException {
 		try {
-			Assertor.nonNullAndEmpty(queue, "queue");
-			Assertor.nonNullAndEmpty(exchange, "exchange");
+			Assertor.nonEmpty(queue, "queue");
+			Assertor.nonEmpty(exchange, "exchange");
 		} catch (Exception e) {
 			throw AmqpDeclareException.with(e);
 		}
@@ -219,8 +219,8 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 	public boolean bindExchange(String destExchange, String sourceExchange, String routingKey)
 			throws AmqpDeclareException {
 		try {
-			Assertor.nonNullAndEmpty(destExchange, "destExchange");
-			Assertor.nonNullAndEmpty(sourceExchange, "sourceExchange");
+			Assertor.nonEmpty(destExchange, "destExchange");
+			Assertor.nonEmpty(sourceExchange, "sourceExchange");
 		} catch (Exception e) {
 			throw AmqpDeclareException.with(e);
 		}
@@ -249,7 +249,7 @@ public final class DeclareOperator extends AbstractRabbitMqTransport {
 
 	public static void main(String[] args) {
 
-		DeclareOperator declareOperator;
+		RabbitMqDeclarant declareOperator;
 		try {
 			declareOperator = create("127.0.0.1", 5672, "guest", "guest");
 			System.out.println(declareOperator.isConnected());
