@@ -16,19 +16,17 @@ import okhttp3.ResponseBody;
 
 public class HttpRequester {
 
-	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
+	private static final Logger logger = CommonLoggerFactory.getLogger(HttpRequester.class);
 
-	private final OkHttpClient client = new OkHttpClient();
+	private static final OkHttpClient Client = new OkHttpClient();
 
-	public static final HttpRequester INSTANCE = new HttpRequester();
-
-	public HttpRequester() {
+	private HttpRequester() {
 	}
 
 	@MayThrowsRuntimeException
-	public String get(String url) {
+	public static String get(String url) {
 		Request request = new Request.Builder().url(url).build();
-		try (Response response = client.newCall(request).execute()) {
+		try (Response response = Client.newCall(request).execute()) {
 			if (response == null)
 				throw new RuntimeException("RuntimeException -> Request Url: [" + url + "]");
 			if (response.code() > 307)
@@ -50,7 +48,7 @@ public class HttpRequester {
 	public String post(String url, Object obj) throws IOException {
 		RequestBody body = RequestBody.create(JsonUtil.toJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
-		try (Response response = client.newCall(request).execute()) {
+		try (Response response = Client.newCall(request).execute()) {
 			if (response == null)
 				throw new RuntimeException("RuntimeException -> Request Url: [" + url + "]");
 			if (response.code() > 307)
