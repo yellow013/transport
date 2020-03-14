@@ -24,7 +24,7 @@ public class HttpRequester {
 	}
 
 	@MayThrowsRuntimeException
-	public static String get(String url) {
+	public static String sentGet(String url) {
 		Request request = new Request.Builder().url(url).build();
 		try (Response response = Client.newCall(request).execute()) {
 			if (response == null)
@@ -45,7 +45,7 @@ public class HttpRequester {
 	private static final MediaType APPLICATION_JSON = MediaType.get("application/json; charset=utf-8");
 
 	@MayThrowsRuntimeException
-	public String post(String url, Object obj) throws IOException {
+	public static String sentPost(String url, Object obj) throws IOException {
 		RequestBody body = RequestBody.create(JsonUtil.toJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
 		try (Response response = Client.newCall(request).execute()) {
