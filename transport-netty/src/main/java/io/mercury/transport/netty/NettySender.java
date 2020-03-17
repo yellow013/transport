@@ -17,7 +17,7 @@ public class NettySender implements Sender<byte[]> {
 
 	// private ByteBuf byteBuf;
 
-	private Logger logger = CommonLoggerFactory.getLogger(getClass());
+	private Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	public NettySender(ChannelHandlerContext context) {
 		this.context = context;
@@ -49,14 +49,14 @@ public class NettySender implements Sender<byte[]> {
 
 	@Override
 	public void send(byte[] msg) {
-		logger.debug(microsecond() + " call sender send -> data length : " + msg.length);
+		log.debug(microsecond() + " call sender send -> data length : " + msg.length);
 		ByteBuf byteBuf = context.alloc().buffer(msg.length);
 		byteBuf.writeBytes(msg);
 		ChannelFuture writeAndFlush = context.writeAndFlush(byteBuf.retain());
 		writeAndFlush.addListener(new ChannelFutureListener() {
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				logger.debug(microsecond() + " call sender send operation complete -> data length : "
+				log.debug(microsecond() + " call sender send operation complete -> data length : "
 						+ byteBuf.writerIndex());
 				byteBuf.clear();
 				byteBuf.release();

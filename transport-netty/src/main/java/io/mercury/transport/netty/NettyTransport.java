@@ -18,7 +18,7 @@ public abstract class NettyTransport {
 
 	protected EventLoopGroup workerGroup;
 
-	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
+	protected Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	protected ChannelHandler[] channelHandlers;
 

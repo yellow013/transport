@@ -61,7 +61,7 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 		try {
 			channel.queueDeclare(receiveQueue, durable, exclusive, autoDelete, null);
 		} catch (IOException e) {
-			logger.error(
+			log.error(
 					"Method channel.queueDeclare(queue==[{}], durable==[{]}, exclusive==[{}], autoDelete==[{}], arguments==null) IOException message -> {}",
 					receiveQueue, durable, exclusive, autoDelete, e.getMessage(), e);
 			destroy();
@@ -78,7 +78,7 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 		try {
 			channel.basicConsume(receiveQueue, false, tag, consumer);
 		} catch (IOException e) {
-			logger.error("basicConsume error", e.getMessage(), e);
+			log.error("basicConsume error", e.getMessage(), e);
 		}
 	}
 
@@ -89,7 +89,7 @@ public class RabbitMqQosBatchReceiver<T> extends AbstractRabbitMqTransport imple
 
 	@Override
 	public boolean destroy() {
-		logger.info("Call method RabbitMqReceiver.destroy()");
+		log.info("Call method RabbitMqReceiver.destroy()");
 		closeConnection();
 		return true;
 	}

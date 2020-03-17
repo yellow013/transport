@@ -14,7 +14,7 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 abstract class Relation {
 
-	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
+	protected Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	protected MutableList<Binding> bindings = MutableLists.newFastList();
 
@@ -29,7 +29,7 @@ abstract class Relation {
 		try {
 			declarant.declareExchange(source);
 		} catch (AmqpDeclareException declareException) {
-			logger.error("Declare source exchange failure -> {}", source);
+			log.error("Declare source exchange failure -> {}", source);
 			throw declareException;
 		}
 		String routingKey = binding.routingKey();
@@ -39,13 +39,13 @@ abstract class Relation {
 			try {
 				declarant.declareExchange(destExchange);
 			} catch (AmqpDeclareException exception) {
-				logger.error("Declare dest exchange failure -> {}", destExchange);
+				log.error("Declare dest exchange failure -> {}", destExchange);
 				throw exception;
 			}
 			try {
 				declarant.bindExchange(destExchange.name(), source.name(), routingKey);
 			} catch (AmqpDeclareException exception) {
-				logger.error("Declare bind exchange failure -> dest==[{}], source==[{}], routingKey==[{}]",
+				log.error("Declare bind exchange failure -> dest==[{}], source==[{}], routingKey==[{}]",
 						destExchange, source, routingKey);
 				throw exception;
 			}
@@ -55,13 +55,13 @@ abstract class Relation {
 			try {
 				declarant.declareQueue(destQueue);
 			} catch (AmqpDeclareException exception) {
-				logger.error("Declare dest queue failure -> {}", destQueue);
+				log.error("Declare dest queue failure -> {}", destQueue);
 				throw exception;
 			}
 			try {
 				declarant.bindQueue(destQueue.name(), source.name(), routingKey);
 			} catch (AmqpDeclareException exception) {
-				logger.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue,
+				log.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue,
 						source, routingKey);
 				throw exception;
 			}

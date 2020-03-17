@@ -20,7 +20,7 @@ public class SocketSender implements Sender<byte[]> {
 
 	private AtomicBoolean isRun = new AtomicBoolean(true);
 
-	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
+	protected Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	public SocketSender(SocketConfigurator configurator) {
 		super();
@@ -77,7 +77,7 @@ public class SocketSender implements Sender<byte[]> {
 				outputStream.write(msg);
 			}
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			destroy();
 		}
 	}

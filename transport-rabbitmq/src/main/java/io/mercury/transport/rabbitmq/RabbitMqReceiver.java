@@ -195,7 +195,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		try {
 			this.receiveQueue.declare(declarant);
 		} catch (Exception e) {
-			logger.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
+			log.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
@@ -217,7 +217,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		try {
 			this.errMsgExchange.declare(opChannel);
 		} catch (AmqpDeclareException e) {
-			logger.error(
+			log.error(
 					"ErrorMsgExchange declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
@@ -232,7 +232,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		try {
 			this.errMsgQueue.declare(operator);
 		} catch (AmqpDeclareException e) {
-			logger.error(
+			log.error(
 					"ErrorMsgQueue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
@@ -273,8 +273,8 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 						public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties,
 								byte[] body) throws IOException {
 							try {
-								logger.debug("Message handle start");
-								logger.debug(
+								log.debug("Message handle start");
+								log.debug(
 										"Callback handleDelivery() consumerTag==[{}], deliveryTag==[{}] body.length==[{}]",
 										consumerTag, envelope.getDeliveryTag(), body.length);
 								T apply = null;
@@ -284,24 +284,24 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 									throw new DecodeException(e);
 								}
 								consumer.accept(apply);
-								logger.debug("Callback handleDelivery() end");
+								log.debug("Callback handleDelivery() end");
 							} catch (Exception e) {
-								logger.error("Consumer accept msg==[{}] throw Exception -> {}", bytesToStr(body),
+								log.error("Consumer accept msg==[{}] throw Exception -> {}", bytesToStr(body),
 										e.getMessage(), e);
 								dumpError(e, consumerTag, envelope, properties, body);
 							}
 							if (!autoAck) {
 								if (ack(envelope.getDeliveryTag()))
-									logger.debug("Message handle and ack finished");
+									log.debug("Message handle and ack finished");
 								else {
-									logger.info("Ack failure envelope.getDeliveryTag()==[{}], Reject message");
+									log.info("Ack failure envelope.getDeliveryTag()==[{}], Reject message");
 									channel.basicReject(envelope.getDeliveryTag(), true);
 								}
 							}
 						}
 					});
 		} catch (IOException e) {
-			logger.error("Method basicConsume() IOException message -> {}", e.getMessage(), e);
+			log.error("Method basicConsume() IOException message -> {}", e.getMessage(), e);
 		}
 	}
 
@@ -309,19 +309,19 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 			byte[] body) throws IOException {
 		if (hasErrMsgExchange) {
 			// Sent message to error dump exchange.
-			logger.error("Exception handling -> Sent to ErrMsgExchange [{}]", errMsgExchangeName);
+			log.error("Exception handling -> Sent to ErrMsgExchange [{}]", errMsgExchangeName);
 			channel.basicPublish(errMsgExchangeName, errMsgRoutingKey, null, body);
-			logger.error("Exception handling -> Sent to ErrMsgExchange [{}] finished", errMsgExchangeName);
+			log.error("Exception handling -> Sent to ErrMsgExchange [{}] finished", errMsgExchangeName);
 		} else if (hasErrMsgQueue) {
 			// Sent message to error dump queue.
-			logger.error("Exception handling -> Sent to ErrMsgQueue [{}]", errMsgQueueName);
+			log.error("Exception handling -> Sent to ErrMsgQueue [{}]", errMsgQueueName);
 			channel.basicPublish("", errMsgQueueName, null, body);
-			logger.error("Exception handling -> Sent to ErrMsgQueue finished");
+			log.error("Exception handling -> Sent to ErrMsgQueue finished");
 		} else {
 			// Reject message and close connection.
-			logger.error("Exception handling -> Reject Msg [{}]", bytesToStr(body));
+			log.error("Exception handling -> Reject Msg [{}]", bytesToStr(body));
 			channel.basicReject(envelope.getDeliveryTag(), true);
-			logger.error("Exception handling -> Reject Msg finished");
+			log.error("Exception handling -> Reject Msg finished");
 			destroy();
 			throw new RuntimeException(
 					"The message could not handle, and could not delivered to the error dump address. "
@@ -336,33 +336,33 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 
 	private boolean ack0(long deliveryTag, int retry) {
 		if (retry == maxAckTotal) {
-			logger.error("Has been retry ack {}, Quit ack", maxAckTotal);
+			log.error("Has been retry ack {}, Quit ack", maxAckTotal);
 			return false;
 		}
-		logger.debug("Has been retry ack {}, Do next ack", retry);
+		log.debug("Has been retry ack {}, Do next ack", retry);
 		try {
 			int reconnectionCount = 0;
 			while (!isConnected()) {
 				reconnectionCount++;
-				logger.debug("Detect connection isConnected() == false, Reconnection count {}", reconnectionCount);
+				log.debug("Detect connection isConnected() == false, Reconnection count {}", reconnectionCount);
 				closeAndReconnection();
 				if (reconnectionCount > maxAckReconnection) {
-					logger.debug("Reconnection count -> {}, Quit current ack", reconnectionCount);
+					log.debug("Reconnection count -> {}, Quit current ack", reconnectionCount);
 					break;
 				}
 			}
 			if (isConnected()) {
-				logger.debug("Last detect connection isConnected() == true, Reconnection count {}", reconnectionCount);
+				log.debug("Last detect connection isConnected() == true, Reconnection count {}", reconnectionCount);
 				channel.basicAck(deliveryTag, multipleAck);
-				logger.debug("Method channel.basicAck() finished");
+				log.debug("Method channel.basicAck() finished");
 				return true;
 			} else {
-				logger.error("Last detect connection isConnected() == false, Reconnection count {}", reconnectionCount);
-				logger.error("Unable to call method channel.basicAck()");
+				log.error("Last detect connection isConnected() == false, Reconnection count {}", reconnectionCount);
+				log.error("Unable to call method channel.basicAck()");
 				return ack0(deliveryTag, retry);
 			}
 		} catch (IOException e) {
-			logger.error("Call method channel.basicAck(deliveryTag==[{}], multiple==[{}]) throw IOException -> {}",
+			log.error("Call method channel.basicAck(deliveryTag==[{}], multiple==[{}]) throw IOException -> {}",
 					deliveryTag, multipleAck, e.getMessage(), e);
 			return ack0(deliveryTag, ++retry);
 		}
@@ -370,7 +370,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 
 	@Override
 	public boolean destroy() {
-		logger.info("Call method destroy() from Receiver name==[{}]", receiverName);
+		log.info("Call method destroy() from Receiver name==[{}]", receiverName);
 		return super.destroy();
 	}
 

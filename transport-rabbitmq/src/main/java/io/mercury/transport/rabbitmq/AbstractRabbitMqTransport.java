@@ -40,7 +40,7 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	protected ShutdownEvent<Exception> shutdownEvent;
 
 	// 子类共用Logger
-	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
+	protected Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	protected String tag;
 
@@ -61,35 +61,35 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	}
 
 	protected void createConnection() {
-		logger.info("Create connection started");
+		log.info("Create connection started");
 		if (connectionFactory == null) {
 			connectionFactory = rmqConnection.createConnectionFactory();
 		}
 		try {
 			connection = connectionFactory.newConnection();
 			connection.setId(tag + "-" + System.nanoTime());
-			logger.info("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}", tag,
+			log.info("Call method connectionFactory.newConnection() finished, tag -> {}, connection id -> {}", tag,
 					connection.getId());
 			connection.addShutdownListener(signal -> {
 				// 输出信号到控制台
-				logger.info("Shutdown listener message -> {}", signal.getMessage());
+				log.info("Shutdown listener message -> {}", signal.getMessage());
 				if (isNormalShutdown(signal))
-					logger.info("connection id -> {}, is normal shutdown", connection.getId());
+					log.info("connection id -> {}, is normal shutdown", connection.getId());
 				else {
-					logger.error("connection id -> {}, not normal shutdown", connection.getId());
+					log.error("connection id -> {}, not normal shutdown", connection.getId());
 					// 如果回调函数不为null, 则执行此函数
 					if (shutdownEvent != null)
 						shutdownEvent.accept(signal);
 				}
 			});
 			channel = connection.createChannel();
-			logger.info("Call method connection.createChannel() finished, connection id -> {}, channel number -> {}",
+			log.info("Call method connection.createChannel() finished, connection id -> {}, channel number -> {}",
 					connection.getId(), channel.getChannelNumber());
-			logger.info("Create connection finished");
+			log.info("Create connection finished");
 		} catch (IOException e) {
-			logger.error("Method createConnection() throw IOException -> {}", e.getMessage(), e);
+			log.error("Method createConnection() throw IOException -> {}", e.getMessage(), e);
 		} catch (TimeoutException e) {
-			logger.error("Method createConnection() throw TimeoutException -> {}", e.getMessage(), e);
+			log.error("Method createConnection() throw TimeoutException -> {}", e.getMessage(), e);
 		}
 	}
 
@@ -99,7 +99,7 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	}
 
 	protected boolean closeAndReconnection() {
-		logger.info("Call method closeAndReconnection()");
+		log.info("Call method closeAndReconnection()");
 		closeConnection();
 		ThreadUtil.sleep(rmqConnection.recoveryInterval() / 2);
 		createConnection();
@@ -122,26 +122,26 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	}
 
 	protected void closeConnection() {
-		logger.info("Call method closeConnection()");
+		log.info("Call method closeConnection()");
 		try {
 			if (channel != null && channel.isOpen()) {
 				channel.close();
-				logger.info("Channel is closeed!");
+				log.info("Channel is closeed!");
 			}
 			if (connection != null && connection.isOpen()) {
 				connection.close();
-				logger.info("Connection is closeed!");
+				log.info("Connection is closeed!");
 			}
 		} catch (IOException e) {
-			logger.error("Method closeConnection() throw IOException -> {}", e.getMessage(), e);
+			log.error("Method closeConnection() throw IOException -> {}", e.getMessage(), e);
 		} catch (TimeoutException e) {
-			logger.error("Method closeConnection() throw TimeoutException -> {}", e.getMessage(), e);
+			log.error("Method closeConnection() throw TimeoutException -> {}", e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public boolean destroy() {
-		logger.info("Call method destroy() from AbstractRabbitMqTransport tag==[{}]", tag);
+		log.info("Call method destroy() from AbstractRabbitMqTransport tag==[{}]", tag);
 		closeConnection();
 		return true;
 	}

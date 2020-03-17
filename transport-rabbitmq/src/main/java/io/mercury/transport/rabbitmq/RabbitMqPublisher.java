@@ -86,14 +86,14 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 	private void declare() {
 		try {
 			if (publishExchange == ExchangeAndBinding.Anonymous)
-				logger.warn(
+				log.warn(
 						"Publisher-> {} use anonymous exchange, Please specify [queue name] as the [routing key] when publish",
 						tag);
 			else
 				this.publishExchange.declare(RabbitMqDeclarant.withChannel(channel));
 		} catch (AmqpDeclareException e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
-			logger.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
+			log.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
@@ -112,7 +112,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		int retry = 0;
 		// 调用isConnected()检查channel和connection是否打开, 如果没有打开, 先销毁连接, 再重新创建连接.
 		while (!isConnected()) {
-			logger.error("Detect connection isConnected() == false, retry {}", (++retry));
+			log.error("Detect connection isConnected() == false, retry {}", (++retry));
 			destroy();
 			ThreadUtil.sleep(rmqConnection.recoveryInterval());
 			createConnection();
@@ -121,18 +121,18 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			try {
 				confirmPublish(target, msg);
 			} catch (IOException e) {
-				logger.error("Method publish isConfirm==[true] throw IOException -> {}, msg==[{}]", e.getMessage(),
+				log.error("Method publish isConfirm==[true] throw IOException -> {}, msg==[{}]", e.getMessage(),
 						bytesToStr(msg), e);
 				destroy();
 			} catch (NoConfirmException e) {
-				logger.error("Method publish isConfirm==[true] throw NoConfirmException -> {}, msg==[{}]",
+				log.error("Method publish isConfirm==[true] throw NoConfirmException -> {}, msg==[{}]",
 						e.getMessage(), bytesToStr(msg), e);
 			}
 		} else {
 			try {
 				basicPublish(target, msg);
 			} catch (IOException e) {
-				logger.error("Method publish isConfirm==[false] throw IOException -> {}, msg==[{}]", e.getMessage(),
+				log.error("Method publish isConfirm==[false] throw IOException -> {}, msg==[{}]", e.getMessage(),
 						bytesToStr(msg), e);
 				destroy();
 			}
@@ -149,21 +149,21 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			basicPublish(routingKey, msg);
 			if (channel.waitForConfirms(confirmTimeout))
 				return;
-			logger.error("Call method channel.waitForConfirms(confirmTimeout==[{}]) retry==[{}]", confirmTimeout,
+			log.error("Call method channel.waitForConfirms(confirmTimeout==[{}]) retry==[{}]", confirmTimeout,
 					retry);
 			if (++retry == confirmRetry)
 				throw new NoConfirmException(exchangeName, routingKey, retry, confirmTimeout);
 			confirmPublish0(routingKey, msg, retry);
 		} catch (IOException e) {
-			logger.error("Method channel.confirmSelect() throw IOException from publisherName -> {}, routingKey -> {}",
+			log.error("Method channel.confirmSelect() throw IOException from publisherName -> {}, routingKey -> {}",
 					publisherName, routingKey, e);
 			throw new IOException(e.getMessage());
 		} catch (InterruptedException e) {
-			logger.error(
+			log.error(
 					"Method channel.waitForConfirms() throw InterruptedException from publisherName -> {}, routingKey -> {}",
 					publisherName, routingKey, e);
 		} catch (TimeoutException e) {
-			logger.error(
+			log.error(
 					"Method channel.waitForConfirms() throw TimeoutException from publisherName -> {}, routingKey -> {}",
 					publisherName, routingKey, e);
 		}
@@ -181,7 +181,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 					// param4: msgBody
 					msg);
 		} catch (IOException e) {
-			logger.error(
+			log.error(
 					"Method channel.basicPublish(exchange==[{}], routingKey==[{}], properties==[{}], msg==[...]) throw IOException -> {}",
 					exchangeName, routingKey, msgProperties, e.getMessage(), e);
 			throw new IOException(e.getMessage());
@@ -190,7 +190,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 	@Override
 	public boolean destroy() {
-		logger.info("Call method destroy() from Publisher name==[{}]", publisherName);
+		log.info("Call method destroy() from Publisher name==[{}]", publisherName);
 		return super.destroy();
 	}
 

@@ -35,7 +35,7 @@ public class QueueAndBinding extends Relation {
 		try {
 			declarant.declareQueue(queue);
 		} catch (AmqpDeclareException e) {
-			logger.error("Declare Queue failure -> {}", queue);
+			log.error("Declare Queue failure -> {}", queue);
 			throw new RuntimeException(e);
 		}
 	}

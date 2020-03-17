@@ -34,7 +34,7 @@ public class RabbitMqBuffer<E> implements Queue<E>, Closeable {
 
 	private String name;
 
-	private Logger logger = CommonLoggerFactory.getLogger(getClass());
+	private Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	public static final <E> RabbitMqBuffer<E> newQueue(RmqConnection connection, String queueName,
 			Function<E, byte[]> serializer, Function<byte[], E> deserializer) throws AmqpDeclareException {
@@ -83,7 +83,7 @@ public class RabbitMqBuffer<E> implements Queue<E>, Closeable {
 			rabbitMqChannel.internalChannel().basicPublish("", queueName, null, msg);
 			return true;
 		} catch (IOException ioe) {
-			logger.error("enqueue basicPublish throw -> {}", ioe.getMessage(), ioe);
+			log.error("enqueue basicPublish throw -> {}", ioe.getMessage(), ioe);
 			return false;
 		}
 	}
@@ -109,7 +109,7 @@ public class RabbitMqBuffer<E> implements Queue<E>, Closeable {
 		if (body == null)
 			return false;
 		if (!function.apply(deserializer.apply(body))) {
-			logger.error("PollFunction failure, no ack");
+			log.error("PollFunction failure, no ack");
 			return false;
 		}
 		return basicAck(response.getEnvelope());
@@ -119,7 +119,7 @@ public class RabbitMqBuffer<E> implements Queue<E>, Closeable {
 		try {
 			return rabbitMqChannel.internalChannel().basicGet(queueName, false);
 		} catch (IOException ioe) {
-			logger.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
+			log.error("poll basicGet throw -> {}", ioe.getMessage(), ioe);
 			return null;
 		}
 	}
@@ -129,7 +129,7 @@ public class RabbitMqBuffer<E> implements Queue<E>, Closeable {
 			rabbitMqChannel.internalChannel().basicAck(envelope.getDeliveryTag(), false);
 			return true;
 		} catch (IOException ioe) {
-			logger.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
+			log.error("poll basicAck throw -> {}", ioe.getMessage(), ioe);
 			return false;
 		}
 	}

@@ -24,7 +24,7 @@ public class SocketReceiver implements Receiver {
 	private AtomicBoolean isReceiving = new AtomicBoolean(false);
 	private AtomicBoolean isRun = new AtomicBoolean(false);
 
-	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
+	protected Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	/**
 	 * @param configurator
@@ -101,7 +101,7 @@ public class SocketReceiver implements Receiver {
 					IOUtils.read(inputStream, bytes);
 					callback.accept(bytes);
 				} catch (IOException e) {
-					logger.error(e.getMessage(), e);
+					log.error(e.getMessage(), e);
 					try {
 						inputStream.close();
 					} catch (IOException e1) {

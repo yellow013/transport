@@ -41,7 +41,7 @@ public class NettyServer extends NettyTransport implements TransportServer {
 				}).option(ChannelOption.SO_BACKLOG, configurator.backlog())
 				.childOption(ChannelOption.SO_KEEPALIVE, configurator.keepAlive())
 				.childOption(ChannelOption.TCP_NODELAY, configurator.tcpNoDelay());
-		logger.info(tag + " : Init-ServerBootStrap.bind -> " + configurator.port());
+		log.info(tag + " : Init-ServerBootStrap.bind -> " + configurator.port());
 	}
 
 	@Override
@@ -52,14 +52,14 @@ public class NettyServer extends NettyTransport implements TransportServer {
 					// Wait close.
 					.channel().closeFuture().sync();
 		} catch (InterruptedException e) {
-			logger.error("NettyServer method startup() -> {}", e.getMessage(), e);
+			log.error("NettyServer method startup() -> {}", e.getMessage(), e);
 			destroy();
 		}
 	}
 
 	@Override
 	public boolean destroy() {
-		logger.info("NettyServer call method destroy().");
+		log.info("NettyServer call method destroy().");
 		workerGroup.shutdownGracefully();
 		bossGroup.shutdownGracefully();
 		return true;

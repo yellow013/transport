@@ -16,7 +16,7 @@ import okhttp3.ResponseBody;
 
 public class HttpRequester {
 
-	private static final Logger logger = CommonLoggerFactory.getLogger(HttpRequester.class);
+	private static final Logger log = CommonLoggerFactory.getLogger(HttpRequester.class);
 
 	private static final OkHttpClient Client = new OkHttpClient();
 
@@ -37,7 +37,7 @@ public class HttpRequester {
 				return "";
 			return body.string();
 		} catch (IOException e) {
-			logger.error("IOException -> {}", e.getMessage(), e);
+			log.error("IOException -> {}", e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -59,7 +59,7 @@ public class HttpRequester {
 				return "";
 			return rtnBody.string();
 		} catch (IOException e) {
-			logger.error("IOException -> {}", e.getMessage(), e);
+			log.error("IOException -> {}", e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
 	}

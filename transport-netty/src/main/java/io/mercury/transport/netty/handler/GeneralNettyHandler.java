@@ -12,7 +12,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public abstract class GeneralNettyHandler extends ChannelInboundHandlerAdapter {
 
-	protected Logger logger = CommonLoggerFactory.getLogger(getClass());
+	protected Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	protected int byteBufSize;
 
@@ -31,7 +31,7 @@ public abstract class GeneralNettyHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-		logger.error(cause.getMessage() , cause);
+		log.error(cause.getMessage() , cause);
 		ctx.close();
 	}
 

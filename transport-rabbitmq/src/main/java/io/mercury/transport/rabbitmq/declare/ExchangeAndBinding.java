@@ -47,7 +47,7 @@ public class ExchangeAndBinding extends Relation {
 		try {
 			declarant.declareExchange(exchange);
 		} catch (AmqpDeclareException e) {
-			logger.error("Declare Exchange failure -> {}", exchange);
+			log.error("Declare Exchange failure -> {}", exchange);
 			throw new RuntimeException(e);
 		}
 	}
