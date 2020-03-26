@@ -19,7 +19,7 @@ import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
-import io.mercury.transport.rabbitmq.exception.NoConfirmException;
+import io.mercury.transport.rabbitmq.exception.AmqpNoConfirmException;
 
 public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publisher<byte[]> {
 
@@ -124,7 +124,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 				log.error("Method publish isConfirm==[true] throw IOException -> {}, msg==[{}]", e.getMessage(),
 						bytesToStr(msg), e);
 				destroy();
-			} catch (NoConfirmException e) {
+			} catch (AmqpNoConfirmException e) {
 				log.error("Method publish isConfirm==[true] throw NoConfirmException -> {}, msg==[{}]",
 						e.getMessage(), bytesToStr(msg), e);
 			}
@@ -139,11 +139,11 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		}
 	}
 
-	private void confirmPublish(String routingKey, byte[] msg) throws IOException, NoConfirmException {
+	private void confirmPublish(String routingKey, byte[] msg) throws IOException, AmqpNoConfirmException {
 		confirmPublish0(routingKey, msg, 0);
 	}
 
-	private void confirmPublish0(String routingKey, byte[] msg, int retry) throws IOException, NoConfirmException {
+	private void confirmPublish0(String routingKey, byte[] msg, int retry) throws IOException, AmqpNoConfirmException {
 		try {
 			channel.confirmSelect();
 			basicPublish(routingKey, msg);
@@ -152,7 +152,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			log.error("Call method channel.waitForConfirms(confirmTimeout==[{}]) retry==[{}]", confirmTimeout,
 					retry);
 			if (++retry == confirmRetry)
-				throw new NoConfirmException(exchangeName, routingKey, retry, confirmTimeout);
+				throw new AmqpNoConfirmException(exchangeName, routingKey, retry, confirmTimeout);
 			confirmPublish0(routingKey, msg, retry);
 		} catch (IOException e) {
 			log.error("Method channel.confirmSelect() throw IOException from publisherName -> {}, routingKey -> {}",
