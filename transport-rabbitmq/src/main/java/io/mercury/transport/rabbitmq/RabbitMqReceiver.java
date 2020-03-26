@@ -16,12 +16,14 @@ import io.mercury.common.character.Charsets;
 import io.mercury.common.codec.DecodeException;
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Receiver;
+import io.mercury.transport.core.api.Subscriber;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
 import io.mercury.transport.rabbitmq.declare.QueueAndBinding;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
+import io.mercury.transport.rabbitmq.exception.AmqpMsgHandleException;
 
 /**
  * 
@@ -30,7 +32,7 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
  *         [已完成]改造升级, 使用共同的创建者建立Exchange, RoutingKey, Queue的绑定关系
  *
  */
-public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Receiver, Runnable {
+public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Subscriber, Receiver, Runnable {
 
 	// 接收消息使用的反序列化器
 	private Function<byte[], T> deserializer;
@@ -204,16 +206,16 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		this.queueName = receiveQueue.queueName();
 		if (errMsgExchange != null && errMsgQueue != null) {
 			errMsgExchange.bindingQueue(errMsgQueue.queue());
-			declareErrorMsgExchange(declarant);
+			declareErrMsgExchange(declarant);
 		} else if (errMsgExchange != null) {
-			declareErrorMsgExchange(declarant);
+			declareErrMsgExchange(declarant);
 		} else if (errMsgQueue != null) {
-			declareErrorMsgQueueName(declarant);
+			declareErrMsgQueueName(declarant);
 		}
 
 	}
 
-	private void declareErrorMsgExchange(RabbitMqDeclarant opChannel) {
+	private void declareErrMsgExchange(RabbitMqDeclarant opChannel) {
 		try {
 			this.errMsgExchange.declare(opChannel);
 		} catch (AmqpDeclareException e) {
@@ -228,12 +230,11 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 		this.hasErrMsgExchange = true;
 	}
 
-	private void declareErrorMsgQueueName(RabbitMqDeclarant operator) {
+	private void declareErrMsgQueueName(RabbitMqDeclarant operator) {
 		try {
 			this.errMsgQueue.declare(operator);
 		} catch (AmqpDeclareException e) {
-			log.error(
-					"ErrorMsgQueue declare throw exception -> connection configurator info : {}, error message : {}",
+			log.error("ErrorMsgQueue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
@@ -245,6 +246,11 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 
 	@Override
 	public void run() {
+		receive();
+	}
+
+	@Override
+	public void subscribe() {
 		receive();
 	}
 
@@ -323,8 +329,9 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Re
 			channel.basicReject(envelope.getDeliveryTag(), true);
 			log.error("Exception handling -> Reject Msg finished");
 			destroy();
-			throw new RuntimeException(
-					"The message could not handle, and could not delivered to the error dump address. "
+			log.error("RabbitMqReceiver: [{}] already closed", receiverName);
+			throw new AmqpMsgHandleException(
+					"The message could not handle, and could not delivered to the error dump address."
 							+ "\n The connection was closed.",
 					cause);
 		}

@@ -249,7 +249,7 @@ public final class RmqConnection implements TransportConfigurator {
 		/**
 		 * @param sslContext the sslContext to set
 		 */
-		public Builder sslContext(SSLContext sslContext) {
+		public Builder setSslContext(SSLContext sslContext) {
 			this.sslContext = sslContext;
 			return this;
 		}
@@ -257,7 +257,7 @@ public final class RmqConnection implements TransportConfigurator {
 		/**
 		 * @param connectionTimeout the connectionTimeout to set
 		 */
-		public Builder connectionTimeout(int connectionTimeout) {
+		public Builder setConnectionTimeout(int connectionTimeout) {
 			this.connectionTimeout = connectionTimeout;
 			return this;
 		}
@@ -265,7 +265,7 @@ public final class RmqConnection implements TransportConfigurator {
 		/**
 		 * @param automaticRecovery the automaticRecovery to set
 		 */
-		public Builder automaticRecovery(boolean automaticRecovery) {
+		public Builder setAutomaticRecovery(boolean automaticRecovery) {
 			this.automaticRecovery = automaticRecovery;
 			return this;
 		}
@@ -273,7 +273,7 @@ public final class RmqConnection implements TransportConfigurator {
 		/**
 		 * @param recoveryInterval the recoveryInterval to set
 		 */
-		public Builder recoveryInterval(long recoveryInterval) {
+		public Builder setRecoveryInterval(long recoveryInterval) {
 			this.recoveryInterval = recoveryInterval;
 			return this;
 		}
@@ -281,31 +281,31 @@ public final class RmqConnection implements TransportConfigurator {
 		/**
 		 * @param handshakeTimeout the handshakeTimeout to set
 		 */
-		public Builder handshakeTimeout(int handshakeTimeout) {
+		public Builder setHandshakeTimeout(int handshakeTimeout) {
 			this.handshakeTimeout = handshakeTimeout;
-			return this;
-		}
-
-		/**
-		 * @param shutdownTimeout the shutdownTimeout to set
-		 */
-		public Builder shutdownTimeout(int shutdownTimeout) {
-			this.shutdownTimeout = shutdownTimeout;
 			return this;
 		}
 
 		/**
 		 * @param requestedHeartbeat the requestedHeartbeat to set
 		 */
-		public Builder requestedHeartbeat(int requestedHeartbeat) {
+		public Builder setRequestedHeartbeat(int requestedHeartbeat) {
 			this.requestedHeartbeat = requestedHeartbeat;
+			return this;
+		}
+
+		/**
+		 * @param shutdownTimeout the shutdownTimeout to set
+		 */
+		public Builder setShutdownTimeout(int shutdownTimeout) {
+			this.shutdownTimeout = shutdownTimeout;
 			return this;
 		}
 
 		/**
 		 * @param shutdownEvent the shutdownEvent to set
 		 */
-		public Builder shutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
+		public Builder setShutdownEvent(ShutdownEvent<Exception> shutdownEvent) {
 			this.shutdownEvent = shutdownEvent;
 			return this;
 		}

@@ -18,7 +18,7 @@ public class RabbitMqPublisherTest {
 		RmqPublisherConfigurator publisherConfigurator = RmqPublisherConfigurator
 				.configuration(connectionConfigurator, ExchangeAndBinding.fanout("TEST_DIR")
 						.bindingQueue(Arrays.asList(Queue.named("TEST_D1")), Arrays.asList("K1", "K2")))
-				.defaultRoutingKey("K1").build();
+				.setDefaultRoutingKey("K1").build();
 
 		try (RabbitMqPublisher publisher = new RabbitMqPublisher("TEST_PUB", publisherConfigurator)) {
 			publisher.publish(new String("To_K1").getBytes());

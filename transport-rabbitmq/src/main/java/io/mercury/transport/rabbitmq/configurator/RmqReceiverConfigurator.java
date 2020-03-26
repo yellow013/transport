@@ -158,7 +158,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param errorMsgExchange the errorMsgExchange to set
 		 */
-		public Builder errMsgExchange(ExchangeAndBinding errMsgExchange) {
+		public Builder setErrMsgExchange(ExchangeAndBinding errMsgExchange) {
 			this.errMsgExchange = errMsgExchange;
 			return this;
 		}
@@ -167,7 +167,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		 * 
 		 * @param errorMsgRoutingKey
 		 */
-		public Builder errMsgRoutingKey(String errMsgRoutingKey) {
+		public Builder setErrMsgRoutingKey(String errMsgRoutingKey) {
 			this.errMsgRoutingKey = errMsgRoutingKey;
 			return this;
 		}
@@ -176,7 +176,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		 * 
 		 * @param errorMsgQueue
 		 */
-		public Builder errMsgQueue(QueueAndBinding errMsgQueue) {
+		public Builder setErrMsgQueue(QueueAndBinding errMsgQueue) {
 			this.errMsgQueue = errMsgQueue;
 			return this;
 		}
@@ -184,7 +184,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param isAutoAck the isAutoAck to set
 		 */
-		public Builder autoAck(boolean autoAck) {
+		public Builder setAutoAck(boolean autoAck) {
 			this.autoAck = autoAck;
 			return this;
 		}
@@ -192,7 +192,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param isMultipleAck the isMultipleAck to set
 		 */
-		public Builder multipleAck(boolean multipleAck) {
+		public Builder setMultipleAck(boolean multipleAck) {
 			this.multipleAck = multipleAck;
 			return this;
 		}
@@ -200,7 +200,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param maxAckTotal the maxAckTotal to set
 		 */
-		public Builder maxAckTotal(int maxAckTotal) {
+		public Builder setMaxAckTotal(int maxAckTotal) {
 			this.maxAckTotal = maxAckTotal;
 			return this;
 		}
@@ -208,7 +208,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param maxAckReconnection the maxAckReconnection to set
 		 */
-		public Builder maxAckReconnection(int maxAckReconnection) {
+		public Builder setMaxAckReconnection(int maxAckReconnection) {
 			this.maxAckReconnection = maxAckReconnection;
 			return this;
 		}
@@ -216,7 +216,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		/**
 		 * @param qos the qos to set
 		 */
-		public Builder qos(int qos) {
+		public Builder setQos(int qos) {
 			this.qos = qos;
 			return this;
 		}

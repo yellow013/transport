@@ -142,7 +142,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param defaultRoutingKey the defaultRoutingKey to set
 		 */
-		public Builder defaultRoutingKey(String defaultRoutingKey) {
+		public Builder setDefaultRoutingKey(String defaultRoutingKey) {
 			this.defaultRoutingKey = defaultRoutingKey;
 			return this;
 		}
@@ -150,7 +150,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param msgProperties the msgProperties to set
 		 */
-		public Builder msgProperties(BasicProperties msgProperties) {
+		public Builder setMsgProperties(BasicProperties msgProperties) {
 			this.msgProperties = msgProperties;
 			return this;
 		}
@@ -158,7 +158,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param isConfirm the isConfirm to set
 		 */
-		public Builder confirm(boolean confirm) {
+		public Builder setConfirm(boolean confirm) {
 			this.confirm = confirm;
 			return this;
 		}
@@ -166,7 +166,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param confirmTimeout the confirmTimeout to set
 		 */
-		public Builder confirmTimeout(long confirmTimeout) {
+		public Builder setConfirmTimeout(long confirmTimeout) {
 			this.confirmTimeout = confirmTimeout;
 			return this;
 		}
@@ -174,7 +174,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param confirmRetry the confirmRetry to set
 		 */
-		public Builder confirmRetry(int confirmRetry) {
+		public Builder setConfirmRetry(int confirmRetry) {
 			this.confirmRetry = confirmRetry;
 			return this;
 		}
