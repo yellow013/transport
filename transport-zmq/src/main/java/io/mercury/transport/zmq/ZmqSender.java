@@ -56,7 +56,7 @@ public class ZmqSender implements Sender<byte[]>, Closeable {
 
 	public static void main(String[] args) {
 
-		ZmqConfigurator configurator = ZmqConfigurator.builder().ioThreads(1).host("tcp://localhost:5551")
+		ZmqConfigurator configurator = ZmqConfigurator.builder().setIoThreads(1).setHost("tcp://localhost:5551")
 				.build();
 
 		try (ZmqSender sender = new ZmqSender(configurator)) {

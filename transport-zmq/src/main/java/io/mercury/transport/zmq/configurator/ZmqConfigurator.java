@@ -61,22 +61,22 @@ public class ZmqConfigurator implements TransportConfigurator {
 		private Builder() {
 		}
 
-		public Builder host(String host) {
+		public Builder setHost(String host) {
 			this.host = host;
 			return this;
 		}
 
-		public Builder port(int port) {
+		public Builder setPort(int port) {
 			this.port = port;
 			return this;
 		}
 
-		public Builder topic(String topic) {
+		public Builder setTopic(String topic) {
 			this.topic = topic;
 			return this;
 		}
 
-		public Builder ioThreads(int ioThreads) {
+		public Builder setIoThreads(int ioThreads) {
 			this.ioThreads = ioThreads;
 			return this;
 		}

@@ -64,8 +64,8 @@ public class ZmqPublisher implements Publisher<byte[]>, Closeable {
 //		JeroMqConfigurator configurator = JeroMqConfigurator.builder().setHost("tcp://*:5559").setIoThreads(1)
 //				.setTopic("").build();
 
-		ZmqConfigurator configurator = ZmqConfigurator.builder().host("tcp://127.0.0.1:13001").topic("command")
-				.ioThreads(2).build();
+		ZmqConfigurator configurator = ZmqConfigurator.builder().setHost("tcp://127.0.0.1:13001").setTopic("command")
+				.setIoThreads(2).build();
 
 		try (ZmqPublisher publisher = new ZmqPublisher(configurator)) {
 			Random random = new Random();

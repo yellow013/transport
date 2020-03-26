@@ -67,7 +67,7 @@ public class ZmqPipeline implements Receiver, Closeable {
 	public static void main(String[] args) {
 
 		try (ZmqPipeline receiver = new ZmqPipeline(
-				ZmqConfigurator.builder().ioThreads(10).host("tcp://*:5551").build(), (byte[] byteMsg) -> {
+				ZmqConfigurator.builder().setIoThreads(10).setHost("tcp://*:5551").build(), (byte[] byteMsg) -> {
 					System.out.println(new String(byteMsg));
 					return null;
 				})) {

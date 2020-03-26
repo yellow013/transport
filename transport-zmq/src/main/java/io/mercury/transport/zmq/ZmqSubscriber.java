@@ -72,8 +72,8 @@ public class ZmqSubscriber implements Subscriber, Closeable {
 		// JeroMqConfigurator configurator =
 		// JeroMqConfigurator.builder().setHost("tcp://127.0.0.1:10001").setIoThreads(2).setTopic("").build();
 
-		ZmqConfigurator configurator = ZmqConfigurator.builder().host("tcp://127.0.0.1:13001").topic("command")
-				.ioThreads(2).build();
+		ZmqConfigurator configurator = ZmqConfigurator.builder().setHost("tcp://127.0.0.1:13001").setTopic("command")
+				.setIoThreads(2).build();
 
 		try (ZmqSubscriber jeroMQSubscriber = new ZmqSubscriber(configurator,
 				(byte[] byteMsg) -> System.out.println(new String(byteMsg, Charsets.UTF8)))) {
