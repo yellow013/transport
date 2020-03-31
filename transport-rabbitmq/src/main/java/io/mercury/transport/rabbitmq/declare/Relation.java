@@ -7,9 +7,6 @@ import io.mercury.common.annotation.lang.ProtectedAbstractMethod;
 import io.mercury.common.collections.MutableLists;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.RabbitMqDeclarant;
-import io.mercury.transport.rabbitmq.declare.Binding;
-import io.mercury.transport.rabbitmq.declare.Exchange;
-import io.mercury.transport.rabbitmq.declare.Queue;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 abstract class Relation {
