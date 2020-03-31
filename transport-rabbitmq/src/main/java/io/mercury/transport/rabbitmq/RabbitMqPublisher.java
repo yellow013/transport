@@ -125,8 +125,8 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 						bytesToStr(msg), e);
 				destroy();
 			} catch (AmqpNoConfirmException e) {
-				log.error("Method publish isConfirm==[true] throw NoConfirmException -> {}, msg==[{}]",
-						e.getMessage(), bytesToStr(msg), e);
+				log.error("Method publish isConfirm==[true] throw NoConfirmException -> {}, msg==[{}]", e.getMessage(),
+						bytesToStr(msg), e);
 			}
 		} else {
 			try {
@@ -149,8 +149,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			basicPublish(routingKey, msg);
 			if (channel.waitForConfirms(confirmTimeout))
 				return;
-			log.error("Call method channel.waitForConfirms(confirmTimeout==[{}]) retry==[{}]", confirmTimeout,
-					retry);
+			log.error("Call method channel.waitForConfirms(confirmTimeout==[{}]) retry==[{}]", confirmTimeout, retry);
 			if (++retry == confirmRetry)
 				throw new AmqpNoConfirmException(exchangeName, routingKey, retry, confirmTimeout);
 			confirmPublish0(routingKey, msg, retry);
@@ -168,6 +167,8 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 					publisherName, routingKey, e);
 		}
 	}
+
+	// TODO add Publish Properties
 
 	private void basicPublish(String routingKey, byte[] msg) throws IOException {
 		try {
