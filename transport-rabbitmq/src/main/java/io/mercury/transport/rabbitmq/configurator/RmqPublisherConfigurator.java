@@ -87,7 +87,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	public BasicProperties defaultMsgProperties() {
 		return defaultMsgProperties;
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -167,6 +167,14 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		 */
 		public Builder setDefaultMsgProperties(BasicProperties defaultMsgProperties) {
 			this.defaultMsgProperties = defaultMsgProperties;
+			return this;
+		}
+
+		/**
+		 * @param msgPropertiesSupplier
+		 */
+		public Builder setMsgPropertiesSupplier(Supplier<BasicProperties> msgPropertiesSupplier) {
+			this.msgPropertiesSupplier = msgPropertiesSupplier;
 			return this;
 		}
 
