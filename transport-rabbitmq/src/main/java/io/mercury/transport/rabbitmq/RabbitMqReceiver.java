@@ -196,12 +196,12 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 		RabbitMqDeclarant declarant = RabbitMqDeclarant.withChannel(channel);
 		try {
 			this.receiveQueue.declare(declarant);
-		} catch (Exception e) {
+		} catch (AmqpDeclareException e) {
 			log.error("Queue declare throw exception -> connection configurator info : {}, error message : {}",
 					rmqConnection.fullInfo(), e.getMessage(), e);
 			// 在定义Queue和进行绑定时抛出任何异常都需要终止程序
 			destroy();
-			throw new RuntimeException(e);
+			throw new AmqpDeclareRuntimeException(e);
 		}
 		this.queueName = receiveQueue.queueName();
 		if (errMsgExchange != null && errMsgQueue != null) {
@@ -212,7 +212,6 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 		} else if (errMsgQueue != null) {
 			declareErrMsgQueueName(declarant);
 		}
-
 	}
 
 	private void declareErrMsgExchange(RabbitMqDeclarant opChannel) {
