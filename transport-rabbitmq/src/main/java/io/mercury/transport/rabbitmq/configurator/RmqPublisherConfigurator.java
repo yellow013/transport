@@ -1,5 +1,7 @@
 package io.mercury.transport.rabbitmq.configurator;
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nonnull;
 
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -22,7 +24,9 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	// 默认RoutingKey
 	private String defaultRoutingKey;
 	// 默认消息发布参数
-	private BasicProperties msgProperties;
+	private BasicProperties defaultMsgProperties;
+	// 消息参数提供者
+	private Supplier<BasicProperties> msgPropertiesSupplier;
 	// 是否进行发布确认
 	private boolean confirm;
 	// 发布确认超时时间
@@ -34,7 +38,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		super(builder.connection);
 		this.publishExchange = builder.publishExchange;
 		this.defaultRoutingKey = builder.defaultRoutingKey;
-		this.msgProperties = builder.msgProperties;
+		this.defaultMsgProperties = builder.defaultMsgProperties;
+		this.msgPropertiesSupplier = builder.msgPropertiesSupplier;
 		this.confirm = builder.confirm;
 		this.confirmTimeout = builder.confirmTimeout;
 		this.confirmRetry = builder.confirmRetry;
@@ -56,7 +61,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	 * @param exchangeRelation
 	 * @return
 	 */
-	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull ExchangeAndBinding publishExchange) {
+	public static Builder configuration(@Nonnull RmqConnection connection,
+			@Nonnull ExchangeAndBinding publishExchange) {
 		return new Builder(Assertor.nonNull(connection, "connection"),
 				Assertor.nonNull(publishExchange, "publishExchange"));
 	}
@@ -78,8 +84,16 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	/**
 	 * @return the msgProperties
 	 */
-	public BasicProperties msgProperties() {
-		return msgProperties;
+	public BasicProperties defaultMsgProperties() {
+		return defaultMsgProperties;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Supplier<BasicProperties> msgPropertiesSupplier() {
+		return msgPropertiesSupplier;
 	}
 
 	/**
@@ -120,7 +134,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		private ExchangeAndBinding publishExchange;
 
 		private String defaultRoutingKey = "";
-		private BasicProperties msgProperties = MessageProperties.PERSISTENT_BASIC;
+		private BasicProperties defaultMsgProperties = MessageProperties.PERSISTENT_BASIC;
+		private Supplier<BasicProperties> msgPropertiesSupplier = null;
 
 		private boolean confirm = false;
 		private long confirmTimeout = 5000;
@@ -150,8 +165,8 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		/**
 		 * @param msgProperties the msgProperties to set
 		 */
-		public Builder setMsgProperties(BasicProperties msgProperties) {
-			this.msgProperties = msgProperties;
+		public Builder setDefaultMsgProperties(BasicProperties defaultMsgProperties) {
+			this.defaultMsgProperties = defaultMsgProperties;
 			return this;
 		}
 
