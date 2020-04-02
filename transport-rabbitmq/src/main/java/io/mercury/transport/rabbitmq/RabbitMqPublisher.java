@@ -27,6 +27,8 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 	// 发布消息使用的[ExchangeDeclare]
 	private final ExchangeAndBinding publishExchange;
+	// 发布消息使用的[Exchange]
+	private final String exchangeName;
 
 	// 发布消息使用的默认[RoutingKey]
 	private final String defaultRoutingKey;
@@ -39,10 +41,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 	private final long confirmTimeout;
 	private final int confirmRetry;
 
-	// 发布消息使用的[Exchange]
-	private String exchangeName;
-
-	private String publisherName;
+	private final String publisherName;
 
 	private boolean hasPropertiesSupplier;
 
@@ -80,6 +79,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			Consumer<Long> noAckCallback) {
 		super(tag, "publisher", configurator.connection());
 		this.publishExchange = Assertor.nonNull(configurator.publishExchange(), "exchangeRelation");
+		this.exchangeName = publishExchange.exchangeName();
 		this.defaultRoutingKey = configurator.defaultRoutingKey();
 		this.defaultMsgProperties = configurator.defaultMsgProperties();
 		this.msgPropertiesSupplier = configurator.msgPropertiesSupplier();
@@ -89,9 +89,9 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		this.ackCallback = ackCallback;
 		this.noAckCallback = noAckCallback;
 		this.hasPropertiesSupplier = (msgPropertiesSupplier != null);
+		this.publisherName = "publisher::" + rmqConnection.fullInfo() + "$" + exchangeName;
 		createConnection();
 		declare();
-		this.publisherName = "publisher::" + rmqConnection.fullInfo() + "$" + exchangeName;
 	}
 
 	private void declare() throws AmqpDeclareRuntimeException {
@@ -109,7 +109,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
-		this.exchangeName = publishExchange.exchangeName();
+
 	}
 
 	@Override

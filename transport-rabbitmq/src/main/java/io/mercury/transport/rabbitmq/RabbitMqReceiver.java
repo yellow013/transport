@@ -176,9 +176,10 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 	private RabbitMqReceiver(String tag, @Nonnull RmqReceiverConfigurator configurator,
 			@Nonnull Function<byte[], T> deserializer, @Nonnull Consumer<T> consumer) {
 		super(tag, "receiver", configurator.connection());
+		this.receiveQueue = configurator.receiveQueue();
+		this.queueName = receiveQueue.queueName();
 		this.deserializer = deserializer;
 		this.consumer = consumer;
-		this.receiveQueue = configurator.receiveQueue();
 		this.errMsgExchange = configurator.errMsgExchange();
 		this.errMsgRoutingKey = configurator.errMsgRoutingKey();
 		this.errMsgQueue = configurator.errMsgQueue();
@@ -187,9 +188,9 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 		this.maxAckTotal = configurator.maxAckTotal();
 		this.maxAckReconnection = configurator.maxAckReconnection();
 		this.qos = configurator.qos();
+		this.receiverName = "receiver::" + rmqConnection.fullInfo() + "$" + queueName;
 		createConnection();
 		declare();
-		this.receiverName = "receiver::" + rmqConnection.fullInfo() + "$" + queueName;
 	}
 
 	private void declare() {
@@ -203,7 +204,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
-		this.queueName = receiveQueue.queueName();
+		
 		if (errMsgExchange != null && errMsgQueue != null) {
 			errMsgExchange.bindingQueue(errMsgQueue.queue());
 			declareErrMsgExchange(declarant);
@@ -266,13 +267,14 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 			if (!autoAck)
 				channel.basicQos(qos);
 			channel.basicConsume(
-					// param1: queue
+					// param1: the name of the queue
 					queueName,
-					// param2: autoAck
+					// param2: true if the server should consider messages acknowledged once
+					// delivered; false if the server should expect explicit acknowledgement
 					autoAck,
-					// param3: consumerTag
+					// param3: a client-generated consumer tag to establish context
 					tag,
-					// param4: consumeCallback
+					// param4: an interface to the consumer object
 					new DefaultConsumer(channel) {
 						@Override
 						public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties,
