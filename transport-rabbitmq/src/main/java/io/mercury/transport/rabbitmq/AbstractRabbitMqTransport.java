@@ -1,5 +1,6 @@
 package io.mercury.transport.rabbitmq;
 
+import static io.mercury.common.thread.ThreadUtil.sleep;
 import static io.mercury.common.util.StringUtil.isNullOrEmpty;
 
 import java.io.Closeable;
@@ -20,7 +21,6 @@ import com.rabbitmq.client.ShutdownSignalException;
 
 import io.mercury.common.functional.ShutdownEvent;
 import io.mercury.common.log.CommonLoggerFactory;
-import io.mercury.common.thread.ThreadUtil;
 import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
 import io.mercury.transport.core.TransportModule;
@@ -101,9 +101,9 @@ public abstract class AbstractRabbitMqTransport implements TransportModule, Clos
 	protected boolean closeAndReconnection() {
 		log.info("Call method closeAndReconnection()");
 		closeConnection();
-		ThreadUtil.sleep(rmqConnection.recoveryInterval() / 2);
+		sleep(rmqConnection.recoveryInterval() / 2);
 		createConnection();
-		ThreadUtil.sleep(rmqConnection.recoveryInterval() / 2);
+		sleep(rmqConnection.recoveryInterval() / 2);
 		return isConnected();
 	}
 
