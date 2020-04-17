@@ -235,7 +235,7 @@ public final class RmqConnection implements TransportConfigurator {
 
 		private Builder(String host, int port, String username, String password, String virtualHost) {
 			this.host = Assertor.nonNull(host, "host");
-			this.port = Assertor.withinRange(port, 1024, 65536, "port");
+			this.port = Assertor.withinRange(port, 4096, 65536, "port");
 			this.username = Assertor.nonNull(username, "username");
 			this.password = Assertor.nonNull(password, "password");
 			if (virtualHost != null && !virtualHost.equals(""))
