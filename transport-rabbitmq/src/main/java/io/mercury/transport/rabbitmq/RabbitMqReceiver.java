@@ -86,38 +86,6 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 
 	/**
 	 * 
-	 * @param callback
-	 * @return
-	 */
-	@Deprecated
-	public void setConsumer(Consumer<T> consumer) {
-		if (this.consumer == null)
-			this.consumer = consumer;
-	}
-
-	/**
-	 * 
-	 * @param configurator
-	 * @return
-	 */
-	@Deprecated
-	public static final RabbitMqReceiver<byte[]> create(@Nonnull RmqReceiverConfigurator configurator) {
-		return new RabbitMqReceiver<byte[]>(null, configurator, msg -> msg, null);
-	}
-
-	/**
-	 * 
-	 * @param tag
-	 * @param configurator
-	 * @return
-	 */
-	@Deprecated
-	public static final RabbitMqReceiver<byte[]> create(String tag, @Nonnull RmqReceiverConfigurator configurator) {
-		return new RabbitMqReceiver<byte[]>(null, configurator, msg -> msg, null);
-	}
-
-	/**
-	 * 
 	 * @param configurator
 	 * @param callback
 	 * @return
@@ -204,7 +172,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
-		
+
 		if (errMsgExchange != null && errMsgQueue != null) {
 			errMsgExchange.bindingQueue(errMsgQueue.queue());
 			declareErrMsgExchange(declarant);
