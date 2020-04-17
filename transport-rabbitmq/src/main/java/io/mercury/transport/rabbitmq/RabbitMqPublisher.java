@@ -15,7 +15,7 @@ import io.mercury.common.character.Charsets;
 import io.mercury.common.thread.ThreadUtil;
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Publisher;
-import io.mercury.transport.core.exception.FailPublishException;
+import io.mercury.transport.core.exception.PublishFailedException;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
@@ -113,16 +113,16 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 	}
 
 	@Override
-	public void publish(byte[] msg) throws FailPublishException {
+	public void publish(byte[] msg) throws PublishFailedException {
 		publish(defaultRoutingKey, msg, defaultMsgProperties);
 	}
 
 	@Override
-	public void publish(String target, byte[] msg) throws FailPublishException {
+	public void publish(String target, byte[] msg) throws PublishFailedException {
 		publish(target, msg, hasPropertiesSupplier ? msgPropertiesSupplier.get() : defaultMsgProperties);
 	}
 
-	public void publish(String target, byte[] msg, BasicProperties props) throws FailPublishException {
+	public void publish(String target, byte[] msg, BasicProperties props) throws PublishFailedException {
 		// 记录重试次数
 		int retry = 0;
 		// 调用isConnected()检查channel和connection是否打开, 如果没有打开, 先销毁连接, 再重新创建连接.
@@ -139,11 +139,11 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 				log.error("Method publish isConfirm==[true] throw IOException -> {}, msg==[{}]", e.getMessage(),
 						bytesToStr(msg), e);
 				destroy();
-				throw new FailPublishException(e);
+				throw new PublishFailedException(e);
 			} catch (AmqpNoConfirmException e) {
 				log.error("Method publish isConfirm==[true] throw NoConfirmException -> {}, msg==[{}]", e.getMessage(),
 						bytesToStr(msg), e);
-				throw new FailPublishException(e);
+				throw new PublishFailedException(e);
 			}
 		} else {
 			try {
@@ -152,7 +152,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 				log.error("Method publish isConfirm==[false] throw IOException -> {}, msg==[{}]", e.getMessage(),
 						bytesToStr(msg), e);
 				destroy();
-				throw new FailPublishException(e);
+				throw new PublishFailedException(e);
 			}
 		}
 	}
