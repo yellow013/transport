@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 
 import io.mercury.codec.json.JsonUtil;
-import io.mercury.common.annotation.lang.MayThrowsRuntimeException;
+import io.mercury.common.annotation.lang.ThrowsRuntimeException;
 import io.mercury.common.log.CommonLoggerFactory;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -18,15 +18,15 @@ public class HttpRequester {
 
 	private static final Logger log = CommonLoggerFactory.getLogger(HttpRequester.class);
 
-	private static final OkHttpClient Client = new OkHttpClient();
+	private static final OkHttpClient CLIENT = new OkHttpClient();
 
 	private HttpRequester() {
 	}
 
-	@MayThrowsRuntimeException
+	@ThrowsRuntimeException
 	public static String sentGet(String url) {
 		Request request = new Request.Builder().url(url).build();
-		try (Response response = Client.newCall(request).execute()) {
+		try (Response response = CLIENT.newCall(request).execute()) {
 			if (response == null)
 				throw new RuntimeException("RuntimeException -> Request Url: [" + url + "]");
 			if (response.code() > 307)
@@ -44,20 +44,20 @@ public class HttpRequester {
 
 	private static final MediaType APPLICATION_JSON = MediaType.get("application/json; charset=utf-8");
 
-	@MayThrowsRuntimeException
+	@ThrowsRuntimeException
 	public static String sentPost(String url, Object obj) throws IOException {
 		RequestBody body = RequestBody.create(JsonUtil.toJson(obj), APPLICATION_JSON);
 		Request request = new Request.Builder().url(url).post(body).build();
-		try (Response response = Client.newCall(request).execute()) {
+		try (Response response = CLIENT.newCall(request).execute()) {
 			if (response == null)
 				throw new RuntimeException("RuntimeException -> Request Url: [" + url + "]");
 			if (response.code() > 307)
 				throw new RuntimeException(
 						"RuntimeException -> Request Url: [" + url + "] return status code: " + response.code());
-			ResponseBody rtnBody = response.body();
-			if (rtnBody == null)
+			ResponseBody rspBody = response.body();
+			if (rspBody == null)
 				return "";
-			return rtnBody.string();
+			return rspBody.string();
 		} catch (IOException e) {
 			log.error("IOException -> {}", e.getMessage(), e);
 			throw new RuntimeException(e);
