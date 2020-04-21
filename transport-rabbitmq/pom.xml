@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.mercury</groupId>
-			<artifactId>codec-json</artifactId>
+			<artifactId>serialization-json</artifactId>
 		</dependency>
 		<!-- rabbitmq amqp-client -->
 		<dependency>

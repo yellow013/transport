@@ -11,11 +11,11 @@ import org.slf4j.Logger;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.GetResponse;
 
-import io.mercury.codec.json.JsonUtil;
 import io.mercury.common.character.Charsets;
 import io.mercury.common.collections.MutableLists;
 import io.mercury.common.collections.queue.api.Queue;
 import io.mercury.common.log.CommonLoggerFactory;
+import io.mercury.serialization.json.JsonUtil;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.declare.Exchange;
 import io.mercury.transport.rabbitmq.declare.QueueAndBinding;

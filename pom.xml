@@ -25,6 +25,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
+		<io.mercury.commons.version>1.0-SNAPSHOT</io.mercury.commons.version>
 	</properties>
 
 	<build>
@@ -34,6 +35,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
+					<compilerArgument>-parameters</compilerArgument>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
@@ -68,27 +70,27 @@
 			<dependency>
 				<groupId>io.mercury</groupId>
 				<artifactId>commons-core</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>${io.mercury.commons.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.mercury</groupId>
 				<artifactId>commons-concurrent</artifactId>
+				<version>${io.mercury.commons.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.mercury</groupId>
+				<artifactId>serialization-json</artifactId>
 				<version>1.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>io.mercury</groupId>
-				<artifactId>codec-json</artifactId>
-				<version>1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>io.mercury</groupId>
-				<artifactId>codec-avro</artifactId>
+				<artifactId>serialization-avro</artifactId>
 				<version>1.0-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
-	
+
+
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
