@@ -14,19 +14,19 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
  * @author yellow013
  *
  */
-public class QueueAndBinding extends Relation {
+public final class QueueAndBinding extends Relation {
 
-	private Queue queue;
+	private AmqpQueue queue;
 
 	public static QueueAndBinding named(String queueName) {
-		return new QueueAndBinding(Queue.named(queueName));
+		return new QueueAndBinding(AmqpQueue.named(queueName));
 	}
 
-	public static QueueAndBinding with(Queue queue) {
+	public static QueueAndBinding withQueue(AmqpQueue queue) {
 		return new QueueAndBinding(queue);
 	}
 
-	private QueueAndBinding(Queue queue) {
+	private QueueAndBinding(AmqpQueue queue) {
 		this.queue = queue;
 	}
 
@@ -43,7 +43,7 @@ public class QueueAndBinding extends Relation {
 	/**
 	 * @return the queue
 	 */
-	public Queue queue() {
+	public AmqpQueue queue() {
 		return queue;
 	}
 
@@ -71,11 +71,11 @@ public class QueueAndBinding extends Relation {
 		return this;
 	}
 
-	public QueueAndBinding binding(Exchange... exchanges) {
+	public QueueAndBinding binding(AmqpExchange... exchanges) {
 		return binding(exchanges != null ? MutableLists.newFastList(exchanges) : null, null);
 	}
 
-	public QueueAndBinding binding(List<Exchange> exchanges, List<String> routingKeys) {
+	public QueueAndBinding binding(List<AmqpExchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (CollectionUtils.isNotEmpty(routingKeys))

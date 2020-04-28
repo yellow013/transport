@@ -22,7 +22,7 @@ abstract class Relation {
 	}
 
 	private void declareBinding(RabbitMqDeclarant declarant, Binding binding) throws AmqpDeclareException {
-		Exchange source = binding.source();
+		AmqpExchange source = binding.source();
 		try {
 			declarant.declareExchange(source);
 		} catch (AmqpDeclareException declareException) {
@@ -32,7 +32,7 @@ abstract class Relation {
 		String routingKey = binding.routingKey();
 		switch (binding.destType()) {
 		case Exchange:
-			Exchange destExchange = binding.destExchange();
+			AmqpExchange destExchange = binding.destExchange();
 			try {
 				declarant.declareExchange(destExchange);
 			} catch (AmqpDeclareException exception) {
@@ -48,7 +48,7 @@ abstract class Relation {
 			}
 			break;
 		case Queue:
-			Queue destQueue = binding.destQueue();
+			AmqpQueue destQueue = binding.destQueue();
 			try {
 				declarant.declareQueue(destQueue);
 			} catch (AmqpDeclareException exception) {

@@ -2,16 +2,16 @@ package io.mercury.transport.rabbitmq.declare;
 
 import io.mercury.common.util.Assertor;
 
-final class Binding {
+public final class Binding {
 
 	static enum DestType {
 		Exchange, Queue
 	}
 
-	private Exchange source;
-	private Exchange destExchange;
-	private Queue destQueue;
-	private String routingKey = "";
+	private AmqpExchange source;
+	private AmqpExchange destExchange;
+	private AmqpQueue destQueue;
+	private String routingKey;
 	private DestType destType;
 
 	/**
@@ -19,17 +19,8 @@ final class Binding {
 	 * @param source
 	 * @param destExchange
 	 */
-	Binding(Exchange source, Exchange destExchange) {
-		this(source, destExchange, null, null, DestType.Exchange);
-	}
-
-	/**
-	 * 
-	 * @param source
-	 * @param destQueue
-	 */
-	Binding(Exchange source, Queue destQueue) {
-		this(source, null, destQueue, null, DestType.Queue);
+	Binding(AmqpExchange source, AmqpExchange destExchange) {
+		this(source, destExchange, "");
 	}
 
 	/**
@@ -38,8 +29,20 @@ final class Binding {
 	 * @param destExchange
 	 * @param routingKey
 	 */
-	Binding(Exchange source, Exchange destExchange, String routingKey) {
-		this(source, destExchange, null, routingKey, DestType.Exchange);
+	Binding(AmqpExchange source, AmqpExchange destExchange, String routingKey) {
+		this.source = Assertor.nonNull(source, "source");
+		this.destExchange = Assertor.nonNull(destExchange, "destExchange");
+		this.routingKey = Assertor.nonNull(routingKey, "routingKey");
+		this.destType = DestType.Exchange;
+	}
+
+	/**
+	 * 
+	 * @param source
+	 * @param destQueue
+	 */
+	Binding(AmqpExchange source, AmqpQueue destQueue) {
+		this(source, destQueue, "");
 	}
 
 	/**
@@ -48,22 +51,17 @@ final class Binding {
 	 * @param destQueue
 	 * @param routingKey
 	 */
-	Binding(Exchange source, Queue destQueue, String routingKey) {
-		this(source, null, destQueue, routingKey, DestType.Queue);
-	}
-
-	Binding(Exchange source, Exchange destExchange, Queue destQueue, String routingKey, DestType destType) {
+	Binding(AmqpExchange source, AmqpQueue destQueue, String routingKey) {
 		this.source = Assertor.nonNull(source, "source");
-		this.destExchange = destExchange;
-		this.destQueue = destQueue;
-		this.routingKey = routingKey == null ? "" : routingKey;
-		this.destType = destType;
+		this.destQueue = Assertor.nonNull(destQueue, "destQueue");
+		this.routingKey = Assertor.nonNull(routingKey, "routingKey");
+		this.destType = DestType.Queue;
 	}
 
 	/**
 	 * @return the source
 	 */
-	Exchange source() {
+	AmqpExchange source() {
 		return source;
 	}
 
@@ -77,14 +75,14 @@ final class Binding {
 	/**
 	 * @return the destExchange
 	 */
-	Exchange destExchange() {
+	AmqpExchange destExchange() {
 		return destExchange;
 	}
 
 	/**
 	 * @return the destQueue
 	 */
-	Queue destQueue() {
+	AmqpQueue destQueue() {
 		return destQueue;
 	}
 
@@ -97,15 +95,15 @@ final class Binding {
 
 	public static void main(String[] args) {
 
-		Exchange exchange0 = Exchange.direct("ABC");
-		Exchange exchange1 = Exchange.direct("ABC");
+		AmqpExchange exchange0 = AmqpExchange.direct("ABC");
+		AmqpExchange exchange1 = AmqpExchange.direct("ABC");
 		System.out.println(exchange0);
 		System.out.println(exchange1);
 		System.out.println(exchange0 == exchange1);
 		System.out.println(exchange0.idempotent(exchange1));
 
-		System.out.println(Exchange.direct("ABC"));
-		System.out.println(Queue.named("ABC"));
+		System.out.println(AmqpExchange.direct("ABC"));
+		System.out.println(AmqpQueue.named("ABC"));
 
 	}
 

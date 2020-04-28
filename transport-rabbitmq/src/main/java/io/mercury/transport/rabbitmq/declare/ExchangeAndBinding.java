@@ -16,29 +16,29 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
  * @author yellow013
  *
  */
-public class ExchangeAndBinding extends Relation {
+public final class ExchangeAndBinding extends Relation {
 
-	public final static ExchangeAndBinding Anonymous = new ExchangeAndBinding(Exchange.Anonymous);
+	public final static ExchangeAndBinding Anonymous = new ExchangeAndBinding(AmqpExchange.Anonymous);
 
-	private Exchange exchange;
+	private AmqpExchange exchange;
 
 	public static ExchangeAndBinding fanout(@Nonnull String exchangeName) {
-		return new ExchangeAndBinding(Exchange.fanout(exchangeName));
+		return new ExchangeAndBinding(AmqpExchange.fanout(exchangeName));
 	}
 
 	public static ExchangeAndBinding direct(@Nonnull String exchangeName) {
-		return new ExchangeAndBinding(Exchange.direct(exchangeName));
+		return new ExchangeAndBinding(AmqpExchange.direct(exchangeName));
 	}
 
 	public static ExchangeAndBinding topic(@Nonnull String exchangeName) {
-		return new ExchangeAndBinding(Exchange.topic(exchangeName));
+		return new ExchangeAndBinding(AmqpExchange.topic(exchangeName));
 	}
 
-	public static ExchangeAndBinding withExchange(@Nonnull Exchange exchange) {
+	public static ExchangeAndBinding withExchange(@Nonnull AmqpExchange exchange) {
 		return new ExchangeAndBinding(exchange);
 	}
 
-	private ExchangeAndBinding(Exchange exchange) {
+	private ExchangeAndBinding(AmqpExchange exchange) {
 		this.exchange = exchange;
 	}
 
@@ -55,7 +55,7 @@ public class ExchangeAndBinding extends Relation {
 	/**
 	 * @return the exchange
 	 */
-	public Exchange exchange() {
+	public AmqpExchange exchange() {
 		return exchange;
 	}
 
@@ -83,11 +83,11 @@ public class ExchangeAndBinding extends Relation {
 		return this;
 	}
 
-	public ExchangeAndBinding bindingExchange(Exchange... exchanges) {
+	public ExchangeAndBinding bindingExchange(AmqpExchange... exchanges) {
 		return bindingExchange(exchanges != null ? MutableLists.newFastList(exchanges) : null, null);
 	}
 
-	public ExchangeAndBinding bindingExchange(List<Exchange> exchanges, List<String> routingKeys) {
+	public ExchangeAndBinding bindingExchange(List<AmqpExchange> exchanges, List<String> routingKeys) {
 		if (exchanges != null) {
 			exchanges.forEach(exchange -> {
 				if (CollectionUtils.isNotEmpty(routingKeys))
@@ -99,12 +99,12 @@ public class ExchangeAndBinding extends Relation {
 		return this;
 	}
 
-	public ExchangeAndBinding bindingQueue(Queue... queues) {
+	public ExchangeAndBinding bindingQueue(AmqpQueue... queues) {
 		return bindingQueue(
 				queues != null ? MutableLists.newFastList(queues) : null, null);
 	}
 
-	public ExchangeAndBinding bindingQueue(List<Queue> queues, List<String> routingKeys) {
+	public ExchangeAndBinding bindingQueue(List<AmqpQueue> queues, List<String> routingKeys) {
 		if (queues != null) {
 			queues.forEach(queue -> {
 				if (CollectionUtils.isNotEmpty(routingKeys))

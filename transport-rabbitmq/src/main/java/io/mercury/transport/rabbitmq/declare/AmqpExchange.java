@@ -4,7 +4,7 @@ import static java.lang.String.valueOf;
 
 import io.mercury.common.util.Assertor;
 
-public final class Exchange {
+public final class AmqpExchange {
 
 	public static enum ExchangeType {
 		Direct, Fanout, Topic, Anonymous
@@ -21,24 +21,24 @@ public final class Exchange {
 	// 是否为内部Exchange
 	private boolean internal = false;
 
-	public static Exchange fanout(String name) {
-		return new Exchange(ExchangeType.Fanout, Assertor.nonEmpty(name, "name"));
+	public static AmqpExchange fanout(String name) {
+		return new AmqpExchange(ExchangeType.Fanout, Assertor.nonEmpty(name, "name"));
 	}
 
-	public static Exchange direct(String name) {
-		return new Exchange(ExchangeType.Direct, Assertor.nonEmpty(name, "name"));
+	public static AmqpExchange direct(String name) {
+		return new AmqpExchange(ExchangeType.Direct, Assertor.nonEmpty(name, "name"));
 	}
 
-	public static Exchange topic(String name) {
-		return new Exchange(ExchangeType.Topic, Assertor.nonEmpty(name, "name"));
+	public static AmqpExchange topic(String name) {
+		return new AmqpExchange(ExchangeType.Topic, Assertor.nonEmpty(name, "name"));
 	}
 
 	/**
 	 * The Anonymous Exchange
 	 */
-	public static final Exchange Anonymous = new Exchange(ExchangeType.Anonymous, "");
+	public static final AmqpExchange Anonymous = new AmqpExchange(ExchangeType.Anonymous, "");
 
-	private Exchange(ExchangeType type, String name) {
+	private AmqpExchange(ExchangeType type, String name) {
 		this.type = type;
 		this.name = name;
 	}
@@ -81,7 +81,7 @@ public final class Exchange {
 	/**
 	 * @param durable the durable to set
 	 */
-	public Exchange durable(boolean durable) {
+	public AmqpExchange durable(boolean durable) {
 		this.durable = durable;
 		return this;
 	}
@@ -89,7 +89,7 @@ public final class Exchange {
 	/**
 	 * @param autoDelete the autoDelete to set
 	 */
-	public Exchange autoDelete(boolean autoDelete) {
+	public AmqpExchange autoDelete(boolean autoDelete) {
 		this.autoDelete = autoDelete;
 		return this;
 	}
@@ -97,7 +97,7 @@ public final class Exchange {
 	/**
 	 * @param internal the internal to set
 	 */
-	public Exchange internal(boolean internal) {
+	public AmqpExchange internal(boolean internal) {
 		this.internal = internal;
 		return this;
 	}
@@ -110,7 +110,7 @@ public final class Exchange {
 				.replace("$autoDelete", valueOf(autoDelete)).replace("$internal", valueOf(internal));
 	}
 
-	public boolean idempotent(Exchange another) {
+	public boolean idempotent(AmqpExchange another) {
 		return name.equals(another.name) && type == another.type && durable == another.durable
 				&& autoDelete == another.autoDelete && internal == another.internal;
 	}

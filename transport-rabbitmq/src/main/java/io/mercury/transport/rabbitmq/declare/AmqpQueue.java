@@ -4,7 +4,7 @@ import static java.lang.String.valueOf;
 
 import io.mercury.common.util.Assertor;
 
-public final class Queue {
+public final class AmqpQueue {
 
 	private String name;
 	// 是否持久化
@@ -14,11 +14,11 @@ public final class Queue {
 	// channel关闭后自动删除队列
 	private boolean autoDelete = false;
 
-	public static Queue named(String name) {
-		return new Queue(Assertor.nonEmpty(name, "name"));
+	public static AmqpQueue named(String name) {
+		return new AmqpQueue(Assertor.nonEmpty(name, "name"));
 	}
 
-	private Queue(String name) {
+	private AmqpQueue(String name) {
 		this.name = name;
 	}
 
@@ -53,7 +53,7 @@ public final class Queue {
 	/**
 	 * @param durable the durable to set
 	 */
-	public Queue durable(boolean durable) {
+	public AmqpQueue durable(boolean durable) {
 		this.durable = durable;
 		return this;
 	}
@@ -61,7 +61,7 @@ public final class Queue {
 	/**
 	 * @param exclusive the exclusive to set
 	 */
-	public Queue exclusive(boolean exclusive) {
+	public AmqpQueue exclusive(boolean exclusive) {
 		this.exclusive = exclusive;
 		return this;
 	}
@@ -69,7 +69,7 @@ public final class Queue {
 	/**
 	 * @param autoDelete the autoDelete to set
 	 */
-	public Queue autoDelete(boolean autoDelete) {
+	public AmqpQueue autoDelete(boolean autoDelete) {
 		this.autoDelete = autoDelete;
 		return this;
 	}
