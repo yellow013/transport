@@ -17,7 +17,7 @@ import io.mercury.common.collections.queue.api.Queue;
 import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.serialization.json.JsonUtil;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
-import io.mercury.transport.rabbitmq.declare.Exchange;
+import io.mercury.transport.rabbitmq.declare.AmqpExchange;
 import io.mercury.transport.rabbitmq.declare.QueueAndBinding;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
@@ -63,12 +63,11 @@ public class RabbitMqBuffer<E> implements Queue<E>, Closeable {
 	}
 
 	private void declareQueue() throws AmqpDeclareException {
-		QueueAndBinding queueRelation = QueueAndBinding
-				.with(io.mercury.transport.rabbitmq.declare.Queue.named(queueName)).binding(
-						// 如果routingKeys为空集合, 则创建fanout交换器, 否则创建直接交换器
-						exchangeNames.stream().map(exchangeName -> routingKeys.isEmpty() ? Exchange.fanout(exchangeName)
-								: Exchange.direct(exchangeName)).collect(Collectors.toList()),
-						routingKeys);
+		QueueAndBinding queueRelation = QueueAndBinding.named(queueName).binding(
+				// 如果routingKeys为空集合, 则创建fanout交换器, 否则创建直接交换器
+				exchangeNames.stream().map(exchangeName -> routingKeys.isEmpty() ? AmqpExchange.fanout(exchangeName)
+						: AmqpExchange.direct(exchangeName)).collect(Collectors.toList()),
+				routingKeys);
 		queueRelation.declare(RabbitMqDeclarant.withChannel(rabbitMqChannel.internalChannel()));
 	}
 

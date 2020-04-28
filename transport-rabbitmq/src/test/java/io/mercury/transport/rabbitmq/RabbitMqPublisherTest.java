@@ -6,7 +6,7 @@ import java.util.Arrays;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
-import io.mercury.transport.rabbitmq.declare.Queue;
+import io.mercury.transport.rabbitmq.declare.AmqpQueue;
 
 public class RabbitMqPublisherTest {
 
@@ -17,7 +17,7 @@ public class RabbitMqPublisherTest {
 
 		RmqPublisherConfigurator publisherConfigurator = RmqPublisherConfigurator
 				.configuration(connectionConfigurator, ExchangeAndBinding.fanout("TEST_DIR")
-						.bindingQueue(Arrays.asList(Queue.named("TEST_D1")), Arrays.asList("K1", "K2")))
+						.bindingQueue(Arrays.asList(AmqpQueue.named("TEST_D1")), Arrays.asList("K1", "K2")))
 				.setDefaultRoutingKey("K1").build();
 
 		try (RabbitMqPublisher publisher = new RabbitMqPublisher("TEST_PUB", publisherConfigurator)) {

@@ -11,8 +11,8 @@ import com.rabbitmq.client.Channel;
 
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
-import io.mercury.transport.rabbitmq.declare.Exchange;
-import io.mercury.transport.rabbitmq.declare.Queue;
+import io.mercury.transport.rabbitmq.declare.AmqpExchange;
+import io.mercury.transport.rabbitmq.declare.AmqpQueue;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
 public final class RabbitMqDeclarant extends AbstractRabbitMqTransport {
@@ -96,7 +96,7 @@ public final class RabbitMqDeclarant extends AbstractRabbitMqTransport {
 	 * @return
 	 * @throws AmqpDeclareException
 	 */
-	public boolean declareQueue(@Nonnull Queue queue) throws AmqpDeclareException {
+	public boolean declareQueue(@Nonnull AmqpQueue queue) throws AmqpDeclareException {
 		Assertor.nonNull(queue, AmqpDeclareException.with(new NullPointerException("param queue is can't null.")));
 		return declareQueue(queue.name(), queue.durable(), queue.exclusive(), queue.autoDelete());
 	}
@@ -133,7 +133,7 @@ public final class RabbitMqDeclarant extends AbstractRabbitMqTransport {
 	 * @return
 	 * @throws ExchangeDeclareException
 	 */
-	public boolean declareExchange(@Nonnull Exchange exchange) throws AmqpDeclareException {
+	public boolean declareExchange(@Nonnull AmqpExchange exchange) throws AmqpDeclareException {
 		Assertor.nonNull(exchange,
 				AmqpDeclareException.with(new NullPointerException("param exchange is can't null.")));
 		switch (exchange.type()) {

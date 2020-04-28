@@ -7,7 +7,7 @@ import com.rabbitmq.client.Channel;
 
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 
-public class RabbitMqChannel extends AbstractRabbitMqTransport {
+public final class RabbitMqChannel extends AbstractRabbitMqTransport {
 
 	/**
 	 * Create GeneralChannel of host, port, username and password
