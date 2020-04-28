@@ -7,7 +7,7 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.MessageProperties;
 
 import io.mercury.common.util.StringUtil;
-import io.mercury.transport.rabbitmq.declare.Exchange.ExchangeType;
+import io.mercury.transport.rabbitmq.declare.AmqpExchange.ExchangeType;
 
 /**
  * 

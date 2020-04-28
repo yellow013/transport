@@ -9,8 +9,8 @@ import com.rabbitmq.client.MessageProperties;
 
 import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
+import io.mercury.transport.rabbitmq.declare.AmqpQueue;
 import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
-import io.mercury.transport.rabbitmq.declare.Queue;
 
 /**
  * 
@@ -51,6 +51,28 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	 * @param connection
 	 * @return
 	 */
+	public static Builder configuration(@Nonnull String host, int port, @Nonnull String username,
+			@Nonnull String password) {
+		return configuration(RmqConnection.configuration(host, port, username, password).build());
+	}
+
+	/**
+	 * Use Anonymous Exchange
+	 * 
+	 * @param connection
+	 * @return
+	 */
+	public static Builder configuration(@Nonnull String host, int port, @Nonnull String username,
+			@Nonnull String password, String virtualHost) {
+		return configuration(RmqConnection.configuration(host, port, username, password, virtualHost).build());
+	}
+
+	/**
+	 * Use Anonymous Exchange
+	 * 
+	 * @param connection
+	 * @return
+	 */
 	public static Builder configuration(@Nonnull RmqConnection connection) {
 		return configuration(connection, ExchangeAndBinding.Anonymous);
 	}
@@ -63,6 +85,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	 */
 	public static Builder configuration(@Nonnull RmqConnection connection,
 			@Nonnull ExchangeAndBinding publishExchange) {
+		
 		return new Builder(Assertor.nonNull(connection, "connection"),
 				Assertor.nonNull(publishExchange, "publishExchange"));
 	}
@@ -206,7 +229,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 	public static void main(String[] args) {
 		System.out.println(configuration(RmqConnection.configuration("localhost", 5672, "user0", "userpass").build(),
-				ExchangeAndBinding.direct("TEST").bindingQueue(Queue.named("TEST_0"))).build());
+				ExchangeAndBinding.direct("TEST").bindingQueue(AmqpQueue.named("TEST_0"))).build());
 	}
 
 }
