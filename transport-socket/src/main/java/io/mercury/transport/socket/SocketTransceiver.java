@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils;
 import io.mercury.common.collections.queue.api.SCQueue;
 import io.mercury.common.concurrent.disruptor.BufferSize;
 import io.mercury.common.concurrent.disruptor.SpscQueue;
-import io.mercury.common.thread.ThreadUtil;
+import io.mercury.common.thread.ThreadHelper;
 import io.mercury.transport.socket.configurator.SocketConfigurator;
 
 public class SocketTransceiver extends BaseTransceiver<String> {
@@ -89,14 +89,14 @@ public class SocketTransceiver extends BaseTransceiver<String> {
 	private synchronized void startReceiveThread() {
 		if (isReceiving.get())
 			return;
-		ThreadUtil.startNewThread(() -> {
+		ThreadHelper.startNewThread(() -> {
 			InputStream inputStream = null;
 			while (isRun.get()) {
 				try {
 					inputStream = socket.getInputStream();
 					int available = inputStream.available();
 					if (available == 0) {
-						ThreadUtil.sleep(configurator.receiveInterval());
+						ThreadHelper.sleep(configurator.receiveInterval());
 						continue;
 					}
 					byte[] bytes = new byte[available];
