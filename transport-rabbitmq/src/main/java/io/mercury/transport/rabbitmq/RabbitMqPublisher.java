@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
 import io.mercury.common.character.Charsets;
-import io.mercury.common.thread.ThreadUtil;
+import io.mercury.common.thread.ThreadHelper;
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Publisher;
 import io.mercury.transport.core.exception.PublishFailedException;
@@ -129,7 +129,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		while (!isConnected()) {
 			log.error("Detect connection isConnected() == false, retry {}", (++retry));
 			destroy();
-			ThreadUtil.sleep(rmqConnection.recoveryInterval());
+			ThreadHelper.sleep(rmqConnection.recoveryInterval());
 			createConnection();
 		}
 		if (confirm) {
@@ -233,10 +233,10 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 		try (RabbitMqPublisher publisher = new RabbitMqPublisher("",
 				RmqPublisherConfigurator.configuration(connectionConfigurator0, fanoutExchange).build())) {
-			ThreadUtil.startNewThread(() -> {
+			ThreadHelper.startNewThread(() -> {
 				int count = 0;
 				while (true) {
-					ThreadUtil.sleep(5000);
+					ThreadHelper.sleep(5000);
 					publisher.publish(String.valueOf(++count).getBytes(Charsets.UTF8));
 					System.out.println(count);
 				}
