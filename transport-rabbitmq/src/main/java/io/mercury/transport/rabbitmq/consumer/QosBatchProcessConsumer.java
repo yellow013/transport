@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.eclipse.collections.api.list.MutableList;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -22,6 +21,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import io.mercury.common.collections.MutableLists;
+import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.common.util.Assertor;
 
 /**
@@ -30,7 +30,7 @@ import io.mercury.common.util.Assertor;
  */
 public class QosBatchProcessConsumer<T> extends DefaultConsumer {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	private Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	private Channel channel;
 

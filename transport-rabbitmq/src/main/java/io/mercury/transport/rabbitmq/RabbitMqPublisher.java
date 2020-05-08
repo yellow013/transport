@@ -15,6 +15,7 @@ import io.mercury.common.character.Charsets;
 import io.mercury.common.thread.ThreadHelper;
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Publisher;
+import io.mercury.transport.core.api.Sender;
 import io.mercury.transport.core.exception.PublishFailedException;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
@@ -23,7 +24,7 @@ import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
 import io.mercury.transport.rabbitmq.exception.AmqpNoConfirmException;
 
-public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publisher<byte[]> {
+public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publisher<byte[]>, Sender<byte[]> {
 
 	// 发布消息使用的[ExchangeDeclare]
 	private final ExchangeAndBinding publishExchange;
@@ -110,6 +111,11 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 			throw new AmqpDeclareRuntimeException(e);
 		}
 
+	}
+
+	@Override
+	public void send(byte[] msg) throws PublishFailedException {
+		publish(msg);
 	}
 
 	@Override

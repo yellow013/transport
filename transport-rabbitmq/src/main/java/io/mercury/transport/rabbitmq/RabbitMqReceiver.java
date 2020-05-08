@@ -29,7 +29,7 @@ import io.mercury.transport.rabbitmq.exception.AmqpMsgHandleException;
  * 
  * @author yellow013<br>
  * 
- *         [已完成]改造升级, 使用共同的创建者建立Exchange, RoutingKey, Queue的绑定关系
+ *         [已完成]改造升级, 使用共同的构建者建立Exchange, RoutingKey, Queue的绑定关系
  *
  */
 public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Subscriber, Receiver, Runnable {
