@@ -2,8 +2,8 @@ package io.mercury.transport.netty;
 
 import org.slf4j.Logger;
 
-import io.mercury.common.datetime.SysSequence;
 import io.mercury.common.log.CommonLoggerFactory;
+import io.mercury.common.sequence.SysSequence;
 import io.mercury.transport.core.api.Sender;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
