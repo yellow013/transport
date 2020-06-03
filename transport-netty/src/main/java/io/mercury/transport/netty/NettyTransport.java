@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 
 import io.mercury.common.annotation.lang.ProtectedAbstractMethod;
 import io.mercury.common.log.CommonLoggerFactory;
+import io.mercury.common.util.Assertor;
 import io.mercury.transport.netty.configurator.NettyConfigurator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
@@ -16,22 +17,16 @@ public abstract class NettyTransport {
 	protected String tag;
 	protected NettyConfigurator configurator;
 
-	protected EventLoopGroup workerGroup;
+	protected final EventLoopGroup workerGroup;
 
-	protected Logger log = CommonLoggerFactory.getLogger(getClass());
+	protected final ChannelHandler[] channelHandlers;
 
-	protected ChannelHandler[] channelHandlers;
+	protected final Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	public NettyTransport(String tag, NettyConfigurator configurator, ChannelHandler... channelHandlers) {
-		if (configurator == null) {
-			throw new IllegalArgumentException("Param-configurator is null in NettyTransport constructor.");
-		}
-		if (channelHandlers == null) {
-			throw new IllegalArgumentException("Param-channelHandlers is null in NettyTransport constructor.");
-		}
 		this.tag = tag;
-		this.configurator = configurator;
-		this.channelHandlers = channelHandlers;
+		this.configurator = Assertor.nonNull(configurator, "configurator");
+		this.channelHandlers = Assertor.requiredLength(channelHandlers, 1, "channelHandlers");
 		this.workerGroup = new NioEventLoopGroup(availableProcessors() * 2 - availableProcessors() / 2);
 		init();
 	}
