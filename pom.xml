@@ -20,6 +20,7 @@
 		<module>transport-rabbitmq</module>
 		<module>transport-socket</module>
 		<module>transport-zmq</module>
+		<module>transport-netty-ex</module>
 	</modules>
 
 	<properties>

@@ -13,6 +13,12 @@ public class NettyClient extends NettyTransport implements TransportClient {
 
 	private Bootstrap bootstrap;
 
+	/**
+	 * 
+	 * @param tag
+	 * @param configurator
+	 * @param channelHandlers
+	 */
 	public NettyClient(String tag, NettyConfigurator configurator, ChannelHandler... channelHandlers) {
 		super(tag, configurator, channelHandlers);
 	}

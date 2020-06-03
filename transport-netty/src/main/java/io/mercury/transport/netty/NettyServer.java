@@ -20,16 +20,17 @@ public class NettyServer extends NettyTransport implements TransportServer {
 	private ServerBootstrap serverBootstrap;
 
 	/**
+	 * 
 	 * @param tag
 	 * @param configurator
-	 * @param lambdaInterface
-	 * @param mode
+	 * @param channelHandlers
 	 */
 	public NettyServer(String tag, NettyConfigurator configurator, ChannelHandler... channelHandlers) {
 		super(tag, configurator, channelHandlers);
 	}
 
-	public void init() {
+	@Override
+	protected void init() {
 		this.bossGroup = new NioEventLoopGroup();
 		this.serverBootstrap = new ServerBootstrap();
 		this.serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
