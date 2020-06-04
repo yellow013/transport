@@ -44,7 +44,8 @@ public final class RabbitMqDeclarant extends AbstractRabbitMqTransport {
 	 * @throws IOException
 	 * @throws TimeoutException
 	 */
-	public static RabbitMqDeclarant create(String host, int port, String username, String password, String virtualHost) {
+	public static RabbitMqDeclarant create(String host, int port, String username, String password,
+			String virtualHost) {
 		return create(RmqConnection.configuration(host, port, username, password, virtualHost).build());
 	}
 

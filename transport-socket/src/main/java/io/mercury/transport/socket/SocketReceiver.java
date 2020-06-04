@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import io.mercury.common.log.CommonLoggerFactory;
-import io.mercury.common.thread.ThreadHelper;
+import io.mercury.common.thread.ThreadTool;
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.socket.configurator.SocketConfigurator;
 
@@ -83,7 +83,7 @@ public class SocketReceiver implements Receiver {
 		if (isReceiving.get())
 			return;
 		isReceiving.set(true);
-		ThreadHelper.startNewThread(() -> {
+		ThreadTool.startNewThread(() -> {
 			InputStream inputStream = null;
 			try {
 				inputStream = socket.getInputStream();
@@ -94,7 +94,7 @@ public class SocketReceiver implements Receiver {
 				try {
 					int available = inputStream.available();
 					if (available == 0) {
-						ThreadHelper.sleep(configurator.receiveInterval());
+						ThreadTool.sleep(configurator.receiveInterval());
 						continue;
 					}
 					byte[] bytes = new byte[available];

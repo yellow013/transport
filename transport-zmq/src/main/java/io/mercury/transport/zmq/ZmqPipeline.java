@@ -8,7 +8,7 @@ import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-import io.mercury.common.thread.ThreadHelper;
+import io.mercury.common.thread.ThreadTool;
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.zmq.configurator.ZmqConfigurator;
 
@@ -53,7 +53,7 @@ public class ZmqPipeline implements Receiver, Closeable {
 	@Override
 	public boolean destroy() {
 		this.isRun = false;
-		ThreadHelper.sleep(50);
+		ThreadTool.sleep(50);
 		zSocket.close();
 		zCtx.close();
 		return zCtx.isClosed();
@@ -71,8 +71,8 @@ public class ZmqPipeline implements Receiver, Closeable {
 					System.out.println(new String(byteMsg));
 					return null;
 				})) {
-			ThreadHelper.sleep(15000);
-			ThreadHelper.startNewThread(() -> receiver.receive());
+			ThreadTool.sleep(15000);
+			ThreadTool.startNewThread(() -> receiver.receive());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

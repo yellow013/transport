@@ -19,6 +19,7 @@ public final class RmqConnection implements TransportConfigurator {
 	private int port;
 	private String username;
 	private String password;
+	
 	// 虚拟主机
 	private String virtualHost;
 	// SSL
