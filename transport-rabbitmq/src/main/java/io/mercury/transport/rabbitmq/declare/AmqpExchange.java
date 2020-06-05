@@ -6,10 +6,6 @@ import io.mercury.common.util.Assertor;
 
 public final class AmqpExchange {
 
-	public static enum ExchangeType {
-		Direct, Fanout, Topic, Anonymous
-	}
-
 	// ExchangeType
 	private ExchangeType type;
 	// name
@@ -38,6 +34,11 @@ public final class AmqpExchange {
 	 */
 	public static final AmqpExchange Anonymous = new AmqpExchange(ExchangeType.Anonymous, "");
 
+	/**
+	 * 
+	 * @param type
+	 * @param name
+	 */
 	private AmqpExchange(ExchangeType type, String name) {
 		this.type = type;
 		this.name = name;
@@ -102,7 +103,8 @@ public final class AmqpExchange {
 		return this;
 	}
 
-	private final static String Template = "Exchange([name==$name],[type==$type],[durable==$durable],[autoDelete==$autoDelete],[internal==$internal])";
+	private final static String Template = "Exchange([name==$name], [type==$type], [durable==$durable], "
+			+ "[autoDelete==$autoDelete], [internal==$internal])";
 
 	@Override
 	public String toString() {
@@ -113,6 +115,10 @@ public final class AmqpExchange {
 	public boolean idempotent(AmqpExchange another) {
 		return name.equals(another.name) && type == another.type && durable == another.durable
 				&& autoDelete == another.autoDelete && internal == another.internal;
+	}
+
+	public static enum ExchangeType {
+		Direct, Fanout, Topic, Anonymous
 	}
 
 }

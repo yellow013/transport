@@ -49,6 +49,12 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		this.qos = builder.qos;
 	}
 
+	/**
+	 * 
+	 * @param connection
+	 * @param receiveQueue
+	 * @return
+	 */
 	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull QueueAndBinding receiveQueue) {
 		return new Builder(Assertor.nonNull(connection, "connection"), Assertor.nonNull(receiveQueue, "receiveQueue"));
 	}
@@ -71,7 +77,6 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 	 * 
 	 * @return the errorMsgRoutingKey
 	 */
-
 	public String errMsgRoutingKey() {
 		return errMsgRoutingKey;
 	}
@@ -214,7 +219,7 @@ public final class RmqReceiverConfigurator extends RmqConfigurator {
 		}
 
 		/**
-		 * @param qos the qos to set
+		 * @param qos the QOS to set
 		 */
 		public Builder setQos(int qos) {
 			this.qos = qos;

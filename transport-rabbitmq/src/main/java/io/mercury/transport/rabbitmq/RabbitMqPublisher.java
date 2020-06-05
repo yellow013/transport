@@ -34,9 +34,11 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 	// 发布消息使用的默认[RoutingKey]
 	private final String defaultRoutingKey;
 	// 发布消息使用的默认[MessageProperties]
-	private final BasicProperties defaultMsgProperties;
-	//
-	private final Supplier<BasicProperties> msgPropertiesSupplier;
+	private final BasicProperties defaultMsgProps;
+	// [MessageProperties]的提供者
+	private final Supplier<BasicProperties> msgPropsSupplier;
+	// 是否有[MessageProperties]的提供者
+	private boolean hasPropsSupplier;
 
 	private final boolean confirm;
 	private final long confirmTimeout;
@@ -44,7 +46,6 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 	private final String publisherName;
 
-	private boolean hasPropertiesSupplier;
 
 	@SuppressWarnings("unused")
 	private Consumer<Long> ackCallback;
@@ -82,14 +83,14 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		this.publishExchange = Assertor.nonNull(configurator.publishExchange(), "exchangeRelation");
 		this.exchangeName = publishExchange.exchangeName();
 		this.defaultRoutingKey = configurator.defaultRoutingKey();
-		this.defaultMsgProperties = configurator.defaultMsgProperties();
-		this.msgPropertiesSupplier = configurator.msgPropertiesSupplier();
+		this.defaultMsgProps = configurator.defaultMsgProps();
+		this.msgPropsSupplier = configurator.msgPropsSupplier();
 		this.confirm = configurator.confirm();
 		this.confirmTimeout = configurator.confirmTimeout();
 		this.confirmRetry = configurator.confirmRetry();
 		this.ackCallback = ackCallback;
 		this.noAckCallback = noAckCallback;
-		this.hasPropertiesSupplier = (msgPropertiesSupplier != null);
+		this.hasPropsSupplier = msgPropsSupplier != null;
 		this.publisherName = "publisher::" + rmqConnection.fullInfo() + "$" + exchangeName;
 		createConnection();
 		declare();
@@ -99,14 +100,14 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		try {
 			if (publishExchange == ExchangeAndBinding.Anonymous)
 				log.warn(
-						"Publisher-> {} use anonymous exchange, Please specify [queue name] as the [routing key] when publish",
-						tag);
+						"Publisher -> {} use anonymous exchange, Please specify [queue name] "
+						+ "as the [routing key] when publish", tag);
 			else
 				this.publishExchange.declare(RabbitMqDeclarant.withChannel(channel));
 		} catch (AmqpDeclareException e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
-			log.error("Exchange declare throw exception -> connection configurator info : {}	, error message : {}",
-					rmqConnection.fullInfo(), e.getMessage(), e);
+			log.error("Exchange declare throw exception -> connection configurator info : {}, "
+					+ "error message : {}",	rmqConnection.fullInfo(), e.getMessage(), e);
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
@@ -120,18 +121,18 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 	@Override
 	public void publish(byte[] msg) throws PublishFailedException {
-		publish(defaultRoutingKey, msg, defaultMsgProperties);
+		publish(defaultRoutingKey, msg, defaultMsgProps);
 	}
 
 	@Override
 	public void publish(String target, byte[] msg) throws PublishFailedException {
-		publish(target, msg, hasPropertiesSupplier ? msgPropertiesSupplier.get() : defaultMsgProperties);
+		publish(target, msg, hasPropsSupplier ? msgPropsSupplier.get() : defaultMsgProps);
 	}
 
 	public void publish(String target, byte[] msg, BasicProperties props) throws PublishFailedException {
 		// 记录重试次数
 		int retry = 0;
-		// 调用isConnected()检查channel和connection是否打开, 如果没有打开, 先销毁连接, 再重新创建连接.
+		// 调用isConnected(), 检查channel和connection是否打开, 如果没有打开, 先销毁连接, 再重新创建连接.
 		while (!isConnected()) {
 			log.error("Detect connection isConnected() == false, retry {}", (++retry));
 			destroy();
@@ -185,13 +186,11 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 					publisherName, routingKey, e);
 			throw e;
 		} catch (InterruptedException e) {
-			log.error(
-					"Method channel.waitForConfirms() throw InterruptedException from publisherName -> {}, routingKey -> {}",
-					publisherName, routingKey, e);
+			log.error("Method channel.waitForConfirms() throw InterruptedException from publisherName -> {}, "
+					+ "routingKey -> {}", publisherName, routingKey, e);
 		} catch (TimeoutException e) {
-			log.error(
-					"Method channel.waitForConfirms() throw TimeoutException from publisherName -> {}, routingKey -> {}",
-					publisherName, routingKey, e);
+			log.error("Method channel.waitForConfirms() throw TimeoutException from publisherName -> {}, "
+					+ "routingKey -> {}", publisherName, routingKey, e);
 		}
 	}
 
@@ -207,11 +206,10 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 					// param4: the message body
 					msg);
 		} catch (IOException e) {
-			StringBuilder propsStringBuilder = new StringBuilder(220);
-			props.appendPropertyDebugStringTo(propsStringBuilder);
-			log.error(
-					"Method channel.basicPublish(exchange==[{}], routingKey==[{}], properties==[{}], msg==[...]) throw IOException -> {}",
-					exchangeName, routingKey, propsStringBuilder.toString(), e.getMessage(), e);
+			StringBuilder sb = new StringBuilder(240);
+			props.appendPropertyDebugStringTo(sb);
+			log.error("Method channel.basicPublish(exchange==[{}], routingKey==[{}], properties==[{}], msg==[...]) "
+					+ "throw IOException -> {}", exchangeName, routingKey, sb.toString(), e.getMessage(), e);
 			throw e;
 		}
 	}

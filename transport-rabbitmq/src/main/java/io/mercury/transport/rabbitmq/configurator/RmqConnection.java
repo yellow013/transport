@@ -19,7 +19,7 @@ public final class RmqConnection implements TransportConfigurator {
 	private int port;
 	private String username;
 	private String password;
-	
+
 	// 虚拟主机
 	private String virtualHost;
 	// SSL
@@ -56,10 +56,10 @@ public final class RmqConnection implements TransportConfigurator {
 		this.shutdownTimeout = builder.shutdownTimeout;
 		this.requestedHeartbeat = builder.requestedHeartbeat;
 		this.shutdownEvent = builder.shutdownEvent;
-		this.connectionInfo = newConnectionInfo();
+		this.connectionInfo = buildConnectionInfo();
 	}
 
-	private String newConnectionInfo() {
+	private String buildConnectionInfo() {
 		return username + "@" + host + ":" + port + (virtualHost.equals("/") ? virtualHost : "/" + virtualHost);
 	}
 
@@ -184,19 +184,19 @@ public final class RmqConnection implements TransportConfigurator {
 
 	public ConnectionFactory createConnectionFactory() {
 		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost(host());
-		factory.setPort(port());
-		factory.setUsername(username());
-		factory.setPassword(password());
-		factory.setVirtualHost(virtualHost());
-		factory.setAutomaticRecoveryEnabled(automaticRecovery());
-		factory.setNetworkRecoveryInterval(recoveryInterval());
-		factory.setHandshakeTimeout(handshakeTimeout());
-		factory.setConnectionTimeout(connectionTimeout());
-		factory.setShutdownTimeout(shutdownTimeout());
-		factory.setRequestedHeartbeat(requestedHeartbeat());
-		if (sslContext() != null)
-			factory.useSslProtocol(sslContext());
+		factory.setHost(host);
+		factory.setPort(port);
+		factory.setUsername(username);
+		factory.setPassword(password);
+		factory.setVirtualHost(virtualHost);
+		factory.setAutomaticRecoveryEnabled(automaticRecovery);
+		factory.setNetworkRecoveryInterval(recoveryInterval);
+		factory.setHandshakeTimeout(handshakeTimeout);
+		factory.setConnectionTimeout(connectionTimeout);
+		factory.setShutdownTimeout(shutdownTimeout);
+		factory.setRequestedHeartbeat(requestedHeartbeat);
+		if (sslContext != null)
+			factory.useSslProtocol(sslContext);
 		return factory;
 	}
 

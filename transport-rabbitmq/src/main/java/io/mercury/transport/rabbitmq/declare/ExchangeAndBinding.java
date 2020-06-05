@@ -100,8 +100,7 @@ public final class ExchangeAndBinding extends Relation {
 	}
 
 	public ExchangeAndBinding bindingQueue(AmqpQueue... queues) {
-		return bindingQueue(
-				queues != null ? MutableLists.newFastList(queues) : null, null);
+		return bindingQueue(queues != null ? MutableLists.newFastList(queues) : null, null);
 	}
 
 	public ExchangeAndBinding bindingQueue(List<AmqpQueue> queues, List<String> routingKeys) {

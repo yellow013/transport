@@ -172,7 +172,6 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
-
 		if (errMsgExchange != null && errMsgQueue != null) {
 			errMsgExchange.bindingQueue(errMsgQueue.queue());
 			declareErrMsgExchange(declarant);
@@ -222,6 +221,61 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 		receive();
 	}
 
+	/**
+	 * channel.basicConsume(queue, callback) <br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, callback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, deliverCallback, cancelCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, deliverCallback, shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, deliverCallback, cancelCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, deliverCallback,
+	 * shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, arguments, callback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, callback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, deliverCallback, cancelCallback,
+	 * shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, deliverCallback, cancelCallback,
+	 * shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, arguments, deliverCallback,
+	 * cancelCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, arguments, deliverCallback,
+	 * shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, deliverCallback,
+	 * cancelCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, deliverCallback,
+	 * shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, arguments, deliverCallback,
+	 * cancelCallback, shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, deliverCallback,
+	 * cancelCallback, shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, noLocal, exclusive,
+	 * arguments, callback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, noLocal, exclusive,
+	 * arguments, deliverCallback, cancelCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, noLocal, exclusive,
+	 * arguments, deliverCallback, shutdownSignalCallback)<br>
+	 * <br>
+	 * channel.basicConsume(queue, autoAck, consumerTag, noLocal, exclusive,
+	 * arguments, deliverCallback, cancelCallback, shutdownSignalCallback)<br>
+	 * 
+	 */
 	@Override
 	public void receive() {
 		Assertor.nonNull(deserializer, "deserializer");
@@ -250,7 +304,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 							try {
 								log.debug("Message handle start");
 								log.debug(
-										"Callback handleDelivery() consumerTag==[{}], deliveryTag==[{}] body.length==[{}]",
+										"Callback handleDelivery, consumerTag==[{}], deliveryTag==[{}] body.length==[{}]",
 										consumerTag, envelope.getDeliveryTag(), body.length);
 								T apply = null;
 								try {

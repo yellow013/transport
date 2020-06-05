@@ -9,18 +9,29 @@ import io.mercury.common.log.CommonLoggerFactory;
 import io.mercury.transport.rabbitmq.RabbitMqDeclarant;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 
-abstract class Relation {
+public abstract class Relation {
 
 	protected Logger log = CommonLoggerFactory.getLogger(getClass());
 
 	protected MutableList<Binding> bindings = MutableLists.newFastList();
 
+	/**
+	 * 
+	 * @param declarant
+	 * @throws AmqpDeclareException
+	 */
 	public void declare(RabbitMqDeclarant declarant) throws AmqpDeclareException {
 		declare0(declarant);
 		for (Binding binding : bindings)
 			declareBinding(declarant, binding);
 	}
 
+	/**
+	 * 
+	 * @param declarant
+	 * @param binding
+	 * @throws AmqpDeclareException
+	 */
 	private void declareBinding(RabbitMqDeclarant declarant, Binding binding) throws AmqpDeclareException {
 		AmqpExchange source = binding.source();
 		try {
@@ -36,14 +47,14 @@ abstract class Relation {
 			try {
 				declarant.declareExchange(destExchange);
 			} catch (AmqpDeclareException exception) {
-				log.error("Declare dest exchange failure -> {}", destExchange);
+				log.error("Declare dest exchange failure -> destExchange==[{}]", destExchange);
 				throw exception;
 			}
 			try {
 				declarant.bindExchange(destExchange.name(), source.name(), routingKey);
 			} catch (AmqpDeclareException exception) {
-				log.error("Declare bind exchange failure -> dest==[{}], source==[{}], routingKey==[{}]",
-						destExchange, source, routingKey);
+				log.error("Declare bind exchange failure -> destExchange==[{}], source==[{}], routingKey==[{}]",
+						destExchange, source, routingKey, exception);
 				throw exception;
 			}
 			break;
@@ -52,14 +63,14 @@ abstract class Relation {
 			try {
 				declarant.declareQueue(destQueue);
 			} catch (AmqpDeclareException exception) {
-				log.error("Declare dest queue failure -> {}", destQueue);
+				log.error("Declare dest queue failure -> destQueue==[{}]", destQueue, exception);
 				throw exception;
 			}
 			try {
 				declarant.bindQueue(destQueue.name(), source.name(), routingKey);
 			} catch (AmqpDeclareException exception) {
-				log.error("Declare bind queue failure -> dest==[{}], source==[{}], routingKey==[{}]", destQueue,
-						source, routingKey);
+				log.error("Declare bind queue failure -> destQueue==[{}], source==[{}], routingKey==[{}]", destQueue,
+						source, routingKey, exception);
 				throw exception;
 			}
 			break;
