@@ -22,6 +22,19 @@
 			<artifactId>serialization-json</artifactId>
 		</dependency>
 
+		<!-- Apache HttpComponents Client -->
+		<!-- <dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+			<version>5.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
+
 		<!-- okhttp 3 -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>

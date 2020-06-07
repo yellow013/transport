@@ -9,9 +9,10 @@
 	<groupId>io.mercury</groupId>
 	<artifactId>transport</artifactId>
 	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
 	<name>transport</name>
-	<packaging>pom</packaging>
+	<url>https://github.com/yellow013/transport.git</url>
 
 	<modules>
 		<module>transport-core</module>
