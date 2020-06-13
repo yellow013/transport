@@ -17,6 +17,7 @@ import io.mercury.common.codec.DecodeException;
 import io.mercury.common.util.Assertor;
 import io.mercury.transport.core.api.Receiver;
 import io.mercury.transport.core.api.Subscriber;
+import io.mercury.transport.core.exception.ReceiverStartException;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqReceiverConfigurator;
 import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
@@ -277,7 +278,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 	 * 
 	 */
 	@Override
-	public void receive() {
+	public void receive() throws ReceiverStartException {
 		Assertor.nonNull(deserializer, "deserializer");
 		Assertor.nonNull(consumer, "consumer");
 		try {
@@ -331,6 +332,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 					});
 		} catch (IOException e) {
 			log.error("Method basicConsume() IOException message -> {}", e.getMessage(), e);
+			throw new ReceiverStartException(e, e.getMessage());
 		}
 	}
 
