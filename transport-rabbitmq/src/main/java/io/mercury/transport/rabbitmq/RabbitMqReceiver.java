@@ -35,25 +35,25 @@ import io.mercury.transport.rabbitmq.exception.AmqpMsgHandleException;
 public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Subscriber, Receiver, Runnable {
 
 	// 接收消息使用的反序列化器
-	private Function<byte[], T> deserializer;
+	private final Function<byte[], T> deserializer;
 
 	// 接收消息时使用的回调函数
-	private volatile Consumer<T> consumer;
+	private final Consumer<T> consumer;
 
 	// 接受者QueueDeclare
-	private QueueAndBinding receiveQueue;
+	private final QueueAndBinding receiveQueue;
 
 	// 接受者QueueName
-	private String queueName;
+	private final String queueName;
 
 	// 消息无法处理时发送到的错误消息ExchangeDeclare
-	private ExchangeAndBinding errMsgExchange;
+	private final ExchangeAndBinding errMsgExchange;
 
 	// 消息无法处理时发送到的错误消息Exchange使用的RoutingKey
-	private String errMsgRoutingKey;
+	private final String errMsgRoutingKey;
 
 	// 消息无法处理时发送到的错误消息QueueDeclare
-	private QueueAndBinding errMsgQueue;
+	private final QueueAndBinding errMsgQueue;
 
 	// 消息无法处理时发送到的错误消息Exchange
 	private String errMsgExchangeName;
@@ -82,7 +82,7 @@ public class RabbitMqReceiver<T> extends AbstractRabbitMqTransport implements Su
 	// QOS预取
 	private int qos;
 
-	private String receiverName;
+	private final String receiverName;
 
 	/**
 	 * 
