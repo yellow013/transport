@@ -10,7 +10,7 @@ import com.rabbitmq.client.MessageProperties;
 import io.mercury.common.util.Assertor;
 import io.mercury.common.util.StringUtil;
 import io.mercury.transport.rabbitmq.declare.AmqpQueue;
-import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
+import io.mercury.transport.rabbitmq.declare.ExchangeRelation;
 
 /**
  * 
@@ -20,7 +20,7 @@ import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
 public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 	// 发布者ExchangeDeclare
-	private ExchangeAndBinding publishExchange;
+	private ExchangeRelation publishExchange;
 	// 默认RoutingKey
 	private String defaultRoutingKey;
 	// 默认消息发布参数
@@ -74,7 +74,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	 * @return
 	 */
 	public static Builder configuration(@Nonnull RmqConnection connection) {
-		return configuration(connection, ExchangeAndBinding.Anonymous);
+		return configuration(connection, ExchangeRelation.Anonymous);
 	}
 
 	/**
@@ -83,8 +83,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	 * @param exchangeRelation
 	 * @return
 	 */
-	public static Builder configuration(@Nonnull RmqConnection connection,
-			@Nonnull ExchangeAndBinding publishExchange) {
+	public static Builder configuration(@Nonnull RmqConnection connection, @Nonnull ExchangeRelation publishExchange) {
 		return new Builder(Assertor.nonNull(connection, "connection"),
 				Assertor.nonNull(publishExchange, "publishExchange"));
 	}
@@ -92,7 +91,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 	/**
 	 * @return the exchangeDeclare
 	 */
-	public ExchangeAndBinding publishExchange() {
+	public ExchangeRelation publishExchange() {
 		return publishExchange;
 	}
 
@@ -153,7 +152,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		// 连接配置
 		private RmqConnection connection;
 
-		private ExchangeAndBinding publishExchange;
+		private ExchangeRelation publishExchange;
 
 		private String defaultRoutingKey = "";
 		private BasicProperties defaultMsgProps = MessageProperties.PERSISTENT_BASIC;
@@ -163,15 +162,28 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 		private long confirmTimeout = 5000;
 		private int confirmRetry = 3;
 
+		/**
+		 * 
+		 * @param connection
+		 */
 		private Builder(RmqConnection connection) {
 			this.connection = connection;
 		}
 
-		private Builder(RmqConnection connection, ExchangeAndBinding publishExchange) {
+		/**
+		 * 
+		 * @param connection
+		 * @param publishExchange
+		 */
+		private Builder(RmqConnection connection, ExchangeRelation publishExchange) {
 			this.connection = connection;
 			this.publishExchange = publishExchange;
 		}
 
+		/**
+		 * 
+		 * @return
+		 */
 		public RmqPublisherConfigurator build() {
 			return new RmqPublisherConfigurator(this);
 		}
@@ -228,7 +240,7 @@ public final class RmqPublisherConfigurator extends RmqConfigurator {
 
 	public static void main(String[] args) {
 		System.out.println(configuration(RmqConnection.configuration("localhost", 5672, "user0", "userpass").build(),
-				ExchangeAndBinding.direct("TEST").bindingQueue(AmqpQueue.named("TEST_0"))).build());
+				ExchangeRelation.direct("TEST").bindingQueue(AmqpQueue.named("TEST_0"))).build());
 	}
 
 }

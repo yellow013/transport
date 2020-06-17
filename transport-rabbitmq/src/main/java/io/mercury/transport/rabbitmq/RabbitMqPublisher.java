@@ -19,7 +19,7 @@ import io.mercury.transport.core.api.Sender;
 import io.mercury.transport.core.exception.PublishFailedException;
 import io.mercury.transport.rabbitmq.configurator.RmqConnection;
 import io.mercury.transport.rabbitmq.configurator.RmqPublisherConfigurator;
-import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
+import io.mercury.transport.rabbitmq.declare.ExchangeRelation;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareException;
 import io.mercury.transport.rabbitmq.exception.AmqpDeclareRuntimeException;
 import io.mercury.transport.rabbitmq.exception.AmqpNoConfirmException;
@@ -27,7 +27,7 @@ import io.mercury.transport.rabbitmq.exception.AmqpNoConfirmException;
 public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publisher<byte[]>, Sender<byte[]> {
 
 	// 发布消息使用的[ExchangeDeclare]
-	private final ExchangeAndBinding publishExchange;
+	private final ExchangeRelation publishExchange;
 	// 发布消息使用的[Exchange]
 	private final String exchangeName;
 
@@ -45,7 +45,6 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 	private final int confirmRetry;
 
 	private final String publisherName;
-
 
 	@SuppressWarnings("unused")
 	private Consumer<Long> ackCallback;
@@ -98,16 +97,15 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 	private void declare() throws AmqpDeclareRuntimeException {
 		try {
-			if (publishExchange == ExchangeAndBinding.Anonymous)
-				log.warn(
-						"Publisher -> {} use anonymous exchange, Please specify [queue name] "
+			if (publishExchange == ExchangeRelation.Anonymous)
+				log.warn("Publisher -> {} use anonymous exchange, Please specify [queue name] "
 						+ "as the [routing key] when publish", tag);
 			else
 				this.publishExchange.declare(RabbitMqDeclarant.withChannel(channel));
 		} catch (AmqpDeclareException e) {
 			// 在定义Exchange和进行绑定时抛出任何异常都需要终止程序
-			log.error("Exchange declare throw exception -> connection configurator info : {}, "
-					+ "error message : {}",	rmqConnection.fullInfo(), e.getMessage(), e);
+			log.error("Exchange declare throw exception -> connection configurator info : {}, " + "error message : {}",
+					rmqConnection.fullInfo(), e.getMessage(), e);
 			destroy();
 			throw new AmqpDeclareRuntimeException(e);
 		}
@@ -164,6 +162,14 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 		}
 	}
 
+	/**
+	 * 
+	 * @param routingKey
+	 * @param msg
+	 * @param props
+	 * @throws IOException
+	 * @throws AmqpNoConfirmException
+	 */
 	private void confirmPublish(String routingKey, byte[] msg, BasicProperties props)
 			throws IOException, AmqpNoConfirmException {
 		confirmPublish0(routingKey, msg, props, 0);
@@ -233,7 +239,7 @@ public class RabbitMqPublisher extends AbstractRabbitMqTransport implements Publ
 
 		RmqConnection connectionConfigurator0 = RmqConnection.configuration("", 5672, "", "").build();
 
-		ExchangeAndBinding fanoutExchange = ExchangeAndBinding.fanout("");
+		ExchangeRelation fanoutExchange = ExchangeRelation.fanout("");
 
 		try (RabbitMqPublisher publisher = new RabbitMqPublisher("",
 				RmqPublisherConfigurator.configuration(connectionConfigurator0, fanoutExchange).build())) {

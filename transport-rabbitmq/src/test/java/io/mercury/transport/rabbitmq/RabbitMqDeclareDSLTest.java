@@ -2,14 +2,14 @@ package io.mercury.transport.rabbitmq;
 
 import org.junit.Test;
 
-import io.mercury.transport.rabbitmq.declare.ExchangeAndBinding;
+import io.mercury.transport.rabbitmq.declare.ExchangeRelation;
 
 public class RabbitMqDeclareDSLTest {
 
 	@Test
 	public void test() {
 		
-		ExchangeAndBinding.fanout("FAN_T1");
+		ExchangeRelation.fanout("FAN_T1");
 		
 	}
 
